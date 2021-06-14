@@ -12,62 +12,8 @@
     </div>
     <svg-icon :icon-class="fullscreen?'exit-fullscreen':'fullscreen'" @click="handleFullScreen" style="position: absolute;right: 2vw;top: 5vh;color: #23cefd;;z-inde: 999;cursor: pointer;width: 20px;height: 20px;"/>
     <div class="bottom-content f-width abs">
-      <div class="content-left abs f-height">
-        <div class="content-left-top f-width rel">
-          <img src="../../assets/img/condition.png" class="f-width f-height" alt="">
-          <div class="com-title-wrapper abs">
-            <img src="../../assets/img/title.png" class="f-width f-height" alt="">
-            <span class="com-title-content abs">区域时间选择</span>
-          </div>
-          <div class="f-width f-height abs" style="top: 35%;left: 3.5%;">
-            <el-select class="map-select" size="mini" v-model="mapForm.area">
-              <el-option v-for="item in areaList" :key="item.area_id"  :value="item.area_id" :label="item.area_name">
-                {{item.area_name}}
-              </el-option>
-            </el-select>
-          </div>
-          <div class="f-width f-height abs" style="top: 65%;left: 3.5%;">
-            <el-select class="map-select" size="mini" v-model="mapForm.time">
-              <el-option value="1" label="一周内">
-                一周内
-              </el-option>
-              <el-option value="2" label="两周内">
-                两周内
-              </el-option>
-              <el-option value="3" label="一月内">
-                一月内
-              </el-option>
-            </el-select>
-          </div>
-        </div>
-        <div class="content-left-mid f-width rel">
-          <img src="../../assets/img/areaevent.png" class="f-width f-height" alt="">
-          <div class="com-title-wrapper abs">
-            <img src="../../assets/img/title.png" class="f-width f-height" alt="">
-            <span class="com-title-content abs">区域事件统计</span>
-          </div>
-          <div class="event-num-wrapper f-width abs">
-            <span class="event-num-words">共计</span>
-            <span class="event-num-content">
-                {{alarmCount}}
-            </span>
-            <span class="event-num-words">次</span>
-          </div>
-          <div ref="chart1" class="abs chart1">
-          </div>
-        </div>
-        <div class="f-width rel" style="height: 27%;"> 
-          <img src="../../assets/img/result.png" class="f-width f-height" alt="">
-          <div class="com-title-wrapper abs">
-            <img src="../../assets/img/title.png" class="f-width f-height" alt="">
-            <span class="com-title-content abs">处理结果统计</span>
-          </div>
-          <div ref="chart3" class="abs chart1" style="height: 100%;width: 100%;bottom: 0px;left: 0;padding: 0 10px;">
-          </div>
-        </div>
-      </div>
-      <div class="content-mid f-height abs" style="width: 50%;left: 25%;"> 
-        <div class="f-width rel" style="height: 68.9%;margin-bottom: 1.5vh;">
+      <div class="content-mid f-height abs" style="width: 76.5%;"> 
+        <div class="f-width rel" style="height: 97.5%;margin-bottom: 1.5vh;">
           <!-- 线路信息窗口开始 -->
           <div class=“gs-info-window-line” 
           :style="{'position': 'absolute', 'width': '250px', 'height': '145px', 'background': 'rgba(8, 32, 51, 0.85)', 'z-index': '12', 'border-radius': '6px', 'color': 'rgb(35 206 253)', 'left': '10px', 'top': '10px','font-size': '14px'}"
@@ -110,42 +56,46 @@
               style="z-index: 100"
               :stroke-opacity="0.9" :stroke-weight="4" :editing="false" @click="test(field.zone)">
             </bm-polyline>    
-              
           </baidu-map>
-        </div>
-        <div class="f-width rel" style="height: 27%;">
-          <img src="../../assets/img/photo.png"  class="f-width f-height" alt="">
-          <div class="com-title-wrapper abs" style="width: 35%;">
-            <img src="../../assets/img/title.png" class="f-width f-height" alt="">
-            <span class="com-title-content abs">现场照片</span>
-          </div>
-          <div style="display: flex;left: 0;top: 0;z-index: 3;height: 70%;margin-top: 50px;padding: 0 20px;justify-content: space-between" class="abs f-width"> 
-            <div style="flex: 0 0 32.5%;border-radius: 5px;" class="rel">
-              <img src="../../assets/img/photo2.png" style="left: 0;top: 0;z-index:10" class="f-width f-height abs" alt="">
-              <img src="../../assets/img/p1.jpg" class="f-width f-height abs" style="left: 0;top: 0;padding: 5px;z-index: 9;" alt="">
-            </div>
-            <div style="flex: 0 0 32.5%;border-radius: 5px;" class="rel"> 
-              <img src="../../assets/img/photo2.png" style="left: 0;top: 0;z-index:10" class="f-width f-height abs" alt="">
-              <img src="../../assets/img/p2.jpg" class="f-width f-height abs" style="left: 0;top: 0;padding: 5px;z-index: 9;" alt="">
-            </div>
-            <div style="flex: 0 0 32.5%;border-radius: 5px;" class="rel">
-              <img src="../../assets/img/photo2.png" style="left: 0;top: 0;z-index:10" class="f-width f-height abs" alt="">
-              <img src="../../assets/img/p3.jpg" class="f-width f-height abs" style="left: 0;top: 0;padding: 5px;z-index: 9;" alt="">
-            </div>
-          </div>
         </div>
       </div>
       <div class="content-right f-height abs" style="width: 25%;right: 0;padding: 0 20px;">
-        <div class="f-width rel" style="height: 37.5%;margin-bottom: 1.5vh;">
-          <img src="../../assets/img/area.png" class="f-width f-height" alt="">
+        <div class="f-width rel" style="height: 17%;margin-bottom: 1.5vh;position:relative;">
+          <img src="../../assets/img/condition.png" class="f-width f-height" alt="">
+          <div class="switch-all">
+            <span style="color:#fff;font-size: 5px;">查看实时数据：</span>
+            <span class="switch">
+                <div class="switch-bg" :class="{on:realTime==1}">
+                    <div class="switch-btn" :class="{on:realTime==1}" @click="openSwitch" ></div>
+                </div>
+            </span>
+          </div>
           <div class="com-title-wrapper abs">
             <img src="../../assets/img/title.png" class="f-width f-height" alt="">
-            <span class="com-title-content abs">区域统计信息</span>
+            <span class="com-title-content abs">线路时间选择</span>
           </div>
-          <div ref="chart2" class="abs chart1" style="height: 100%;">
+          <div class="f-width f-height abs" style="top: 35%;left: 3.5%;">
+            <el-select class="map-select" size="mini" v-model="mapForm.line">
+              <el-option v-for="item in lineList" :key="item.field_id"  :value="item.field_id" :label="item.field_id">
+                {{item.field_id}}
+              </el-option>
+            </el-select>
+          </div>
+          <div class="f-width f-height abs" style="top: 65%;left: 3.5%;">
+            <el-select class="map-select" size="mini" v-model="mapForm.time">
+              <el-option value="1" label="一周内">
+                一周内
+              </el-option>
+              <el-option value="2" label="两周内">
+                两周内
+              </el-option>
+              <el-option value="3" label="一月内">
+                一月内
+              </el-option>
+            </el-select>
           </div>
         </div>
-        <div class="f-width rel" style="height: 57.8%;">
+        <div class="f-width rel" style="height: 80.5%;">
           <img src="../../assets/img/event.png" class="f-width f-height" alt="">
           <div class="com-title-wrapper abs">
             <img src="../../assets/img/title.png" class="f-width f-height" alt="">
@@ -175,6 +125,7 @@
             </el-table>
           </div>
         </div>
+        
       </div>
     </div>    
 
@@ -227,6 +178,8 @@ export default {
       currentZone: {},
       infoType: '',
       areaList: [],
+      lineList: [],
+      realTime:0,
       mapStyle: {
         features: ["road", "building", "water", "land"], //隐藏地图上的"poi",
         style: "midnight"
@@ -285,8 +238,8 @@ export default {
   created() {
     this.getInfo()
     this.getDeviceGps()
-    this.getCenter() // 获取地图坐标中线点
-    this.getAreaInfo() // 区域统计信息
+    //this.getCenter() // 获取地图坐标中线点
+    //this.getAreaInfo() // 区域统计信息
     this.getAreaList() // 获取地区列表
     this.getTableData() // 获取事件列表数据
     this.queryLineDetail() // 获取所有责任区的告警事件
@@ -442,11 +395,26 @@ export default {
       params.limit = 1000
       queryArea(params).then(res => {
         if (res.retcode == 200) {
-          this.areaList = res.result
+          /* this.areaList = res.result
           this.mapForm.area = this.areaList[0].area_id
           if (this.areaList && this.areaList.length > 0) {
             this.total = this.areaList.length
-          }
+          } */
+          res.result.some(item => {
+            if(item.area_id == '0001'){
+              this.center.lng = item.longitude
+              this.center.lat = item.latitude
+              let params = {}
+              params.area_id = item.area_id;
+              queryAreaGps(params).then(res => {
+                if (res.retcode === 200 && res.result && res.result.length > 0) {
+                  this.lineList = res.result[0].fields;
+                  this.mapForm.line = this.lineList[0].field_id;
+                  return true;
+                }
+              })
+            }
+          })
         }
       })
     },
@@ -781,6 +749,11 @@ export default {
       window.addEventListener("resize",()=>{
         this.chart3.resize();
       })
+    },
+
+    openSwitch(){
+      this.realTime = !this.realTime;
+      console.log(this.realTime)
     }
   }
 }
@@ -1036,4 +1009,46 @@ export default {
       top: 70px;
     }
 }
-</style>>
+.switch-all{
+  position: absolute;
+  right: 40px;
+  top: 10px;
+  z-index:100; 
+}
+.switch{
+    width: 2rem;
+    height: 1.1rem;
+    border-radius: 50px;
+    border: 1px solid #0671a8;
+    position: absolute;
+}
+.switch-btn{
+    width: 1.1rem;
+    height: 1.1rem;
+    border-radius: 50%;
+    border: 1px solid #021019;
+    position: absolute;
+    background-color: #00aeff;
+    top: -1px;
+    left: -1px;
+    transition:left .5s;
+    -moz-transition:left .5s; /* Firefox 4 */
+    -webkit-transition:left .5s; /* Safari and Chrome */
+    -o-transition:left .5s; /* Opera */
+}
+.switch-bg{
+    background-color: #104c74;
+    width: 1rem;
+    height: 1.1rem;
+    border-radius: 50px;
+    transition: width .5s;
+    -moz-transition: width .5s; /* Firefox 4 */
+    -webkit-transition:  width .5s; /* Safari and Chrome */
+}
+.switch-btn.on{
+    left: 1rem;
+}
+.switch-bg.on{
+    width: 2rem;
+}
+</style>
