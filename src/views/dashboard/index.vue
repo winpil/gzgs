@@ -42,16 +42,18 @@
           <img src="../../assets/img/map.png" class="f-width f-height abs" style="left: 0; top: 0;z-index: 2;" alt="">
           <baidu-map :mapStyle="mapStyle" :mapClick="false" :scroll-wheel-zoom="true" :center="center" :zoom="zoom" @ready="handler" class="bm-view">
             <!-- 自定义点 -->
-            <bm-marker :position="item" :dragging="false" v-for="(item, index) in polylinePath" :key="index" :icon="{url: index % 2 === 0 ? 'https://s1.ax1x.com/2020/08/03/aUiTte.gif' : 'https://s1.ax1x.com/2020/08/03/aUAul9.gif', size: {width: 35, height: 35}}" @click="handleShowDecInfo(item.id)"></bm-marker>
+            <bm-marker :position="item" :dragging="false" v-for="(item) in linePoint" :key="item.id" :icon="{url: item.icon, size: {width: 35, height: 35}}"></bm-marker>
+            <bm-marker :position="item" :dragging="false" v-for="(item) in alarmPoints" :key="item.id" :icon="{url: item.icon, size: {width: 35, height: 35}}"></bm-marker>
+             <!-- <bm-marker :position="item" :dragging="false" v-for="(item, index) in linePoint" :key="index" :icon="{url: item.icon, size: {width: 35, height: 35}}" @click="handleShowDecInfo(item.id)"></bm-marker>-->
             <!-- <bm-marker :position="item" :dragging="true" v-for="(item, index) in polylinePath" :key="index" :icon="{url: 'https://s1.ax1x.com/2020/08/03/aUAul9.gif', size: {width: 35, height: 35}}"></bm-marker> -->
             <!-- 折线控件 -->
-            <div v-for="(line, index) in lines" :key=" 'line' + '-' + line.zone_id + '-' + index">
-              <bm-polyline v-for="(item, index2) in line.fields" :key="line.zone_id + '--' + index2" :path="item.points" :stroke-color="item.lineColor"
-                @mouseover="lineIn(index + '--' + index2)"
-                @mouseout="lineOut(index + '--' + index2)"
+            <!--<div v-for="(line, index) in lines" :key=" 'line' + '-' + line.zone_id + '-' + index">-->
+              <bm-polyline v-for="(item, index2) in lines2" :key="item.field_id" :path="item.points" :stroke-color="item.lineColor"
+                @mouseover="lineIn(index2)"
+                @mouseout="lineOut(index2)"
                 :stroke-opacity="0.75" :stroke-weight="4" :editing="false" @click="test(line.zone_id)">
               </bm-polyline>    
-            </div>
+            <!--</div>-->
             <bm-polyline v-for="(field, index) in alarmlines" :key="'alarm' + index" :path="field.nodes" stroke-color="#ec2d2e"
               style="z-index: 100"
               :stroke-opacity="0.9" :stroke-weight="4" :editing="false" @click="test(field.zone)">
@@ -75,7 +77,7 @@
             <span class="com-title-content abs">线路时间选择</span>
           </div>
           <div class="f-width f-height abs" style="top: 35%;left: 3.5%;">
-            <el-select class="map-select" size="mini" v-model="mapForm.line">
+            <el-select class="map-select" size="mini" v-model="mapForm.line" @change="changeLine">
               <el-option v-for="item in lineList" :key="item.field_id"  :value="item.field_id" :label="item.field_id">
                 {{item.field_id}}
               </el-option>
@@ -101,7 +103,8 @@
             <img src="../../assets/img/title.png" class="f-width f-height" alt="">
             <span class="com-title-content abs">近期事件列表</span>
           </div>
-          <div class="abs f-width user_skills" style="top: 8%;height: 100%;">
+          <div class="abs f-width user_skills scrollbar" style="top: 8%;height: 100%;">
+            <el-scrollbar style="height:100%">
             <el-table
               :data="tableData"
               style="width: 94%;height:84%">
@@ -123,7 +126,9 @@
                 align="left">
               </el-table-column>
             </el-table>
+            </el-scrollbar>
           </div>
+          
         </div>
         
       </div>
@@ -167,6 +172,8 @@ export default {
       zoom: 8,
       polylinePath: [],
       lines: [],
+      lines2: [],
+      linePoint:[],
       alarmlines: [],
       lineColor: [],
       showWindow: false,
@@ -179,6 +186,9 @@ export default {
       infoType: '',
       areaList: [],
       lineList: [],
+      defaultAreaId : "0001",
+      alarmPoints : [],
+      currentLine : "全部",
       realTime:0,
       mapStyle: {
         features: ["road", "building", "water", "land"], //隐藏地图上的"poi",
@@ -236,7 +246,7 @@ export default {
     }
   },
   created() {
-    this.getInfo()
+    //this.getInfo()
     this.getDeviceGps()
     //this.getCenter() // 获取地图坐标中线点
     //this.getAreaInfo() // 区域统计信息
@@ -401,15 +411,54 @@ export default {
             this.total = this.areaList.length
           } */
           res.result.some(item => {
-            if(item.area_id == '0001'){
+            if(item.area_id == this.defaultAreaId){
               this.center.lng = item.longitude
               this.center.lat = item.latitude
               let params = {}
               params.area_id = item.area_id;
               queryAreaGps(params).then(res => {
                 if (res.retcode === 200 && res.result && res.result.length > 0) {
-                  this.lineList = res.result[0].fields;
+                  //this.lineList = res.result[0].fields;
+                  //下拉框内容
+                  this.lineList.push({"field_id":"全部"})
+                  res.result[0].fields.forEach(f => {
+                      this.lineList.push({"field_id":f.field_id})
+                  })
+                  //线路图
                   this.mapForm.line = this.lineList[0].field_id;
+                  this.lines2 = [];
+                  this.linePoint = [];
+                  res.result[0].fields.forEach(line => {
+                    let tempObj = {}
+                    tempObj.points = []
+                    line.nodes.forEach(node => {
+                      let nodeObj = {}
+                      nodeObj.lng = node.longitude
+                      nodeObj.lat = node.latitude
+                      nodeObj.order = node.order
+                      tempObj['points'].push(nodeObj)
+                    })
+                    tempObj.field_id = item.field_id
+                    tempObj.lineColor = NORMAL_COLOR
+                    this.lines2.push(tempObj)
+                    //获取起点和终点
+                    let startPoint = {};
+                    startPoint.lng = line.nodes[0].longitude
+                    startPoint.lat = line.nodes[0].latitude
+                    startPoint.filedId = line.field_id
+                    startPoint.type = "start"
+                    startPoint.id = line.field_id + "start"
+                    startPoint.icon = "https://z3.ax1x.com/2021/06/16/2X0WuQ.png"
+                    this.linePoint.push(startPoint);
+                    let endPoint = {};
+                    endPoint.lng = line.nodes[line.nodes.length-1].longitude
+                    endPoint.lat = line.nodes[line.nodes.length-1].latitude
+                    endPoint.filedId = line.field_id
+                    endPoint.type = "end"
+                    startPoint.id = line.field_id + "end"
+                    endPoint.icon = "https://z3.ax1x.com/2021/06/16/2X0o40.png"
+                    this.linePoint.push(endPoint);
+                  })
                   return true;
                 }
               })
@@ -455,6 +504,18 @@ export default {
       queryAlarm(params).then(res => {
         if (res.retcode === 200 && res.result && res.result.length > 0) {
           this.tableData = res.result
+          this.alarmPoints = [];
+          res.result.forEach(it => {
+            if(it.area_id == this.defaultAreaId){
+              let alarmPoint = {};
+              alarmPoint.lng = it.longitude
+              alarmPoint.lat = it.latitude
+              alarmPoint.id = it.alarm_id
+              alarmPoint.type = "alarm"
+              alarmPoint.icon = "https://z3.ax1x.com/2021/06/16/2XvFbD.png"
+              this.alarmPoints.push(alarmPoint);
+            }
+          })
         }
       })
     },
@@ -470,8 +531,6 @@ export default {
     getDeviceGps() {
       queryDeviceGps().then(res => {
         if (res.retcode === 200 && res.result && res.result.length > 0) {
-        console.log("-----------------console.log(res.result);---------------------");
-        console.log(res.result);
           this.polylinePath = res.result
           this.polylinePath.forEach(item => {
             item.lng = item.longitude
@@ -560,7 +619,49 @@ export default {
         }
       })
     },
-
+    changeLine(val){
+      console.log(val);
+      this.currentLine = val;
+      let params = {}
+      params.area_id = this.defaultAreaId;
+      queryAreaGps(params).then(res => {
+        if (res.retcode === 200 && res.result && res.result.length > 0) {
+          this.lines2 = [];
+          this.linePoint = [];
+          res.result[0].fields.forEach(line => {
+            if(line.field_id == val || val == "全部"){
+              let tempObj = {}
+              tempObj.points = []
+              line.nodes.forEach(node => {
+                let nodeObj = {}
+                nodeObj.lng = node.longitude
+                nodeObj.lat = node.latitude
+                nodeObj.order = node.order
+                tempObj['points'].push(nodeObj)
+              })
+              tempObj.field_id = line.field_id
+              tempObj.lineColor = NORMAL_COLOR
+              this.lines2.push(tempObj)
+              //获取起点和终点
+              let startPoint = {};
+              startPoint.lng = line.nodes[0].longitude
+              startPoint.lat = line.nodes[0].latitude
+              startPoint.id = line.field_id
+              startPoint.type = "start"
+              startPoint.icon = "https://z3.ax1x.com/2021/06/16/2X0WuQ.png"
+              this.linePoint.push(startPoint);
+              let endPoint = {};
+              endPoint.lng = line.nodes[line.nodes.length-1].longitude
+              endPoint.lat = line.nodes[line.nodes.length-1].latitude
+              endPoint.id = line.field_id
+              endPoint.type = "end"
+              endPoint.icon = "https://z3.ax1x.com/2021/06/16/2X0o40.png"
+              this.linePoint.push(endPoint);
+            }
+          })
+        }
+      })
+  },
     test(id) {
       // this.info.height = event.screenY
       // this.info.width = event.screenX
@@ -588,16 +689,19 @@ export default {
       this.center.lng = this.center.longitude
       this.center.lat = this.center.latitude
       this.zoom = 14
+      window.map = map;
       map.ControlAnchor = 'BMAP_ANCHOR_TOP_LEFT'
       map.enableAutoResize()
     },
     lineIn(str) {
-      let tempArr = str.split('--')
-      this.lines[tempArr[0]].fields[tempArr[1]].lineColor = '#e6a700'
+      //let tempArr = str.split('--')
+      //this.lines[tempArr[0]].fields[tempArr[1]].lineColor = '#e6a700'
+      this.lines2[str].lineColor = '#e6a700'
     },
     lineOut(str) {
-      let tempArr = str.split('--')
-      this.lines[tempArr[0]].fields[tempArr[1]].lineColor = '#23cefd'
+      //let tempArr = str.split('--')
+      //this.lines[tempArr[0]].fields[tempArr[1]].lineColor = '#23cefd'
+      this.lines2[str].lineColor = '#23cefd'
     },
     handleShowAreaInfo() {
       this.showArea = !this.showArea
@@ -1051,4 +1155,19 @@ export default {
 .switch-bg.on{
     width: 2rem;
 }
+/*滚动条样式*/
+.scrollbar {
+  white-space: nowrap;
+  el-scrollbar {
+    display: flex;
+    justify-content: space-around;
+    padding: 0 10px;
+  }
+  .el-scrollbar__wrap {
+    overflow: scroll;
+    width: 110%;
+    height: 100%;
+  }
+}
+
 </style>
