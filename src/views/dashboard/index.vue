@@ -77,14 +77,14 @@
             <span class="com-title-content abs">线路时间选择</span>
           </div>
           <div class="f-width f-height abs" style="top: 35%;left: 3.5%;">
-            <el-select class="map-select" size="mini" v-model="mapForm.line" @change="changeLine">
+            <el-select ref="selectLine" class="map-select" size="mini" v-model="mapForm.line" @change="changeLine" v-bind:disabled="realTime">
               <el-option v-for="item in lineList" :key="item.field_id"  :value="item.field_id" :label="item.field_id">
                 {{item.field_id}}
               </el-option>
             </el-select>
           </div>
           <div class="f-width f-height abs" style="top: 65%;left: 3.5%;">
-            <el-select class="map-select" size="mini" v-model="mapForm.time">
+            <el-select ref="selectTime" class="map-select" size="mini" v-model="mapForm.time"  @change="changeTime" v-bind:disabled="realTime">
               <el-option value="1" label="一周内">
                 一周内
               </el-option>
@@ -109,20 +109,14 @@
               :data="tableData"
               style="width: 94%;height:84%">
               <el-table-column
-                type="index"
-                label="序号"
-                align="center"
-                width="50">
-              </el-table-column>
-              <el-table-column
-                prop="begin_time"
+                prop="field_id"
                 align="center"
                 min-width="100"
-                label="发生时间">
+                label="线路名称">
               </el-table-column>
               <el-table-column
-                prop="position"
-                label="发生位置"
+                prop="alarm_level"
+                label="报警级别"
                 align="left">
               </el-table-column>
             </el-table>
@@ -154,7 +148,7 @@
 
 <script>
 import { queryArea } from '@/api/area/area.js'
-import { queryAlarm } from '@/api/alarm/alarm.js'
+import { queryAlarm,queryRealTimeAlarm } from '@/api/alarm/alarm.js'
 import { queryLineDetail } from '@/api/line/line.js'
 import echarts from 'echarts'
 import { queryAreaGps, queryDeviceGps, getAreaInfo, getMapCenter, getDeviceInfo, queryZoneInfo, getAlarmFields } from '@/api/dashboard/dashboard.js'
@@ -189,7 +183,10 @@ export default {
       defaultAreaId : "0001",
       alarmPoints : [],
       currentLine : "全部",
-      realTime:0,
+      currentDate : 1,
+      currentStartDate : this.defaultStartDate(),
+      currentEndDate : this.defaultEndDate(),
+      realTime:false,
       mapStyle: {
         features: ["road", "building", "water", "land"], //隐藏地图上的"poi",
         style: "midnight"
@@ -257,7 +254,14 @@ export default {
   },
   mounted() {
     setInterval(() => {
-      this.getAlarmFields()
+      if(this.currentLine){
+        this.getRealTableData();
+      }else{
+        this.getTableData();
+      }
+    }, 1000*60)
+    setInterval(() => {
+      //this.getAlarmFields()
     }, 5000)
     setInterval(() => {
       this.gettTime()
@@ -397,7 +401,29 @@ export default {
         }, 1 * 1000)
       })
     },
-
+    defaultEndDate() {
+      var tmp = Date.parse(new Date()).toString();
+      tmp = tmp.substr(0,10);
+      return tmp;
+    },
+    defaultStartDate() {
+      var tmp = Date.parse(new Date());
+      tmp = tmp - 1000 * 60 * 60 * 24 * 7;
+      tmp = tmp.toString().substr(0,10);
+      return tmp;
+    },
+    defaultStartDate2() {
+      var tmp = Date.parse(new Date());
+      tmp = tmp - 1000 * 60 * 60 * 24 * 14;
+      tmp = tmp.toString().substr(0,10);
+      return tmp;
+    },
+    defaultStartDate3() {
+      var tmp = Date.parse(new Date());
+      tmp = tmp - 1000 * 60 * 60 * 24 * 30;
+      tmp = tmp.toString().substr(0,10);
+      return tmp;
+    },
     // 获取地区数据
     getAreaList() {
       let params = {}
@@ -420,6 +446,7 @@ export default {
                 if (res.retcode === 200 && res.result && res.result.length > 0) {
                   //this.lineList = res.result[0].fields;
                   //下拉框内容
+                  this.lineList = [];
                   this.lineList.push({"field_id":"全部"})
                   res.result[0].fields.forEach(f => {
                       this.lineList.push({"field_id":f.field_id})
@@ -429,35 +456,7 @@ export default {
                   this.lines2 = [];
                   this.linePoint = [];
                   res.result[0].fields.forEach(line => {
-                    let tempObj = {}
-                    tempObj.points = []
-                    line.nodes.forEach(node => {
-                      let nodeObj = {}
-                      nodeObj.lng = node.longitude
-                      nodeObj.lat = node.latitude
-                      nodeObj.order = node.order
-                      tempObj['points'].push(nodeObj)
-                    })
-                    tempObj.field_id = item.field_id
-                    tempObj.lineColor = NORMAL_COLOR
-                    this.lines2.push(tempObj)
-                    //获取起点和终点
-                    let startPoint = {};
-                    startPoint.lng = line.nodes[0].longitude
-                    startPoint.lat = line.nodes[0].latitude
-                    startPoint.filedId = line.field_id
-                    startPoint.type = "start"
-                    startPoint.id = line.field_id + "start"
-                    startPoint.icon = "https://z3.ax1x.com/2021/06/16/2X0WuQ.png"
-                    this.linePoint.push(startPoint);
-                    let endPoint = {};
-                    endPoint.lng = line.nodes[line.nodes.length-1].longitude
-                    endPoint.lat = line.nodes[line.nodes.length-1].latitude
-                    endPoint.filedId = line.field_id
-                    endPoint.type = "end"
-                    startPoint.id = line.field_id + "end"
-                    endPoint.icon = "https://z3.ax1x.com/2021/06/16/2X0o40.png"
-                    this.linePoint.push(endPoint);
+                    this.buildMapLines(line);
                   })
                   return true;
                 }
@@ -467,7 +466,39 @@ export default {
         }
       })
     },
-
+    buildMapLines(line) {
+      if(this.currentLine == "全部" || this.realTime || line.field_id == this.currentLine){
+        let tempObj = {}
+        tempObj.points = []
+        line.nodes.forEach(node => {
+          let nodeObj = {}
+          nodeObj.lng = node.longitude
+          nodeObj.lat = node.latitude
+          nodeObj.order = node.order
+          tempObj['points'].push(nodeObj)
+        })
+        tempObj.field_id = line.field_id
+        tempObj.lineColor = NORMAL_COLOR
+        this.lines2.push(tempObj)
+        //获取起点和终点
+        let startPoint = {};
+        startPoint.lng = line.nodes[0].longitude
+        startPoint.lat = line.nodes[0].latitude
+        startPoint.filedId = line.field_id
+        startPoint.type = "start"
+        startPoint.id = line.field_id + "start"
+        startPoint.icon = "https://z3.ax1x.com/2021/06/16/2X0WuQ.png"
+        this.linePoint.push(startPoint);
+        let endPoint = {};
+        endPoint.lng = line.nodes[line.nodes.length-1].longitude
+        endPoint.lat = line.nodes[line.nodes.length-1].latitude
+        endPoint.filedId = line.field_id
+        endPoint.type = "end"
+        startPoint.id = line.field_id + "end"
+        endPoint.icon = "https://z3.ax1x.com/2021/06/16/2X0o40.png"
+        this.linePoint.push(endPoint);
+      }
+    },
     queryLineDetail() {
       let now = new Date()
       let nowStr = now.getFullYear() + '-' + (Number(now.getMonth()) + 1) + '-' + now.getDay() + ' ' + now.getHours() + ':' + now.getMinutes() + ':' + now.getSeconds()
@@ -498,28 +529,63 @@ export default {
     },
 
     getTableData() {
+      this.currentEndDate = this.defaultEndDate();
+      if(this.currentDate == 1){
+        this.currentStartDate = this.defaultStartDate();
+      }else if(this.currentDate == 2){
+        this.currentStartDate = this.defaultStartDate2();
+      }else if(this.currentDate == 3){
+        this.currentStartDate = this.defaultStartDate3();
+      }
       let params = {}
       params.page = 1
       params.limit = 1000
+      params.begin_time = this.currentStartDate;
+      params.end_time = this.currentEndDate;
+      params.area_id = this.defaultAreaId;
       queryAlarm(params).then(res => {
         if (res.retcode === 200 && res.result && res.result.length > 0) {
           this.tableData = res.result
           this.alarmPoints = [];
           res.result.forEach(it => {
-            if(it.area_id == this.defaultAreaId){
+            if(it.field_id == this.currentLine || this.currentLine == "全部"){
               let alarmPoint = {};
               alarmPoint.lng = it.longitude
               alarmPoint.lat = it.latitude
               alarmPoint.id = it.alarm_id
               alarmPoint.type = "alarm"
-              alarmPoint.icon = "https://z3.ax1x.com/2021/06/16/2XvFbD.png"
+              if(it.alarm_level == "严重告警"){
+                alarmPoint.icon = "https://z3.ax1x.com/2021/06/20/RFTa9g.png"
+              }else if(it.alarm_level == "中级警告"){
+                alarmPoint.icon = "https://z3.ax1x.com/2021/06/20/RFTwcj.png"
+              }else{
+                alarmPoint.icon = "https://z3.ax1x.com/2021/06/20/RFTd3Q.png";
+              }
               this.alarmPoints.push(alarmPoint);
             }
           })
         }
       })
     },
-
+    getRealTableData() {
+      let params = {}
+      queryRealTimeAlarm(params).then(res => {
+        if (res.retcode === 200 && res.result && res.result.length > 0) {
+          this.tableData = res.result
+          this.alarmPoints = [];
+          res.result.forEach(it => {
+            let alarmPoint = {};
+            alarmPoint.lng = it.longitude
+            alarmPoint.lat = it.latitude
+            alarmPoint.id = it.alarm_id
+            alarmPoint.type = "alarm"
+            alarmPoint.icon = "https://z3.ax1x.com/2021/06/20/RkmCdI.gif"
+            this.alarmPoints.push(alarmPoint);
+          })
+        }
+      })
+    },
+    
     getCenter() {
       getMapCenter().then(res => {
         if (res.retcode === 200 && res.result && res.result.length > 0) {
@@ -527,7 +593,7 @@ export default {
         }
       })
     },
-
+    
     getDeviceGps() {
       queryDeviceGps().then(res => {
         if (res.retcode === 200 && res.result && res.result.length > 0) {
@@ -629,39 +695,17 @@ export default {
           this.lines2 = [];
           this.linePoint = [];
           res.result[0].fields.forEach(line => {
-            if(line.field_id == val || val == "全部"){
-              let tempObj = {}
-              tempObj.points = []
-              line.nodes.forEach(node => {
-                let nodeObj = {}
-                nodeObj.lng = node.longitude
-                nodeObj.lat = node.latitude
-                nodeObj.order = node.order
-                tempObj['points'].push(nodeObj)
-              })
-              tempObj.field_id = line.field_id
-              tempObj.lineColor = NORMAL_COLOR
-              this.lines2.push(tempObj)
-              //获取起点和终点
-              let startPoint = {};
-              startPoint.lng = line.nodes[0].longitude
-              startPoint.lat = line.nodes[0].latitude
-              startPoint.id = line.field_id
-              startPoint.type = "start"
-              startPoint.icon = "https://z3.ax1x.com/2021/06/16/2X0WuQ.png"
-              this.linePoint.push(startPoint);
-              let endPoint = {};
-              endPoint.lng = line.nodes[line.nodes.length-1].longitude
-              endPoint.lat = line.nodes[line.nodes.length-1].latitude
-              endPoint.id = line.field_id
-              endPoint.type = "end"
-              endPoint.icon = "https://z3.ax1x.com/2021/06/16/2X0o40.png"
-              this.linePoint.push(endPoint);
-            }
+            this.buildMapLines(line);
           })
         }
       })
-  },
+      this.getTableData();
+    },
+    changeTime(val){
+      console.log(val);
+      this.currentDate = val;
+      this.getTableData();
+    },
     test(id) {
       // this.info.height = event.screenY
       // this.info.width = event.screenX
@@ -858,6 +902,13 @@ export default {
     openSwitch(){
       this.realTime = !this.realTime;
       console.log(this.realTime)
+      if(this.realTime){
+        this.getAreaList() // 获取地区列表
+        this.getRealTableData();
+      }else{
+        this.getAreaList() // 获取地区列表
+        this.getTableData() // 获取事件列表数据
+      } 
     }
   }
 }
@@ -1168,6 +1219,7 @@ export default {
     width: 110%;
     height: 100%;
   }
+
 }
 
 </style>

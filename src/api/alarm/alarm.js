@@ -8,7 +8,14 @@ export function queryAlarm(query) {
         params: query
       })
 }
-
+// 获取实时告警事件列表
+export function queryRealTimeAlarm(query) {
+    return request({
+        url: '/api/v1/alarm_query/',
+        method: 'get',
+        params: query
+      })
+}
 // 获取告警事件列表
 export function dealAlarm(query) {
     return request({
