@@ -254,7 +254,7 @@ export default {
   },
   mounted() {
     setInterval(() => {
-      if(this.currentLine){
+      if(this.realTime){
         this.getRealTableData();
       }else{
         this.getTableData();
@@ -452,7 +452,7 @@ export default {
                       this.lineList.push({"field_id":f.field_id})
                   })
                   //线路图
-                  this.mapForm.line = this.lineList[0].field_id;
+                  this.mapForm.line = this.currentLine;
                   this.lines2 = [];
                   this.linePoint = [];
                   res.result[0].fields.forEach(line => {
@@ -487,7 +487,7 @@ export default {
         startPoint.filedId = line.field_id
         startPoint.type = "start"
         startPoint.id = line.field_id + "start"
-        startPoint.icon = "https://z3.ax1x.com/2021/06/16/2X0WuQ.png"
+        startPoint.icon = "https://z3.ax1x.com/2021/06/21/RELhIs.png"
         this.linePoint.push(startPoint);
         let endPoint = {};
         endPoint.lng = line.nodes[line.nodes.length-1].longitude
@@ -495,7 +495,7 @@ export default {
         endPoint.filedId = line.field_id
         endPoint.type = "end"
         startPoint.id = line.field_id + "end"
-        endPoint.icon = "https://z3.ax1x.com/2021/06/16/2X0o40.png"
+        endPoint.icon = "https://z3.ax1x.com/2021/06/21/RELgsS.png"
         this.linePoint.push(endPoint);
       }
     },
@@ -545,10 +545,11 @@ export default {
       params.area_id = this.defaultAreaId;
       queryAlarm(params).then(res => {
         if (res.retcode === 200 && res.result && res.result.length > 0) {
-          this.tableData = res.result
+          this.tableData = [];
           this.alarmPoints = [];
           res.result.forEach(it => {
             if(it.field_id == this.currentLine || this.currentLine == "全部"){
+              this.tableData.push({"field_id":it.field_id,"alarm_level":it.alarm_level})
               let alarmPoint = {};
               alarmPoint.lng = it.longitude
               alarmPoint.lat = it.latitude
@@ -556,7 +557,7 @@ export default {
               alarmPoint.type = "alarm"
               if(it.alarm_level == "严重告警"){
                 alarmPoint.icon = "https://z3.ax1x.com/2021/06/20/RFTa9g.png"
-              }else if(it.alarm_level == "中级警告"){
+              }else if(it.alarm_level == "中级告警"){
                 alarmPoint.icon = "https://z3.ax1x.com/2021/06/20/RFTwcj.png"
               }else{
                 alarmPoint.icon = "https://z3.ax1x.com/2021/06/20/RFTd3Q.png";
@@ -579,7 +580,13 @@ export default {
             alarmPoint.lat = it.latitude
             alarmPoint.id = it.alarm_id
             alarmPoint.type = "alarm"
-            alarmPoint.icon = "https://z3.ax1x.com/2021/06/20/RkmCdI.gif"
+            if(it.alarm_level == "严重告警"){
+              alarmPoint.icon = "https://z3.ax1x.com/2021/06/21/RELfaj.gif"
+            }else if(it.alarm_level == "中级告警"){
+              alarmPoint.icon = "https://z3.ax1x.com/2021/06/21/RELWZQ.gif"
+            }else{
+              alarmPoint.icon = "https://z3.ax1x.com/2021/06/21/REL2qg.gif";
+            }
             this.alarmPoints.push(alarmPoint);
           })
         }
