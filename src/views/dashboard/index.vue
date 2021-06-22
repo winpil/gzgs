@@ -16,13 +16,14 @@
         <div class="f-width rel" style="height: 97.5%;margin-bottom: 1.5vh;">
           <!-- 线路信息窗口开始 -->
           <div class=“gs-info-window-line” 
-          :style="{'position': 'absolute', 'width': '250px', 'height': '145px', 'background': 'rgba(8, 32, 51, 0.85)', 'z-index': '12', 'border-radius': '6px', 'color': 'rgb(35 206 253)', 'left': '10px', 'top': '10px','font-size': '14px'}"
+          :style="{'position': 'absolute', 'background': 'rgba(8, 32, 51, 0.85)', 'z-index': '12', 'border-radius': '6px', 'color': 'rgb(35 206 253)', 'left': '10px', 'top': '10px','font-size': '14px'}"
           ref="infoWindow" 
           v-show="showWindow">
               <div class="line-info-title">
                 <span class="title-detail">
                   <span v-if="infoType == 0">线路名称：{{currentZone.name}}</span>  
-                  <span v-if="infoType == 1">设备名称：{{currentDev.name}}</span>  
+                  <span v-if="infoType == 1">设备名称：{{currentDev.name}}</span>
+                  <span v-if="infoType == 2">线路名称：{{currentAlarm.fieldId}}</span>  
                 </span>
               </div>
               <div class="line-info-content" v-if="infoType == 0">
@@ -37,13 +38,22 @@
                 <!-- <div class="content-detail"><span>发生时间：</span> <span>{{currentDev.time}}</span> </div> -->
                 <!-- <div class="content-detail"><span>负责人二：</span> <span>李四</span> </div> -->
               </div>
+              <div class="line-info-content" v-if="infoType == 2">
+                <div class="content-detail"><span>告警时间：</span> <span>{{currentAlarm.beginTime}}</span></div>
+                <div class="content-detail"><span>经度：</span> <span>{{currentAlarm.lng}}</span></div>
+                <div class="content-detail"><span>纬度：</span> <span>{{currentAlarm.lat}}</span> </div>
+                <div class="content-detail"><span>告警等级：</span> <span>{{currentAlarm.level}}</span> </div>
+                <div class="content-detail"><span>负责人：</span> <span>{{currentAlarm.assigneeName}}</span> </div>
+                <div class="content-detail"><span>负责人电话：</span> <span>{{currentAlarm.assigneePhone}}</span> </div>
+                <div class="content-detail"><el-button style="float: right;margin-right: 10px;"  @click="addToWhiteList(currentAlarm.id)">加入白名单</el-button></div>
+              </div>
           </div>
           <!-- 线路信息窗口结束 -->
           <img src="../../assets/img/map.png" class="f-width f-height abs" style="left: 0; top: 0;z-index: 2;" alt="">
           <baidu-map :mapStyle="mapStyle" :mapClick="false" :scroll-wheel-zoom="true" :center="center" :zoom="zoom" @ready="handler" class="bm-view">
             <!-- 自定义点 -->
             <bm-marker :position="item" :dragging="false" v-for="(item) in linePoint" :key="item.id" :icon="{url: item.icon, size: {width: 35, height: 35}}"></bm-marker>
-            <bm-marker :position="item" :dragging="false" v-for="(item) in alarmPoints" :key="item.id" :icon="{url: item.icon, size: {width: 35, height: 35}}"></bm-marker>
+            <bm-marker :position="item" :dragging="false" v-for="(item) in alarmPoints" :key="item.id" :icon="{url: item.icon, size: {width: 35, height: 35}}" @click="showAlarmInfo(item)"></bm-marker>
              <!-- <bm-marker :position="item" :dragging="false" v-for="(item, index) in linePoint" :key="index" :icon="{url: item.icon, size: {width: 35, height: 35}}" @click="handleShowDecInfo(item.id)"></bm-marker>-->
             <!-- <bm-marker :position="item" :dragging="true" v-for="(item, index) in polylinePath" :key="index" :icon="{url: 'https://s1.ax1x.com/2020/08/03/aUAul9.gif', size: {width: 35, height: 35}}"></bm-marker> -->
             <!-- 折线控件 -->
@@ -124,7 +134,14 @@
           </div>
           
         </div>
-        
+        <Modal :show="showModal" :title="modalTitle" @hideModal="hideModal" @submit="submitModal">
+          <el-form ref="whiteListForm" :model="whiteListForm">
+            <el-input  v-model="whiteListForm.id" hidden="true"/>
+            <el-form-item label="到期日">
+              <el-date-picker v-model="whiteListForm.endDate" type="datetime" placeholder="选择日期" />
+            </el-form-item>
+          </el-form>
+        </Modal>
       </div>
     </div>    
 
@@ -152,6 +169,7 @@ import { queryAlarm,queryRealTimeAlarm } from '@/api/alarm/alarm.js'
 import { queryLineDetail } from '@/api/line/line.js'
 import echarts from 'echarts'
 import { queryAreaGps, queryDeviceGps, getAreaInfo, getMapCenter, getDeviceInfo, queryZoneInfo, getAlarmFields } from '@/api/dashboard/dashboard.js'
+import Modal from './modal.vue'
 const NORMAL_COLOR = '#23cefd'
 const SPECIAL_COLOR = "black"
 export default {
@@ -177,6 +195,8 @@ export default {
       },
       currentDev: {},
       currentZone: {},
+      currentAlarm:{},
+      whiteListForm:{},
       infoType: '',
       areaList: [],
       lineList: [],
@@ -197,6 +217,8 @@ export default {
       chart2: '',
       chart3: '',
       chart1Data: [],
+      modalTitle: '加入白名单',
+      showModal: false,
       tableData: [{
             date: '2016-05-02',
             name: '王小虎',
@@ -242,6 +264,9 @@ export default {
     
     }
   },
+  components: {
+      Modal
+    },
   created() {
     //this.getInfo()
     this.getDeviceGps()
@@ -555,6 +580,11 @@ export default {
               alarmPoint.lat = it.latitude
               alarmPoint.id = it.alarm_id
               alarmPoint.type = "alarm"
+              alarmPoint.level = it.alarm_level
+              alarmPoint.beginTime = it.begin_time
+              alarmPoint.assigneeName = it.name
+              alarmPoint.assigneePhone = it.phone
+              alarmPoint.fieldId = it.field_id
               if(it.alarm_level == "严重告警"){
                 alarmPoint.icon = "https://z3.ax1x.com/2021/06/20/RFTa9g.png"
               }else if(it.alarm_level == "中级告警"){
@@ -580,6 +610,11 @@ export default {
             alarmPoint.lat = it.latitude
             alarmPoint.id = it.alarm_id
             alarmPoint.type = "alarm"
+            alarmPoint.level = it.alarm_level
+            alarmPoint.beginTime = it.begin_time
+            alarmPoint.assigneeName = it.name
+            alarmPoint.assigneePhone = it.phone
+            alarmPoint.fieldId = it.field_id
             if(it.alarm_level == "严重告警"){
               alarmPoint.icon = "https://z3.ax1x.com/2021/06/21/RELfaj.gif"
             }else if(it.alarm_level == "中级告警"){
@@ -691,6 +726,17 @@ export default {
           }
         }
       })
+    },
+    showAlarmInfo(it) {
+      this.currentAlarm = it
+      this.infoType = 2
+      this.showWindow = true
+      this.$forceUpdate()
+    },
+    addToWhiteList(id) {
+      this.showModal = true
+      this.whiteListForm.id = id
+      this.whiteListForm.endDate = new Date()
     },
     changeLine(val){
       console.log(val);
@@ -905,7 +951,6 @@ export default {
         this.chart3.resize();
       })
     },
-
     openSwitch(){
       this.realTime = !this.realTime;
       console.log(this.realTime)
@@ -916,6 +961,13 @@ export default {
         this.getAreaList() // 获取地区列表
         this.getTableData() // 获取事件列表数据
       } 
+    },
+    hideModal(){
+      // 取消弹窗回调
+      this.showModal = false
+    },
+    submitModal(){
+      this.showModal = false 
     }
   }
 }
