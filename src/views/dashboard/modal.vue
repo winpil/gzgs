@@ -59,7 +59,7 @@ export default {
 }
 .modal-header {
     height: 56px;
-    background: #104c74;
+    background: #304156;
     color: #fff;
     display: flex;
     align-items: center;
@@ -68,7 +68,7 @@ export default {
 }
 .modal-footer {
     display: flex;
-    background: #104c74;
+    background: #304156;
     align-items: center;
     justify-content: center;
     height: 57px;
@@ -79,5 +79,9 @@ export default {
 }
 .modal-main {
     padding: 15px 40px;
+    background: #304156;
+}
+.el-input__inner{
+  background:#104c74;
 }
 </style>

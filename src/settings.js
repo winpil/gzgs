@@ -1,5 +1,5 @@
 module.exports = {
-  title: '振动预警防护全覆盖平台',
+  title: '运维管理系统',
 
   /**
    * @type {boolean} true | false

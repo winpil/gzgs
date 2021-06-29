@@ -1,5 +1,5 @@
 <template>
-  <div class="gs-home-wrapper" @click.capture="showWindow = false" ref="doc">
+  <div class="gs-home-wrapper" @click.capture="showWindow = false" ref="doc" >
     <img src="../../assets/img/background.png" class="bg-img" alt="">
     <div class="top-title">
       <img src="../../assets/img/topleft.png" class="top-left-wrapper" alt="">
@@ -21,32 +21,33 @@
           v-show="showWindow">
               <div class="line-info-title">
                 <span class="title-detail">
-                  <span v-if="infoType == 0">线路名称：{{currentZone.name}}</span>  
-                  <span v-if="infoType == 1">设备名称：{{currentDev.name}}</span>
-                  <span v-if="infoType == 2">线路名称：{{currentAlarm.fieldId}}</span>  
+                  <span v-if="infoType == 0">线路名称：{{currentLineInfo.name}}</span>  
+                  <span v-if="infoType == 1">线路名称：{{currentLineInfo.name}}</span>
+                  <span v-if="infoType == 2">告警信息</span>  
                 </span>
               </div>
               <div class="line-info-content" v-if="infoType == 0">
-                <div class="content-detail"><span>防区数：</span> <span>{{currentZone.fields_num}}</span></div>
-                <div class="content-detail"><span>告警事件数：</span> <span>{{currentZone.alarm_num}}</span> </div>
-                <div class="content-detail"><span>负责人一：</span> <span>{{currentZone.person1}}</span> </div>
-                <div class="content-detail"><span>负责人二：</span> <span>{{currentZone.person2}}</span> </div>
               </div>
               <div class="line-info-content" v-if="infoType == 1">
-                <div class="content-detail"><span>设备号：</span> <span>{{currentDev.device_id}}</span></div>
-                <div class="content-detail"><span>告警事件数：</span> <span>{{currentDev.alarm_num}}</span> </div>
-                <!-- <div class="content-detail"><span>发生时间：</span> <span>{{currentDev.time}}</span> </div> -->
-                <!-- <div class="content-detail"><span>负责人二：</span> <span>李四</span> </div> -->
+                <div class="content-detail"><span>线路ID：</span> <span>{{currentLineInfo.field_id}}</span></div>
+                <div class="content-detail"><span>负责人1：</span> <span>{{currentLineInfo.head1}}</span> </div>
+                <div class="content-detail"><span>联系电话：</span> <span>{{currentLineInfo.phone1}}</span> </div>
+                <div class="content-detail"><span>负责人2：</span> <span>{{currentLineInfo.head2}}</span> </div>
+                <div class="content-detail"><span>联系电话：</span> <span>{{currentLineInfo.phone2}}</span> </div>
               </div>
               <div class="line-info-content" v-if="infoType == 2">
-                <div class="content-detail"><span>告警时间：</span> <span>{{currentAlarm.beginTime}}</span></div>
-                <div class="content-detail"><span>经度：</span> <span>{{currentAlarm.lng}}</span></div>
-                <div class="content-detail"><span>纬度：</span> <span>{{currentAlarm.lat}}</span> </div>
-                <div class="content-detail"><span>告警等级：</span> <span>{{currentAlarm.level}}</span> </div>
-                <div class="content-detail"><span>负责人：</span> <span>{{currentAlarm.assigneeName}}</span> </div>
-                <div class="content-detail"><span>负责人电话：</span> <span>{{currentAlarm.assigneePhone}}</span> </div>
+                <div class="content-detail"><span>位置：</span> <span>{{parseFloat(currentAlarm.lng).toFixed(2)}},{{parseFloat(currentAlarm.lat).toFixed(2)}}</span></div>
+                <div class="content-detail"><span>距离：</span> <span>{{currentAlarm.position}}</span></div>
+                <div class="content-detail"><span>振动开始时间：</span> <span>{{currentAlarm.beginTime}}</span></div>
+                <div class="content-detail"><span>振动结束时间：</span> <span>{{currentAlarm.endTime}}</span></div>
+                <div class="content-detail"><span>次数：</span> <span>{{currentAlarm.continueTime}}</span> </div>
+                <div class="content-detail"><span>类型：</span> <span>{{currentAlarm.alarmType}}</span> </div>
+                <div class="content-detail"><span>等级：</span> <span>{{currentAlarm.level}}</span> </div>
                 <div class="content-detail"><el-button style="float: right;margin-right: 10px;"  @click="addToWhiteList(currentAlarm.id)">加入白名单</el-button></div>
               </div>
+          </div>
+          <div id="blink">
+              <img :src="blinkImg" :style="{'position': 'absolute', 'z-index': '12','right': '0px', 'top': '0px'}"/>
           </div>
           <!-- 线路信息窗口结束 -->
           <img src="../../assets/img/map.png" class="f-width f-height abs" style="left: 0; top: 0;z-index: 2;" alt="">
@@ -59,9 +60,9 @@
             <!-- 折线控件 -->
             <!--<div v-for="(line, index) in lines" :key=" 'line' + '-' + line.zone_id + '-' + index">-->
               <bm-polyline v-for="(item, index2) in lines2" :key="item.field_id" :path="item.points" :stroke-color="item.lineColor"
-                @mouseover="lineIn(index2)"
-                @mouseout="lineOut(index2)"
-                :stroke-opacity="0.75" :stroke-weight="4" :editing="false" @click="test(line.zone_id)">
+                @mouseover="lineIn(item,index2)" 
+                @mouseout="lineOut(item,index2)"
+                :stroke-opacity="0.75" :stroke-weight="4" :editing="false" @click="showLineInfo(item)" >
               </bm-polyline>    
             <!--</div>-->
             <bm-polyline v-for="(field, index) in alarmlines" :key="'alarm' + index" :path="field.nodes" stroke-color="#ec2d2e"
@@ -76,9 +77,9 @@
           <img src="../../assets/img/condition.png" class="f-width f-height" alt="">
           <div class="switch-all">
             <span style="color:#fff;font-size: 5px;">查看实时数据：</span>
-            <span class="switch">
+            <span class="switch"  @click="openSwitch">
                 <div class="switch-bg" :class="{on:realTime==1}">
-                    <div class="switch-btn" :class="{on:realTime==1}" @click="openSwitch" ></div>
+                    <div class="switch-btn" :class="{on:realTime==1}"></div>
                 </div>
             </span>
           </div>
@@ -86,15 +87,15 @@
             <img src="../../assets/img/title.png" class="f-width f-height" alt="">
             <span class="com-title-content abs">线路时间选择</span>
           </div>
-          <div class="f-width f-height abs" style="top: 35%;left: 3.5%;">
-            <el-select ref="selectLine" class="map-select" size="mini" v-model="mapForm.line" @change="changeLine" v-bind:disabled="realTime">
+          <div class="f-width f-height abs" style="top: 35%;left: 3.5%;" >
+            <el-select ref="selectLine" class="map-select" size="mini" v-model="mapForm.line" @change="changeLine" v-bind:disabled="realTime" :popper-append-to-body="false">
               <el-option v-for="item in lineList" :key="item.field_id"  :value="item.field_id" :label="item.field_id">
                 {{item.field_id}}
               </el-option>
             </el-select>
           </div>
           <div class="f-width f-height abs" style="top: 65%;left: 3.5%;">
-            <el-select ref="selectTime" class="map-select" size="mini" v-model="mapForm.time"  @change="changeTime" v-bind:disabled="realTime">
+            <el-select ref="selectTime" class="map-select" size="mini" v-model="mapForm.time"  @change="changeTime" v-bind:disabled="realTime" :popper-append-to-body="false">
               <el-option value="1" label="一周内">
                 一周内
               </el-option>
@@ -136,11 +137,13 @@
         </div>
         <Modal :show="showModal" :title="modalTitle" @hideModal="hideModal" @submit="submitModal">
           <el-form ref="whiteListForm" :model="whiteListForm">
-            <el-input  v-model="whiteListForm.id" hidden="true"/>
-            <el-form-item label="到期日">
+            <el-form-item style="color:#FFF" label="到期日">
               <el-date-picker v-model="whiteListForm.endDate" type="datetime" placeholder="选择日期" />
             </el-form-item>
           </el-form>
+        </Modal>
+        <Modal :show="showDeviceMsg" :title="deviceMsgTitle" @hideModal="hideDeviceMsg" @submit="hideDeviceMsg">
+          <p style="color:#fff">{{deviceErrorMsg}}</p>
         </Modal>
       </div>
     </div>    
@@ -165,8 +168,9 @@
 
 <script>
 import { queryArea } from '@/api/area/area.js'
-import { queryAlarm,queryRealTimeAlarm } from '@/api/alarm/alarm.js'
+import { queryAlarm,queryRealTimeAlarm,alertWhite } from '@/api/alarm/alarm.js'
 import { queryLineDetail } from '@/api/line/line.js'
+import { deviceInfo } from '@/api/device/device.js'
 import echarts from 'echarts'
 import { queryAreaGps, queryDeviceGps, getAreaInfo, getMapCenter, getDeviceInfo, queryZoneInfo, getAlarmFields } from '@/api/dashboard/dashboard.js'
 import Modal from './modal.vue'
@@ -203,10 +207,12 @@ export default {
       defaultAreaId : "0001",
       alarmPoints : [],
       currentLine : "全部",
+      currentLineInfo:{},
       currentDate : 1,
       currentStartDate : this.defaultStartDate(),
       currentEndDate : this.defaultEndDate(),
-      realTime:false,
+      realTime : true,
+      blinkImg : require("../../assets/img/greenLight.png"),
       mapStyle: {
         features: ["road", "building", "water", "land"], //隐藏地图上的"poi",
         style: "midnight"
@@ -219,6 +225,10 @@ export default {
       chart1Data: [],
       modalTitle: '加入白名单',
       showModal: false,
+      deviceMsgTitle:"设备故障",
+      showDeviceMsg: false,
+      isDeviceError: false,
+      deviceErrorMsg:"正常运行",
       tableData: [{
             date: '2016-05-02',
             name: '王小虎',
@@ -273,7 +283,12 @@ export default {
     //this.getCenter() // 获取地图坐标中线点
     //this.getAreaInfo() // 区域统计信息
     this.getAreaList() // 获取地区列表
-    this.getTableData() // 获取事件列表数据
+    // 获取事件列表数据
+    if(this.realTime){
+      this.getRealTableData();
+    }else{
+      this.getTableData();
+    }
     this.queryLineDetail() // 获取所有责任区的告警事件
     this.time = (new Date()).toLocaleString()
   },
@@ -291,6 +306,16 @@ export default {
     setInterval(() => {
       this.gettTime()
     }, 1000)
+    setInterval(() => {
+      this.getDeviceInfo()//获取设备状态
+      this.showBlink()//亮灯
+    }, 1000)
+    //设备故障时十分钟提醒一次
+    setInterval(() => {
+      if(this.isDeviceError){
+        this.showDeviceMsg = true;
+      }
+    }, 1000*60*10)
   },
   computed: {
     alarmCount() {
@@ -503,23 +528,30 @@ export default {
           tempObj['points'].push(nodeObj)
         })
         tempObj.field_id = line.field_id
+        tempObj.name = line.field_name
+        tempObj.head1 = line.head1
+        tempObj.phone1 = line.phone1
+        tempObj.head2 = line.head2
+        tempObj.phone2 = line.phone2
         tempObj.lineColor = NORMAL_COLOR
         this.lines2.push(tempObj)
         //获取起点和终点
-        let startPoint = {};
-        startPoint.lng = line.nodes[0].longitude
-        startPoint.lat = line.nodes[0].latitude
-        startPoint.filedId = line.field_id
-        startPoint.type = "start"
-        startPoint.id = line.field_id + "start"
-        startPoint.icon = "https://z3.ax1x.com/2021/06/21/RELhIs.png"
-        this.linePoint.push(startPoint);
+        if(this.linePoint.length == 0){//起点只要一个
+          let startPoint = {};
+          startPoint.lng = line.nodes[0].longitude
+          startPoint.lat = line.nodes[0].latitude
+          startPoint.filedId = line.field_id
+          startPoint.type = "start"
+          startPoint.id = line.field_id + "start"
+          startPoint.icon = "https://z3.ax1x.com/2021/06/21/RELhIs.png"
+          this.linePoint.push(startPoint);
+        }
         let endPoint = {};
         endPoint.lng = line.nodes[line.nodes.length-1].longitude
         endPoint.lat = line.nodes[line.nodes.length-1].latitude
         endPoint.filedId = line.field_id
         endPoint.type = "end"
-        startPoint.id = line.field_id + "end"
+        endPoint.id = line.field_id + "end"
         endPoint.icon = "https://z3.ax1x.com/2021/06/21/RELgsS.png"
         this.linePoint.push(endPoint);
       }
@@ -548,8 +580,8 @@ export default {
             [16, '示例四']
           ]
         }
-        this.initChart1()
-        this.initChart3()
+        //this.initChart1()
+        //this.initChart3()
       })
     },
 
@@ -578,12 +610,14 @@ export default {
               let alarmPoint = {};
               alarmPoint.lng = it.longitude
               alarmPoint.lat = it.latitude
-              alarmPoint.id = it.alarm_id
+              alarmPoint.id = it.id
               alarmPoint.type = "alarm"
               alarmPoint.level = it.alarm_level
               alarmPoint.beginTime = it.begin_time
-              alarmPoint.assigneeName = it.name
-              alarmPoint.assigneePhone = it.phone
+              alarmPoint.endTime = it.end_time
+              alarmPoint.position = it.position
+              alarmPoint.alarmType = it.alarm_type
+              alarmPoint.continueTime = it.continue_time
               alarmPoint.fieldId = it.field_id
               if(it.alarm_level == "严重告警"){
                 alarmPoint.icon = "https://z3.ax1x.com/2021/06/20/RFTa9g.png"
@@ -608,7 +642,7 @@ export default {
             let alarmPoint = {};
             alarmPoint.lng = it.longitude
             alarmPoint.lat = it.latitude
-            alarmPoint.id = it.alarm_id
+            alarmPoint.id = it.id
             alarmPoint.type = "alarm"
             alarmPoint.level = it.alarm_level
             alarmPoint.beginTime = it.begin_time
@@ -645,6 +679,41 @@ export default {
             item.lat = item.latitude
             item.id = item.device_id
           })
+        }
+      })
+    },
+    getDeviceInfo() {
+     deviceInfo().then(res => {
+        if (res.retcode === 200 && res.result && res.result.length > 0) {
+          debugger
+          this.deviceErrorMsg = "";
+          let flag = true
+          let rs = res.result[0]//只有一个设备
+          rs.channels.forEach(it => {
+            if(it.fiber_info != "正常"){
+              flag = false
+              deviceErrorMsg += it.id+"号通道"+it.fiber_info+"&"
+            }
+          })
+          let deviceStatus = rs.device_run_status[0];
+          if(flag && deviceStatus.is_online && deviceStatus.is_device_online && deviceStatus.device_status ){
+            this.blinkImg = require("../../assets/img/greenLight.png")
+          }else{
+            this.blinkImg = require("../../assets/img/redLigth.png")
+            if(!this.isDeviceError){
+              this.showDeviceMsg = true;
+            }
+            this.isDeviceError = true;
+            if(!deviceStatus.is_online){
+              this.deviceErrorMsg += "数据处理程序故障&"
+            }
+            if(!deviceStatus.is_device_online){
+              this.deviceErrorMsg += "断网&"
+            }
+            if(!deviceStatus.device_status){
+              this.deviceErrorMsg += "设备故障"
+            }
+          }
         }
       })
     },
@@ -790,15 +859,21 @@ export default {
       map.ControlAnchor = 'BMAP_ANCHOR_TOP_LEFT'
       map.enableAutoResize()
     },
-    lineIn(str) {
+    lineIn(it,i) {
       //let tempArr = str.split('--')
       //this.lines[tempArr[0]].fields[tempArr[1]].lineColor = '#e6a700'
-      this.lines2[str].lineColor = '#e6a700'
+      this.lines2[i].lineColor = '#e6a700'
     },
-    lineOut(str) {
+    lineOut(it,i) {
       //let tempArr = str.split('--')
       //this.lines[tempArr[0]].fields[tempArr[1]].lineColor = '#23cefd'
-      this.lines2[str].lineColor = '#23cefd'
+      this.lines2[i].lineColor = '#23cefd'
+    },
+    showLineInfo(it) {
+      this.currentLineInfo = it
+      this.infoType = 1
+      this.showWindow = true
+      this.$forceUpdate()
     },
     handleShowAreaInfo() {
       this.showArea = !this.showArea
@@ -967,10 +1042,42 @@ export default {
       this.showModal = false
     },
     submitModal(){
-      this.showModal = false 
+      let params = {}
+      params.alarm_id = this.whiteListForm.id
+      console.log(this.whiteListForm.endDate);
+      if(this.whiteListForm.endDate){
+        params.end_time = (this.whiteListForm.endDate.getTime()+"").substr(0,10)
+        alertWhite(params).then(res => {
+          if (res.retcode === 200) {
+            this.$message({ type: 'success', message: '加入白名单成功！' })
+            //加入白名单后延迟2秒获取告警
+            setTimeout(function () {
+              if(this.realTime){
+                this.getRealTableData();
+              }else{
+                this.getTableData();
+              }
+            },2000)
+          }
+        })
+        this.showModal = false
+      }else{
+          this.$message({ type: 'warning', message: '请输入到期日！' })
+      }
+    },
+    hideDeviceMsg (){
+      // 取消弹窗回调
+      this.showDeviceMsg = false
+    },
+    showBlink() {
+      var blink = document.getElementById("blink");
+      //this.$refs.blink
+      blink.style.visibility = (blink.style.visibility == "visible") ? "hidden" : "visible";
     }
   }
 }
+
+
 </script>
 
 <style scoped lang='less'>

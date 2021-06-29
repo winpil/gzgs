@@ -42,7 +42,14 @@ export function updateAlarmJudge(query) {
       params: query
     })
 }
-
+// 导入事件数据
+export function alertWhite(query) {
+  return request({
+    url: '/api/v1/alert_white/',
+    method: 'post',
+    data: query
+  })
+}
 // 导入事件数据
 export function insertEvent(query) {
   return request({
