@@ -58,3 +58,19 @@ export function insertEvent(query) {
     data: query
   })
 }
+//清空告警
+export function clearAlarm(query) {
+  return request({
+    url: '/api/v1/clear_alarm/',
+    method: 'post',
+    data: query
+  })
+}
+//告警统计信息
+export function queryAlarmCount(query) {
+  return request({
+    url: '/api/v1/alarm_count/',
+    method: 'get',
+    params: query
+  })
+}

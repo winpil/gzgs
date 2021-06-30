@@ -73,24 +73,36 @@
         </div>
       </div>
       <div class="content-right f-height abs" style="width: 25%;right: 0;padding: 0 20px;">
-        <div class="f-width rel" style="height: 17%;margin-bottom: 1.5vh;position:relative;">
+        <div class="f-width rel" style="height: 20%;margin-bottom: 1.5vh;position:relative;">
           <img src="../../assets/img/condition.png" class="f-width f-height" alt="">
-          <div class="switch-all">
-            <span style="color:#fff;font-size: 5px;">查看实时数据：</span>
-            <span class="switch"  @click="openSwitch">
+          <div class="com-title-wrapper abs">
+            <img src="../../assets/img/title.png" class="f-width f-height" alt="">
+            <span class="com-title-content abs">实时数据</span>
+          </div>
+          <div class="f-width f-height abs" style="top: 35%;left: 3.5%;margin-top:5px;" >
+            <div class="switch-all">
+              <span style="color:#fff;font-size: 15px;">查看实时数据：</span>
+              <span class="switch"  @click="openSwitch">
                 <div class="switch-bg" :class="{on:realTime==1}">
                     <div class="switch-btn" :class="{on:realTime==1}"></div>
                 </div>
-            </span>
+              </span>
+            </div>
           </div>
+          <div class="f-width f-height abs" style="top: 35%;left: 3.5%;margin-top:30px;" >
+            <el-button type="primary" @click="cleanAlarm" v-bind:disabled="!realTime">清空告警</el-button>
+          </div>
+        </div>
+        <div class="f-width rel" style="height: 20%;margin-bottom: 1.5vh;position:relative;">
+          <img src="../../assets/img/condition.png" class="f-width f-height" alt="">
           <div class="com-title-wrapper abs">
             <img src="../../assets/img/title.png" class="f-width f-height" alt="">
             <span class="com-title-content abs">线路时间选择</span>
           </div>
           <div class="f-width f-height abs" style="top: 35%;left: 3.5%;" >
             <el-select ref="selectLine" class="map-select" size="mini" v-model="mapForm.line" @change="changeLine" v-bind:disabled="realTime" :popper-append-to-body="false">
-              <el-option v-for="item in lineList" :key="item.field_id"  :value="item.field_id" :label="item.field_id">
-                {{item.field_id}}
+              <el-option v-for="item in lineList" :key="item.field_id"  :value="item.field_id" :label="item.field_name">
+                {{item.field_name}}
               </el-option>
             </el-select>
           </div>
@@ -108,32 +120,47 @@
             </el-select>
           </div>
         </div>
-        <div class="f-width rel" style="height: 80.5%;">
+        <div class="f-width rel" style="height: 55.5%;">
           <img src="../../assets/img/event.png" class="f-width f-height" alt="">
           <div class="com-title-wrapper abs">
             <img src="../../assets/img/title.png" class="f-width f-height" alt="">
-            <span class="com-title-content abs">近期事件列表</span>
+            <span class="com-title-content abs">近期事件汇总</span>
           </div>
-          <div class="abs f-width user_skills scrollbar" style="top: 8%;height: 100%;">
+          <div class="f-width f-height abs" style="top: 13%;left: 3.5%;text-align: center;" >
+            <span style="color:#fff;font-size: 15px;">{{deviceName}}</span>
+          </div>
+          <div class="f-width f-height abs" style="top: 20%;left: 3.5%;color:#fff;font-size: 15px;" >
+            线路：<el-select ref="selectLine2" class="map-select" size="mini" v-model="mapForm.line2" @change="changeLine2" :popper-append-to-body="false">
+              <el-option v-for="item in lineList2" :key="item.field_id"  :value="item.field_id" :label="item.field_name">
+                {{item.field_name}}
+              </el-option>
+            </el-select>
+          </div>
+          <div class="abs f-width user_skills scrollbar" style="top: 30%;height: 100%;">
             <el-scrollbar style="height:100%">
             <el-table
-              :data="tableData"
+              :data="alarmCountList"
               style="width: 94%;height:84%">
               <el-table-column
-                prop="field_id"
+                prop="name"
                 align="center"
-                min-width="100"
-                label="线路名称">
+                width="80"
+                label="告警等级">
               </el-table-column>
               <el-table-column
-                prop="alarm_level"
-                label="报警级别"
-                align="left">
+                prop="alarm_times"
+                label="报警次数"
+                width="80"
+                align="center">
+              </el-table-column>
+              <el-table-column
+                prop="alarm_deal"
+                label="已处理次数"
+                align="center">
               </el-table-column>
             </el-table>
             </el-scrollbar>
           </div>
-          
         </div>
         <Modal :show="showModal" :title="modalTitle" @hideModal="hideModal" @submit="submitModal">
           <el-form ref="whiteListForm" :model="whiteListForm">
@@ -168,7 +195,7 @@
 
 <script>
 import { queryArea } from '@/api/area/area.js'
-import { queryAlarm,queryRealTimeAlarm,alertWhite } from '@/api/alarm/alarm.js'
+import { queryAlarm,queryRealTimeAlarm,alertWhite,clearAlarm,queryAlarmCount } from '@/api/alarm/alarm.js'
 import { queryLineDetail } from '@/api/line/line.js'
 import { deviceInfo } from '@/api/device/device.js'
 import echarts from 'echarts'
@@ -204,6 +231,7 @@ export default {
       infoType: '',
       areaList: [],
       lineList: [],
+      lineList2: [],
       defaultAreaId : "0001",
       alarmPoints : [],
       currentLine : "全部",
@@ -225,10 +253,12 @@ export default {
       chart1Data: [],
       modalTitle: '加入白名单',
       showModal: false,
+      deviceName:"",
       deviceMsgTitle:"设备故障",
       showDeviceMsg: false,
       isDeviceError: false,
       deviceErrorMsg:"正常运行",
+      alarmCountList: [],
       tableData: [{
             date: '2016-05-02',
             name: '王小虎',
@@ -280,6 +310,7 @@ export default {
   created() {
     //this.getInfo()
     this.getDeviceGps()
+    this.getLineList();
     //this.getCenter() // 获取地图坐标中线点
     //this.getAreaInfo() // 区域统计信息
     this.getAreaList() // 获取地区列表
@@ -316,6 +347,14 @@ export default {
         this.showDeviceMsg = true;
       }
     }, 1000*60*10)
+    setInterval(() => {
+      this.mapForm.line2Index += 1
+      if(this.mapForm.line2Index >= this.lineList2.length){
+        this.mapForm.line2Index = 0
+      }
+      this.mapForm.line2 = this.lineList2[this.mapForm.line2Index].field_id
+      this.getAlarmCount();
+    }, 1000*15)
   },
   computed: {
     alarmCount() {
@@ -474,6 +513,26 @@ export default {
       tmp = tmp.toString().substr(0,10);
       return tmp;
     },
+    getLineList() {
+      let params = {}
+      params.area_id = this.defaultAreaId;
+      queryAreaGps(params).then(res => {
+        if (res.retcode === 200 && res.result && res.result.length > 0) {
+          //下拉框内容
+          this.lineList = [];
+          this.lineList2 = [];
+          this.lineList.push({"field_id":"全部","field_name":"全部"})
+          res.result[0].fields.forEach(f => {
+              this.lineList.push({"field_id":f.field_id,"field_name":f.field_name})
+              this.lineList2.push({"field_id":f.field_id,"field_name":f.field_name})
+          })
+          this.mapForm.line = this.currentLine;
+          this.mapForm.line2 = this.lineList2[0].field_id;
+          this.mapForm.line2Index = 0;
+          this.getAlarmCount();
+        }
+      })
+    },
     // 获取地区数据
     getAreaList() {
       let params = {}
@@ -494,15 +553,7 @@ export default {
               params.area_id = item.area_id;
               queryAreaGps(params).then(res => {
                 if (res.retcode === 200 && res.result && res.result.length > 0) {
-                  //this.lineList = res.result[0].fields;
-                  //下拉框内容
-                  this.lineList = [];
-                  this.lineList.push({"field_id":"全部"})
-                  res.result[0].fields.forEach(f => {
-                      this.lineList.push({"field_id":f.field_id})
-                  })
                   //线路图
-                  this.mapForm.line = this.currentLine;
                   this.lines2 = [];
                   this.linePoint = [];
                   res.result[0].fields.forEach(line => {
@@ -650,11 +701,23 @@ export default {
             alarmPoint.assigneePhone = it.phone
             alarmPoint.fieldId = it.field_id
             if(it.alarm_level == "严重告警"){
-              alarmPoint.icon = "https://z3.ax1x.com/2021/06/21/RELfaj.gif"
+              if(it.is_now_shake){
+                alarmPoint.icon = "https://z3.ax1x.com/2021/06/21/RELfaj.gif"
+              }else{
+                alarmPoint.icon = "https://z3.ax1x.com/2021/06/20/RFTa9g.png"
+              }
             }else if(it.alarm_level == "中级告警"){
-              alarmPoint.icon = "https://z3.ax1x.com/2021/06/21/RELWZQ.gif"
+              if(it.is_now_shake){
+                alarmPoint.icon = "https://z3.ax1x.com/2021/06/21/RELWZQ.gif"
+              }else{
+                alarmPoint.icon = "https://z3.ax1x.com/2021/06/20/RFTwcj.png"
+              }
             }else{
-              alarmPoint.icon = "https://z3.ax1x.com/2021/06/21/REL2qg.gif";
+              if(it.is_now_shake){
+                alarmPoint.icon = "https://z3.ax1x.com/2021/06/21/REL2qg.gif";
+              }else{
+                alarmPoint.icon = "https://z3.ax1x.com/2021/06/20/RFTd3Q.png";
+              }
             }
             this.alarmPoints.push(alarmPoint);
           })
@@ -685,10 +748,10 @@ export default {
     getDeviceInfo() {
      deviceInfo().then(res => {
         if (res.retcode === 200 && res.result && res.result.length > 0) {
-          debugger
           this.deviceErrorMsg = "";
           let flag = true
           let rs = res.result[0]//只有一个设备
+          this.deviceName = rs.device_name
           rs.channels.forEach(it => {
             if(it.fiber_info != "正常"){
               flag = false
@@ -822,6 +885,14 @@ export default {
         }
       })
       this.getTableData();
+    },
+    changeLine2(val){
+      this.lineList2.forEach((it,i) => {
+        if(it.field_id == val){
+          this.mapForm.line2Index = i
+        }
+        this.getAlarmCount()
+      })
     },
     changeTime(val){
       console.log(val);
@@ -1050,14 +1121,14 @@ export default {
         alertWhite(params).then(res => {
           if (res.retcode === 200) {
             this.$message({ type: 'success', message: '加入白名单成功！' })
-            //加入白名单后延迟2秒获取告警
+            //加入白名单后延迟3秒获取告警
             setTimeout(function () {
               if(this.realTime){
                 this.getRealTableData();
               }else{
                 this.getTableData();
               }
-            },2000)
+            },3000)
           }
         })
         this.showModal = false
@@ -1071,8 +1142,38 @@ export default {
     },
     showBlink() {
       var blink = document.getElementById("blink");
-      //this.$refs.blink
       blink.style.visibility = (blink.style.visibility == "visible") ? "hidden" : "visible";
+    },
+    cleanAlarm() {
+      let params = {}
+      let alarmIds = []
+      this.alarmPoints.forEach(it => {
+        alarmIds.push(it.id)
+      }) 
+      params.alarm_ids = alarmIds
+      clearAlarm(params).then(res => {
+        if (res.retcode === 200) {
+          this.$message({ type: 'success', message: '清空告警成功！' })
+          //清空告警后延迟3秒获取告警
+          setTimeout(function () {
+            if(this.realTime){
+              this.getRealTableData();
+            }else{
+              this.getTableData();
+            }
+          },3000)
+        }
+      })
+    },
+    getAlarmCount(){
+      let params = {}
+      params.field_id = this.mapForm.line2
+      console.log("params.field_id:",params.field_id)
+      queryAlarmCount(params).then(res => {
+        if (res.retcode === 200) {
+          this.alarmCountList = res.result
+        }
+      })
     }
   }
 }
@@ -1331,25 +1432,24 @@ export default {
     }
 }
 .switch-all{
-  position: absolute;
   right: 40px;
   top: 10px;
   z-index:100; 
 }
 .switch{
-    width: 2rem;
-    height: 1.1rem;
+    width: 2.25rem;
+    height: 1.17rem;
     border-radius: 50px;
     border: 1px solid #0671a8;
     position: absolute;
 }
 .switch-btn{
-    width: 1.1rem;
-    height: 1.1rem;
+    width: 1.17rem;
+    height: 1.17rem;
     border-radius: 50%;
     border: 1px solid #021019;
     position: absolute;
-    background-color: #00aeff;
+    background-color: #1890ff;
     top: -1px;
     left: -1px;
     transition:left .5s;
@@ -1359,18 +1459,18 @@ export default {
 }
 .switch-bg{
     background-color: #104c74;
-    width: 1rem;
-    height: 1.1rem;
+    width: 1.12rem;
+    height: 1.17rem;
     border-radius: 50px;
     transition: width .5s;
     -moz-transition: width .5s; /* Firefox 4 */
     -webkit-transition:  width .5s; /* Safari and Chrome */
 }
 .switch-btn.on{
-    left: 1rem;
+    left: 1.12rem;
 }
 .switch-bg.on{
-    width: 2rem;
+    width: 2.25rem;
 }
 /*滚动条样式*/
 .scrollbar {
