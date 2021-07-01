@@ -697,8 +697,10 @@ export default {
             alarmPoint.type = "alarm"
             alarmPoint.level = it.alarm_level
             alarmPoint.beginTime = it.begin_time
-            alarmPoint.assigneeName = it.name
-            alarmPoint.assigneePhone = it.phone
+            alarmPoint.endTime = it.end_time
+            alarmPoint.position = it.position
+            alarmPoint.alarmType = it.alarm_type
+            alarmPoint.continueTime = it.continue_time
             alarmPoint.fieldId = it.field_id
             if(it.alarm_level == "严重告警"){
               if(it.is_now_shake){
