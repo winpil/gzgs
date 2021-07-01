@@ -40,7 +40,7 @@
                 <div class="content-detail"><span>距离：</span> <span>{{currentAlarm.position}}</span></div>
                 <div class="content-detail"><span>振动开始时间：</span> <span>{{currentAlarm.beginTime}}</span></div>
                 <div class="content-detail"><span>振动结束时间：</span> <span>{{currentAlarm.endTime}}</span></div>
-                <div class="content-detail"><span>次数：</span> <span>{{currentAlarm.continueTime}}</span> </div>
+                <div class="content-detail"><span>次数：</span> <span>{{currentAlarm.frequency}}</span> </div>
                 <div class="content-detail"><span>类型：</span> <span>{{currentAlarm.alarmType}}</span> </div>
                 <div class="content-detail"><span>等级：</span> <span>{{currentAlarm.level}}</span> </div>
                 <div class="content-detail"><el-button style="float: right;margin-right: 10px;"  @click="addToWhiteList(currentAlarm.id)">加入白名单</el-button></div>
@@ -668,7 +668,7 @@ export default {
               alarmPoint.endTime = it.end_time
               alarmPoint.position = it.position
               alarmPoint.alarmType = it.alarm_type
-              alarmPoint.continueTime = it.continue_time
+              alarmPoint.frequency = it.frequency
               alarmPoint.fieldId = it.field_id
               if(it.alarm_level == "严重告警"){
                 alarmPoint.icon = "https://z3.ax1x.com/2021/06/20/RFTa9g.png"
@@ -700,7 +700,7 @@ export default {
             alarmPoint.endTime = it.end_time
             alarmPoint.position = it.position
             alarmPoint.alarmType = it.alarm_type
-            alarmPoint.continueTime = it.continue_time
+            alarmPoint.frequency = it.frequency
             alarmPoint.fieldId = it.field_id
             if(it.alarm_level == "严重告警"){
               if(it.is_now_shake){
