@@ -2,13 +2,13 @@
   <div class="app-container">
     <div v-if="showFlag === pageType.list">
       <div class="filter-container">
-        <el-input v-model="queryForm.keyword" clearable placeholder="线路ID/线路名称" style="width: 300px;margin-right: 10px;" class="filter-item" @keyup.enter.native="handleFilter" />
+        <!-- <el-input v-model="queryForm.keyword" clearable placeholder="线路ID/线路名称" style="width: 300px;margin-right: 10px;" class="filter-item" @keyup.enter.native="handleFilter" /> -->
         <el-button class="filter-item" style="margin-left: 10px;float:right;margin-right: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
           {{ $t('table.add') }}
         </el-button>
-        <el-button class="filter-item" style="float: right;" type="primary" icon="el-icon-search" @click="handleFilter">
+        <!-- <el-button class="filter-item" style="float: right;" type="primary" icon="el-icon-search" @click="handleFilter">
           {{ $t('table.search') }}
-        </el-button>
+        </el-button> -->
         <!-- <el-button class="filter-item" style="margin-left: 10px;float:right;" type="primary" icon="el-icon-edit" @click="handleShowImport">
           数据导入
         </el-button> -->

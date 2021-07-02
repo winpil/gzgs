@@ -156,7 +156,7 @@ export const asyncRoutes = [
     ],
   },
 
-  {
+  /*{
     path: '/data',
     component: Layout,
     meta:{ roles: [2,3]},
@@ -168,7 +168,7 @@ export const asyncRoutes = [
     }]
   },
 
-  {
+   {
     path: '/area',
     component: Layout,
     meta:{ roles: [2,3]},
@@ -178,7 +178,7 @@ export const asyncRoutes = [
       name: 'area',
       meta: { title: 'area', icon: 'international' , roles: [2,3] }
     }]
-  },
+  }, */
 
   {
     path: '/users',
@@ -193,7 +193,7 @@ export const asyncRoutes = [
     ]
   },
 
-  {
+  /* {
     path: '/backup',
     component: Layout,
     children: [
@@ -218,7 +218,7 @@ export const asyncRoutes = [
         meta: { title: 'importExcel', icon: 'tree-table' , roles: [2,3] }
       }
     ]
-  },
+  }, */
 
   // {
   //   path: '/roles',

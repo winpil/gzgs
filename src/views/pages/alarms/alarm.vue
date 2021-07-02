@@ -22,9 +22,9 @@
         <!-- <el-button class="filter-item" style="margin-left: 10px;float:right;" type="primary" icon="el-icon-edit" @click="handleShowImport">
           数据导入
         </el-button> -->
-        <el-button v-waves class="filter-item" style="float: right;" type="primary" icon="el-icon-setting" @click="handleSet">
+        <!-- <el-button v-waves class="filter-item" style="float: right;" type="primary" icon="el-icon-setting" @click="handleSet">
           事件条件设置
-        </el-button>
+        </el-button> -->
       </div>
 
       <el-table
