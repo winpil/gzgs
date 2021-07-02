@@ -105,20 +105,20 @@ export const asyncRoutes = [
   {
     path: '/devices',
     component: Layout,
-    meta: { title: 'device', icon: 'el-icon-s-platform' , roles: [2,3]},
+    meta: {roles: [2,3]},
     children: [
       {
         path: 'index',
-        component: () => import('@/views/pages/devices/device-gt.vue'),
-        name: 'devices_gt',
-        meta: { title: 'gt_device', icon: 'el-icon-s-platform', roles: [2,3] }
-      },
+        component: () => import('@/views/pages/devices/device.vue'),
+        name: 'devices',
+        meta: { title: 'device', icon: 'el-icon-s-platform', roles: [2,3] }
+      }/* ,
       {
         path: 'smt',
         component: () => import('@/views/pages/devices/device-smt.vue'),
         name: 'devices_smt',
         meta: { title: 'smt_device', icon: 'el-icon-s-platform', roles: [2,3] }
-      }
+      } */
     ]
   },
 

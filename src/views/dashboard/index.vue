@@ -21,12 +21,14 @@
           v-show="showWindow">
               <div class="line-info-title">
                 <span class="title-detail">
-                  <span v-if="infoType == 0">线路名称：{{currentLineInfo.name}}</span>  
+                  <span v-if="infoType == 0">断纤信息</span>  
                   <span v-if="infoType == 1">线路名称：{{currentLineInfo.name}}</span>
                   <span v-if="infoType == 2">告警信息</span>  
                 </span>
               </div>
               <div class="line-info-content" v-if="infoType == 0">
+                <div class="content-detail"><span>断纤地址：</span> <span>{{currentErrorChannels.address}}</span></div>
+                <div class="content-detail"><span>断纤详情：</span> <span>{{currentErrorChannels.fiberInfo}}</span> </div>
               </div>
               <div class="line-info-content" v-if="infoType == 1">
                 <div class="content-detail"><span>线路ID：</span> <span>{{currentLineInfo.field_id}}</span></div>
@@ -36,7 +38,7 @@
                 <div class="content-detail"><span>联系电话：</span> <span>{{currentLineInfo.phone2}}</span> </div>
               </div>
               <div class="line-info-content" v-if="infoType == 2">
-                <div class="content-detail"><span>位置：</span> <span>{{parseFloat(currentAlarm.lng).toFixed(2)}},{{parseFloat(currentAlarm.lat).toFixed(2)}}</span></div>
+                <div class="content-detail"><span>位置：</span> <span>{{currentAlarm.address}}</span></div>
                 <div class="content-detail"><span>距离：</span> <span>{{currentAlarm.position}}</span></div>
                 <div class="content-detail"><span>振动开始时间：</span> <span>{{currentAlarm.beginTime}}</span></div>
                 <div class="content-detail"><span>振动结束时间：</span> <span>{{currentAlarm.endTime}}</span></div>
@@ -46,15 +48,16 @@
                 <div class="content-detail"><el-button style="float: right;margin-right: 10px;"  @click="addToWhiteList(currentAlarm.id)">加入白名单</el-button></div>
               </div>
           </div>
-          <div id="blink">
+          <div v-show="showBlink">
               <img :src="blinkImg" :style="{'position': 'absolute', 'z-index': '12','right': '0px', 'top': '0px'}"/>
           </div>
           <!-- 线路信息窗口结束 -->
           <img src="../../assets/img/map.png" class="f-width f-height abs" style="left: 0; top: 0;z-index: 2;" alt="">
           <baidu-map :mapStyle="mapStyle" :mapClick="false" :scroll-wheel-zoom="true" :center="center" :zoom="zoom" @ready="handler" class="bm-view">
             <!-- 自定义点 -->
-            <bm-marker :position="item" :dragging="false" v-for="(item) in linePoint" :key="item.id" :icon="{url: item.icon, size: {width: 35, height: 35}}"></bm-marker>
-            <bm-marker :position="item" :dragging="false" v-for="(item) in alarmPoints" :key="item.id" :icon="{url: item.icon, size: {width: 35, height: 35}}" @click="showAlarmInfo(item)"></bm-marker>
+            <bm-marker :position="item" :dragging="false" v-for="(item) in linePoint" :key="'linePoint' + item.id" :icon="{url: item.icon, size: {width: 35, height: 35}}"></bm-marker>
+            <bm-marker :position="item" :dragging="false" v-for="(item) in alarmPoints" :key="'alarmPoint'+ item.id" :icon="{url: item.icon, size: {width: 35, height: 35}}" @click="showAlarmInfo(item)"></bm-marker>
+            <bm-marker :position="item" :dragging="false" v-for="(item) in deviceErrorChannels" :key="item.deviceCode + item.id" :icon="{url: item.icon, size: {width: 35, height: 35}}" @click="showErrorChannelsInfo(item)">></bm-marker>
              <!-- <bm-marker :position="item" :dragging="false" v-for="(item, index) in linePoint" :key="index" :icon="{url: item.icon, size: {width: 35, height: 35}}" @click="handleShowDecInfo(item.id)"></bm-marker>-->
             <!-- <bm-marker :position="item" :dragging="true" v-for="(item, index) in polylinePath" :key="index" :icon="{url: 'https://s1.ax1x.com/2020/08/03/aUAul9.gif', size: {width: 35, height: 35}}"></bm-marker> -->
             <!-- 折线控件 -->
@@ -124,19 +127,16 @@
           <img src="../../assets/img/event.png" class="f-width f-height" alt="">
           <div class="com-title-wrapper abs">
             <img src="../../assets/img/title.png" class="f-width f-height" alt="">
-            <span class="com-title-content abs">近期事件汇总</span>
+            <span class="com-title-content abs">告警统计</span>
           </div>
-          <div class="f-width f-height abs" style="top: 13%;left: 3.5%;text-align: center;" >
-            <span style="color:#fff;font-size: 15px;">{{deviceName}}</span>
-          </div>
-          <div class="f-width f-height abs" style="top: 20%;left: 3.5%;color:#fff;font-size: 15px;" >
+          <div class="f-width f-height abs" style="top: 15%;left: 3.5%;color:#fff;font-size: 15px;" >
             线路：<el-select ref="selectLine2" class="map-select" size="mini" v-model="mapForm.line2" @change="changeLine2" :popper-append-to-body="false">
               <el-option v-for="item in lineList2" :key="item.field_id"  :value="item.field_id" :label="item.field_name">
                 {{item.field_name}}
               </el-option>
             </el-select>
           </div>
-          <div class="abs f-width user_skills scrollbar" style="top: 30%;height: 100%;">
+          <div class="abs f-width user_skills scrollbar" style="top: 20%;height: 100%;">
             <el-scrollbar style="height:100%">
             <el-table
               :data="alarmCountList"
@@ -144,13 +144,13 @@
               <el-table-column
                 prop="name"
                 align="center"
-                width="80"
+                width="77"
                 label="告警等级">
               </el-table-column>
               <el-table-column
                 prop="alarm_times"
                 label="报警次数"
-                width="80"
+                width="77"
                 align="center">
               </el-table-column>
               <el-table-column
@@ -227,6 +227,7 @@ export default {
       currentDev: {},
       currentZone: {},
       currentAlarm:{},
+      currentErrorChannels:{},
       whiteListForm:{},
       infoType: '',
       areaList: [],
@@ -237,6 +238,7 @@ export default {
       currentLine : "全部",
       currentLineInfo:{},
       currentDate : 1,
+      showBlink : true,
       currentStartDate : this.defaultStartDate(),
       currentEndDate : this.defaultEndDate(),
       realTime : true,
@@ -258,6 +260,7 @@ export default {
       showDeviceMsg: false,
       isDeviceError: false,
       deviceErrorMsg:"正常运行",
+      deviceErrorChannels : [],
       alarmCountList: [],
       tableData: [{
             date: '2016-05-02',
@@ -320,6 +323,7 @@ export default {
     }else{
       this.getTableData();
     }
+    this.getErrorChannels()
     this.queryLineDetail() // 获取所有责任区的告警事件
     this.time = (new Date()).toLocaleString()
   },
@@ -339,7 +343,7 @@ export default {
     }, 1000)
     setInterval(() => {
       this.getDeviceInfo()//获取设备状态
-      this.showBlink()//亮灯
+      this.builBlink()//亮灯
     }, 1000)
     //设备故障时十分钟提醒一次
     setInterval(() => {
@@ -670,6 +674,7 @@ export default {
               alarmPoint.alarmType = it.alarm_type
               alarmPoint.frequency = it.frequency
               alarmPoint.fieldId = it.field_id
+              alarmPoint.address = it.address
               if(it.alarm_level == "严重告警"){
                 alarmPoint.icon = "https://z3.ax1x.com/2021/06/20/RFTa9g.png"
               }else if(it.alarm_level == "中级告警"){
@@ -686,7 +691,7 @@ export default {
     getRealTableData() {
       let params = {}
       queryRealTimeAlarm(params).then(res => {
-        if (res.retcode === 200 && res.result && res.result.length > 0) {
+        if (res.retcode === 200) {
           this.tableData = res.result
           this.alarmPoints = [];
           res.result.forEach(it => {
@@ -702,6 +707,7 @@ export default {
             alarmPoint.alarmType = it.alarm_type
             alarmPoint.frequency = it.frequency
             alarmPoint.fieldId = it.field_id
+            alarmPoint.address = it.address
             if(it.alarm_level == "严重告警"){
               if(it.is_now_shake){
                 alarmPoint.icon = "https://z3.ax1x.com/2021/06/21/RELfaj.gif"
@@ -747,9 +753,22 @@ export default {
         }
       })
     },
+    getErrorChannels(){
+      deviceInfo().then(res => {
+        if (res.retcode === 200) {
+          let rs = res.result[0]//只有一个设备
+          this.deviceErrorChannels = [];
+          rs.channels.forEach(it => {
+            if(it.fiber_info != "正常"){
+              this.deviceErrorChannels.push({"id":it.id,"lng":it.longitude,"lat":it.latitude,"fiberInfo":it.fiber_info,"address":it.address,"icon":"https://z3.ax1x.com/2021/07/02/RcXvcR.png","deviceCode":it.device_code});
+            }
+          })
+        }
+      })
+    },
     getDeviceInfo() {
      deviceInfo().then(res => {
-        if (res.retcode === 200 && res.result && res.result.length > 0) {
+        if (res.retcode === 200) {
           this.deviceErrorMsg = "";
           let flag = true
           let rs = res.result[0]//只有一个设备
@@ -757,7 +776,7 @@ export default {
           rs.channels.forEach(it => {
             if(it.fiber_info != "正常"){
               flag = false
-              deviceErrorMsg += it.id+"号通道"+it.fiber_info+"&"
+              this.deviceErrorMsg += it.id+"号光纤"+it.fiber_info+"&"
             }
           })
           let deviceStatus = rs.device_run_status[0];
@@ -867,6 +886,12 @@ export default {
       this.showWindow = true
       this.$forceUpdate()
     },
+    showErrorChannelsInfo(it) {
+      this.currentErrorChannels = it
+      this.infoType = 0
+      this.showWindow = true
+      this.$forceUpdate()
+    },
     addToWhiteList(id) {
       this.showModal = true
       this.whiteListForm.id = id
@@ -878,7 +903,7 @@ export default {
       let params = {}
       params.area_id = this.defaultAreaId;
       queryAreaGps(params).then(res => {
-        if (res.retcode === 200 && res.result && res.result.length > 0) {
+        if (res.retcode === 200) {
           this.lines2 = [];
           this.linePoint = [];
           res.result[0].fields.forEach(line => {
@@ -1123,14 +1148,11 @@ export default {
         alertWhite(params).then(res => {
           if (res.retcode === 200) {
             this.$message({ type: 'success', message: '加入白名单成功！' })
-            //加入白名单后延迟3秒获取告警
-            setTimeout(function () {
-              if(this.realTime){
-                this.getRealTableData();
-              }else{
-                this.getTableData();
-              }
-            },3000)
+            if(this.realTime){
+              this.getRealTableData();
+            }else{
+              this.getTableData();
+            }
           }
         })
         this.showModal = false
@@ -1142,9 +1164,8 @@ export default {
       // 取消弹窗回调
       this.showDeviceMsg = false
     },
-    showBlink() {
-      var blink = document.getElementById("blink");
-      blink.style.visibility = (blink.style.visibility == "visible") ? "hidden" : "visible";
+    builBlink() {
+      this.showBlink = !this.showBlink
     },
     cleanAlarm() {
       let params = {}
@@ -1156,21 +1177,17 @@ export default {
       clearAlarm(params).then(res => {
         if (res.retcode === 200) {
           this.$message({ type: 'success', message: '清空告警成功！' })
-          //清空告警后延迟3秒获取告警
-          setTimeout(function () {
-            if(this.realTime){
-              this.getRealTableData();
-            }else{
-              this.getTableData();
-            }
-          },3000)
+          if(this.realTime){
+            this.getRealTableData();
+          }else{
+            this.getTableData();
+          }
         }
       })
     },
     getAlarmCount(){
       let params = {}
       params.field_id = this.mapForm.line2
-      console.log("params.field_id:",params.field_id)
       queryAlarmCount(params).then(res => {
         if (res.retcode === 200) {
           this.alarmCountList = res.result
@@ -1489,5 +1506,4 @@ export default {
   }
 
 }
-
 </style>
