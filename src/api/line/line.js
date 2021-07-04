@@ -23,7 +23,7 @@ export function updateLine(query) {
     return request({
         url: '/api/v1/line_set/',
         method: 'put',
-        params: query
+        data: query
       })
 }
 
