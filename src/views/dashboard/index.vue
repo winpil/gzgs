@@ -5,7 +5,7 @@
       <img src="../../assets/img/topleft.png" class="top-left-wrapper" alt="">
       <div class="top-mid-wrapper">
         <img src="../../assets/img/topmid.png" class="f-width f-width">
-        <span class="title-content f-width abs">振动预警防护全覆盖平台</span>
+        <span class="title-content f-width abs">预警平台网管系统</span>
       </div>
       <img src="../../assets/img/topright.png" class="top-right-img abs">
       <span style="position: absolute;z-index: 9;color: #23cefd;right: 3%;top: 10%;">{{time}}</span>
@@ -241,6 +241,12 @@ export default {
       showBlink : true,
       currentStartDate : this.defaultStartDate(),
       currentEndDate : this.defaultEndDate(),
+      endPointIcon : ["https://z3.ax1x.com/2021/07/03/RREFwF.png",
+                      "https://z3.ax1x.com/2021/07/03/RRECLT.png",
+                      "https://z3.ax1x.com/2021/07/03/RREwm8.png",
+                      "https://z3.ax1x.com/2021/07/03/RRE9yV.png",
+                      "https://z3.ax1x.com/2021/07/03/RRAzzq.png",
+                      "https://z3.ax1x.com/2021/07/03/RREieU.png"],
       realTime : true,
       blinkImg : require("../../assets/img/greenLight.png"),
       mapStyle: {
@@ -560,8 +566,8 @@ export default {
                   //线路图
                   this.lines2 = [];
                   this.linePoint = [];
-                  res.result[0].fields.forEach(line => {
-                    this.buildMapLines(line);
+                  res.result[0].fields.forEach((it,i) => {
+                    this.buildMapLines(it,i);
                   })
                   return true;
                 }
@@ -571,7 +577,7 @@ export default {
         }
       })
     },
-    buildMapLines(line) {
+    buildMapLines(line,i) {
       if(this.currentLine == "全部" || this.realTime || line.field_id == this.currentLine){
         let tempObj = {}
         tempObj.points = []
@@ -601,13 +607,14 @@ export default {
           startPoint.icon = "https://z3.ax1x.com/2021/06/21/RELhIs.png"
           this.linePoint.push(startPoint);
         }
+        i = i % 6
         let endPoint = {};
         endPoint.lng = line.nodes[line.nodes.length-1].longitude
         endPoint.lat = line.nodes[line.nodes.length-1].latitude
         endPoint.filedId = line.field_id
         endPoint.type = "end"
         endPoint.id = line.field_id + "end"
-        endPoint.icon = "https://z3.ax1x.com/2021/06/21/RELgsS.png"
+        endPoint.icon = this.endPointIcon[i]
         this.linePoint.push(endPoint);
       }
     },
@@ -906,8 +913,8 @@ export default {
         if (res.retcode === 200) {
           this.lines2 = [];
           this.linePoint = [];
-          res.result[0].fields.forEach(line => {
-            this.buildMapLines(line);
+          res.result[0].fields.forEach((it,i) => {
+            this.buildMapLines(it,i);
           })
         }
       })

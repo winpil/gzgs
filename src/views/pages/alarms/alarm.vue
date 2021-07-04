@@ -2,7 +2,7 @@
   <div class="app-container">
     <div v-if="pageFlag === pageType.list">
       <div class="filter-container" style="margin-bottom: 10px;">
-        <el-input v-model="queryForm.keyword" clearable placeholder="设备号/区域/设备代号" style="width: 200px;margin-right: 10px;margin-bottom: 1px;" class="filter-item" @keyup.enter.native="handleFilter" />
+        <el-input v-model="queryForm.keyword" clearable placeholder="线路ID" style="width: 200px;margin-right: 10px;margin-bottom: 1px;" class="filter-item" @keyup.enter.native="handleFilter" />
         <el-date-picker
             v-model="queryForm.dateTime"
             type="datetimerange"
@@ -36,26 +36,43 @@
         highlight-current-row
         style="width: 100%;"
       >
-        <el-table-column label="ID" prop="id" align="center" width="80">
+        <el-table-column label="序号" type="index" align="center" width="50">
+        </el-table-column>
+        <el-table-column label="线路ID" width="70px" prop="channel" align="center">
           <template slot-scope="{row}">
-            <span>{{ row.id }}</span>
+            <span>{{ row.channel }}</span>
           </template>
         </el-table-column>
-       <el-table-column label="设备号" width="200px" align="center" prop="device_id">
+        <el-table-column label="线路名" width="200px" align="center" prop="line_name">
         </el-table-column>
-        <el-table-column label="设备类型" width="100px" align="center" prop="device_type">
+       <!-- <el-table-column label="设备号" width="200px" align="center" prop="device_id">
+        </el-table-column> -->
+        <!-- <el-table-column label="设备类型" width="100px" align="center" prop="device_type">
           <template slot-scope="{row}">
             <span>{{ row.device_type === 0 ? '防区型' : '定位型' }}</span>
           </template>
-        </el-table-column>
-        <el-table-column label="发生时间" width="200px" align="center" prop="begin_time">
+        </el-table-column> -->
+        <el-table-column label="开始时间" width="160px" align="center" prop="begin_time">
           <template slot-scope="{row}">
-            <span>{{ row.begin_time.split('T')[0] + '  ' + row.begin_time.split('T')[1] }}</span>
+            <span>{{ row.begin_time.split('T')[0] }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="发生位置" width="300px" align="center" prop="position">
+        <el-table-column label="结束时间" width="160px" align="center" prop="end_time">
+          <template slot-scope="{row}">
+            <span>{{ row.end_time.split('T')[0] }}</span>
+          </template>
         </el-table-column>
-        <el-table-column label="事件状态" width="200px" align="center" prop="status">
+        <el-table-column label="位置" width="180px" align="center" prop="address">
+        </el-table-column>
+        <el-table-column label="距离" width="80px" align="center" prop="position">
+        </el-table-column>
+        <el-table-column label="次数" width="50px" align="center" prop="frequency">
+        </el-table-column>
+        <el-table-column label="告警级别" width="80px" align="center" prop="alarm_level">
+        </el-table-column>
+        <el-table-column label="告警分类" width="80px" align="center" prop="alarm_type">
+        </el-table-column>
+        <el-table-column label="事件状态" width="150px" align="center" prop="status">
           <template slot-scope="{row}">
             <div style="display: flex;padding-left: 30px;justify-content: space-between;">
               <span v-if="row.status == 0" class="el-icon-warning" style="font-size: 16px;flex: 0 0 20px;padding-top: 3px;color: orange;"></span>
@@ -68,7 +85,7 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column label="非受控描述" width="200px" align="center" prop="text">
+        <!-- <el-table-column label="非受控描述" width="200px" align="center" prop="text">
           <template slot-scope="{row}">
             {{ row.text == 0 ? '无' : row.text }}
           </template>
@@ -89,7 +106,7 @@
           <template slot-scope="{row}">
             <span>{{Number(row.latitude).toFixed(4)}}</span>
           </template>
-        </el-table-column>
+        </el-table-column> -->
         
         <el-table-column fixed="right" :label="$t('table.actions')" align="center" width="120" class-name="small-padding fixed-width">
           <template slot-scope="{row}">
@@ -103,7 +120,7 @@
         </el-table-column>
       </el-table>
 
-      <pagination v-show="total>0" :total="total" :page.sync="queryForm.page" :limit.sync="queryForm.limit" @pagination="getList" />
+      <pagination v-show="total>0" :total="total" :page-sizes="pageSizes" :page.sync="queryForm.page" :limit.sync="queryForm.limit" @pagination="getList" />
     </div>
     <div v-else-if="pageFlag === pageType.set">
       <div class="filter-container formBar">
@@ -212,13 +229,13 @@
       </div>
       <div v-else-if="showFlag === dialogType.deal">
         <el-form ref="eventForm" label-position="left" label-width="100px" :model="eventForm" style="overflow: hidden;" :rules="eventRules">
-          <div class="event-wrapper">
+          <!-- <div class="event-wrapper">
             <el-radio-group v-model="eventDealType" size="small" style="margin-bottom: 20px;">
               <el-radio label="2" border>管控中事件</el-radio>
               <el-radio label="1" border>非管控中事件</el-radio>
               <el-radio label="3" border>未发生事件</el-radio>
             </el-radio-group>
-          </div>
+          </div> -->
           <div class="event-wrapper">
             <el-form-item label="现场联系人:" class="flex-item" style="margin-right: 80px;flex: 1;" prop="e_name">
               <el-input placeholder="请输入现场联系人姓名" v-model="eventForm.e_name"></el-input>
@@ -240,7 +257,7 @@
               </el-input>
             </el-form-item>
           </div>
-          <div class="event-wrapper">
+          <!-- <div class="event-wrapper">
             <el-upload
               class="upload-demo"
               action="https://jsonplaceholder.typicode.com/posts/"
@@ -249,7 +266,7 @@
               <el-button size="small" type="primary">点击上传</el-button>
               <div slot="tip" class="el-upload__tip">只能上传jpg/png/jpeg文件</div>
             </el-upload>
-          </div>
+          </div> -->
           <el-button style="float: right;margin-right: 90px;margin-left: 10px;" @click="handleCancel">取消</el-button>
           <el-button type="primary" style="float: right;" @click="handleFinishDeal">确认</el-button>
         </el-form>
@@ -305,6 +322,7 @@ export default {
       tableKey: 0,
       list: [],
       total: 0,
+      pageSizes : [15,20,30,50],
       listLoading: true,
       postRules: {
         name: [{ required: true, message: '请输入名称代号', trigger: 'blur' }],
@@ -418,19 +436,27 @@ export default {
       let params = {}
       params.page = this.queryForm.page
       params.limit = this.queryForm.limit
+      if(this.queryForm.keyword && this.queryForm.keyword.length > 0){
+        params.channel = this.queryForm.keyword
+      }
+      if(this.queryForm.dateTime){
+        params.begin_time = (this.queryForm.dateTime[0].getTime()+"").substr(0,10)
+        params.end_time = (this.queryForm.dateTime[1].getTime()+"").substr(0,10)
+      }
       queryAlarm(params).then(res => {
         if (res.retcode === 200) {
-          if (!res.result || res.result.length == 0) {
+          /* if (!res.result || res.result.length == 0) {
             // Just to simulate the time of the request
             setTimeout(() => {
               this.listLoading = false
             }, 1 * 1000)
             return
-          }
+          } */
           this.list = this.dataDeal(res.result) || []
-          if (this.list && this.list.length > 0) {
-            this.total = this.list.length
-          }
+          this.total = res.total
+          /* if (this.list && this.list.length > 0) {
+            this.total = 176
+          } */ 
           // Just to simulate the time of the request
           setTimeout(() => {
             this.listLoading = false
@@ -552,8 +578,8 @@ export default {
       } else {
         this.showFlag = this.dialogType.deal
       }
-      this.confirmForm.line = this.currentRow.line
-      this.confirmForm.time = row.begin_time.split('T')[0] + '  ' + row.begin_time.split('T')[1]
+      this.confirmForm.line = this.currentRow.line_name
+      this.confirmForm.time = row.begin_time.split('T')[0]
       this.confirmForm.person = this.currentRow.name
       this.confirmForm.position = this.currentRow.position
       console.log('confirmForm', this.confirmForm)

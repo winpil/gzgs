@@ -1,5 +1,5 @@
 module.exports = {
-  title: '运维管理系统',
+  title: '预警平台网管系统',
 
   /**
    * @type {boolean} true | false
