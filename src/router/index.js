@@ -102,7 +102,7 @@ export const constantRoutes = [
 export const asyncRoutes = [
   /** when your routing map is too long, you can split it into small modules **/
 
-  {
+  /*{
     path: '/devices',
     component: Layout,
     meta: {roles: [2,3]},
@@ -112,15 +112,15 @@ export const asyncRoutes = [
         component: () => import('@/views/pages/devices/device.vue'),
         name: 'devices',
         meta: { title: 'device', icon: 'el-icon-s-platform', roles: [2,3] }
-      }/* ,
+      } ,
       {
         path: 'smt',
         component: () => import('@/views/pages/devices/device-smt.vue'),
         name: 'devices_smt',
         meta: { title: 'smt_device', icon: 'el-icon-s-platform', roles: [2,3] }
-      } */
+      } 
     ]
-  },
+  },*/
 
   {
     path: '/lines',

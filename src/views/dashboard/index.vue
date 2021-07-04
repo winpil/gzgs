@@ -31,7 +31,7 @@
                 <div class="content-detail"><span>断纤详情：</span> <span>{{currentErrorChannels.fiberInfo}}</span> </div>
               </div>
               <div class="line-info-content" v-if="infoType == 1">
-                <div class="content-detail"><span>线路ID：</span> <span>{{currentLineInfo.field_id}}</span></div>
+                <div class="content-detail"><span>线路ID：</span> <span>{{currentLineInfo.channel_code}}</span></div>
                 <div class="content-detail"><span>负责人1：</span> <span>{{currentLineInfo.head1}}</span> </div>
                 <div class="content-detail"><span>联系电话：</span> <span>{{currentLineInfo.phone1}}</span> </div>
                 <div class="content-detail"><span>负责人2：</span> <span>{{currentLineInfo.head2}}</span> </div>
@@ -55,14 +55,14 @@
           <img src="../../assets/img/map.png" class="f-width f-height abs" style="left: 0; top: 0;z-index: 2;" alt="">
           <baidu-map :mapStyle="mapStyle" :mapClick="false" :scroll-wheel-zoom="true" :center="center" :zoom="zoom" @ready="handler" class="bm-view">
             <!-- 自定义点 -->
-            <bm-marker :position="item" :dragging="false" v-for="(item) in linePoint" :key="'linePoint' + item.id" :icon="{url: item.icon, size: {width: 35, height: 35}}"></bm-marker>
+            <bm-marker :position="item" :dragging="false" v-for="(item) in linePoint" :key="'linePoint' + item.id" :icon="{url: item.icon, size: {width: 35, height: 35}}" @click="showLineInfo(item)"></bm-marker>
             <bm-marker :position="item" :dragging="false" v-for="(item) in alarmPoints" :key="'alarmPoint'+ item.id" :icon="{url: item.icon, size: {width: 35, height: 35}}" @click="showAlarmInfo(item)"></bm-marker>
             <bm-marker :position="item" :dragging="false" v-for="(item) in deviceErrorChannels" :key="item.deviceCode + item.id" :icon="{url: item.icon, size: {width: 35, height: 35}}" @click="showErrorChannelsInfo(item)">></bm-marker>
              <!-- <bm-marker :position="item" :dragging="false" v-for="(item, index) in linePoint" :key="index" :icon="{url: item.icon, size: {width: 35, height: 35}}" @click="handleShowDecInfo(item.id)"></bm-marker>-->
             <!-- <bm-marker :position="item" :dragging="true" v-for="(item, index) in polylinePath" :key="index" :icon="{url: 'https://s1.ax1x.com/2020/08/03/aUAul9.gif', size: {width: 35, height: 35}}"></bm-marker> -->
             <!-- 折线控件 -->
             <!--<div v-for="(line, index) in lines" :key=" 'line' + '-' + line.zone_id + '-' + index">-->
-              <bm-polyline v-for="(item, index2) in lines2" :key="item.field_id" :path="item.points" :stroke-color="item.lineColor"
+              <bm-polyline v-for="(item, index2) in lines2" :key="'lines'+ item.channel_code" :path="item.points" :stroke-color="item.lineColor"
                 @mouseover="lineIn(item,index2)" 
                 @mouseout="lineOut(item,index2)"
                 :stroke-opacity="0.75" :stroke-weight="4" :editing="false" @click="showLineInfo(item)" >
@@ -104,7 +104,7 @@
           </div>
           <div class="f-width f-height abs" style="top: 35%;left: 3.5%;" >
             <el-select ref="selectLine" class="map-select" size="mini" v-model="mapForm.line" @change="changeLine" v-bind:disabled="realTime" :popper-append-to-body="false">
-              <el-option v-for="item in lineList" :key="item.field_id"  :value="item.field_id" :label="item.field_name">
+              <el-option v-for="item in lineList" :key="item.channel_code"  :value="item.channel_code" :label="item.field_name">
                 {{item.field_name}}
               </el-option>
             </el-select>
@@ -484,7 +484,7 @@ export default {
                 nodeObj.order = node.order
                 tempObj['points'].push(nodeObj)
               })
-              tempObj.field_id = item.field_id
+              tempObj.channel_code = item.channel_code
               tempObj.lineColor = NORMAL_COLOR
               originLine.fields.push(tempObj)
             })
@@ -531,9 +531,9 @@ export default {
           //下拉框内容
           this.lineList = [];
           this.lineList2 = [];
-          this.lineList.push({"field_id":"全部","field_name":"全部"})
+          this.lineList.push({"channel_code":"全部","field_name":"全部"})
           res.result[0].fields.forEach(f => {
-              this.lineList.push({"field_id":f.field_id,"field_name":f.field_name})
+              this.lineList.push({"channel_code":f.channel_code,"field_name":f.field_name})
               this.lineList2.push({"field_id":f.field_id,"field_name":f.field_name})
           })
           this.mapForm.line = this.currentLine;
@@ -578,7 +578,7 @@ export default {
       })
     },
     buildMapLines(line,i) {
-      if(this.currentLine == "全部" || this.realTime || line.field_id == this.currentLine){
+      if(this.currentLine == "全部" || this.realTime || line.channel_code == this.currentLine){
         let tempObj = {}
         tempObj.points = []
         line.nodes.forEach(node => {
@@ -588,7 +588,7 @@ export default {
           nodeObj.order = node.order
           tempObj['points'].push(nodeObj)
         })
-        tempObj.field_id = line.field_id
+        tempObj.channel_code = line.channel_code
         tempObj.name = line.field_name
         tempObj.head1 = line.head1
         tempObj.phone1 = line.phone1
@@ -601,9 +601,9 @@ export default {
           let startPoint = {};
           startPoint.lng = line.nodes[0].longitude
           startPoint.lat = line.nodes[0].latitude
-          startPoint.filedId = line.field_id
+          startPoint.filedId = line.channel_code
           startPoint.type = "start"
-          startPoint.id = line.field_id + "start"
+          startPoint.id = line.channel_code + "start"
           startPoint.icon = "https://z3.ax1x.com/2021/06/21/RELhIs.png"
           this.linePoint.push(startPoint);
         }
@@ -611,9 +611,15 @@ export default {
         let endPoint = {};
         endPoint.lng = line.nodes[line.nodes.length-1].longitude
         endPoint.lat = line.nodes[line.nodes.length-1].latitude
-        endPoint.filedId = line.field_id
+        endPoint.filedId = line.channel_code
         endPoint.type = "end"
-        endPoint.id = line.field_id + "end"
+        endPoint.id = line.channel_code + "end"
+        endPoint.name = line.field_name
+        endPoint.head1 = line.head1
+        endPoint.phone1 = line.phone1
+        endPoint.head2 = line.head2
+        endPoint.phone2 = line.phone2
+        endPoint.channel_code = line.channel_code
         endPoint.icon = this.endPointIcon[i]
         this.linePoint.push(endPoint);
       }
@@ -667,8 +673,8 @@ export default {
           this.tableData = [];
           this.alarmPoints = [];
           res.result.forEach(it => {
-            if(it.field_id == this.currentLine || this.currentLine == "全部"){
-              this.tableData.push({"field_id":it.field_id,"alarm_level":it.alarm_level})
+            if(it.channel == this.currentLine || this.currentLine == "全部"){
+              this.tableData.push({"field_id":it.channel_code,"alarm_level":it.alarm_level})
               let alarmPoint = {};
               alarmPoint.lng = it.longitude
               alarmPoint.lat = it.latitude
@@ -680,7 +686,7 @@ export default {
               alarmPoint.position = it.position
               alarmPoint.alarmType = it.alarm_type
               alarmPoint.frequency = it.frequency
-              alarmPoint.fieldId = it.field_id
+              alarmPoint.fieldId = it.channel_code
               alarmPoint.address = it.address
               if(it.alarm_level == "严重告警"){
                 alarmPoint.icon = "https://z3.ax1x.com/2021/06/20/RFTa9g.png"
@@ -713,7 +719,7 @@ export default {
             alarmPoint.position = it.position
             alarmPoint.alarmType = it.alarm_type
             alarmPoint.frequency = it.frequency
-            alarmPoint.fieldId = it.field_id
+            alarmPoint.fieldId = it.channel_code
             alarmPoint.address = it.address
             if(it.alarm_level == "严重告警"){
               if(it.is_now_shake){
@@ -766,7 +772,7 @@ export default {
           let rs = res.result[0]//只有一个设备
           this.deviceErrorChannels = [];
           rs.channels.forEach(it => {
-            if(it.fiber_info != "正常"){
+            if(it.fiber_info != "正常" && (this.currentLine == "全部" || this.realTime || it.channel_code == this.currentLine)){
               this.deviceErrorChannels.push({"id":it.id,"lng":it.longitude,"lat":it.latitude,"fiberInfo":it.fiber_info,"address":it.address,"icon":"https://z3.ax1x.com/2021/07/02/RcXvcR.png","deviceCode":it.device_code});
             }
           })
@@ -919,6 +925,7 @@ export default {
         }
       })
       this.getTableData();
+      this.getErrorChannels();
     },
     changeLine2(val){
       this.lineList2.forEach((it,i) => {
@@ -975,10 +982,12 @@ export default {
       this.lines2[i].lineColor = '#23cefd'
     },
     showLineInfo(it) {
-      this.currentLineInfo = it
-      this.infoType = 1
-      this.showWindow = true
-      this.$forceUpdate()
+      if(it.type != "start"){
+        this.currentLineInfo = it
+        this.infoType = 1
+        this.showWindow = true
+        this.$forceUpdate()
+      }
     },
     handleShowAreaInfo() {
       this.showArea = !this.showArea
