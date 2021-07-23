@@ -31,7 +31,7 @@
                 <div class="content-detail"><span>断纤详情：</span> <span>{{currentErrorChannels.fiberInfo}}</span> </div>
               </div>
               <div class="line-info-content" v-if="infoType == 1">
-                <div class="content-detail"><span>线路ID：</span> <span>{{currentLineInfo.channel_code}}</span></div>
+                <div class="content-detail"><span>线路ID：</span> <span>{{Number(currentLineInfo.channel_code)+1}}</span></div>
                 <div class="content-detail"><span>负责人1：</span> <span>{{currentLineInfo.head1}}</span> </div>
                 <div class="content-detail"><span>联系电话：</span> <span>{{currentLineInfo.phone1}}</span> </div>
                 <div class="content-detail"><span>负责人2：</span> <span>{{currentLineInfo.head2}}</span> </div>
