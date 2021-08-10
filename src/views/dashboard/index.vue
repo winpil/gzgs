@@ -795,6 +795,8 @@ export default {
           let deviceStatus = rs.device_run_status[0];
           if(flag && deviceStatus.is_online && deviceStatus.is_device_online && deviceStatus.device_status ){
             this.blinkImg = require("../../assets/img/greenLight.png")
+            this.showDeviceMsg = false;
+            this.isDeviceError = false;
           }else{
             this.blinkImg = require("../../assets/img/redLigth.png")
             if(!this.isDeviceError){
