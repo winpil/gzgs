@@ -207,6 +207,7 @@ export default {
   name: 'Dashboard',
   data() {
     return {
+      mapBaseImgUrl:'http://139.159.199.30:9528/img/',
       fullscreen: false,
       value1: '',
       time: '',
@@ -241,12 +242,7 @@ export default {
       showBlink : true,
       currentStartDate : this.defaultStartDate(),
       currentEndDate : this.defaultEndDate(),
-      endPointIcon : ["https://z3.ax1x.com/2021/07/03/RREFwF.png",
-                      "https://z3.ax1x.com/2021/07/03/RRECLT.png",
-                      "https://z3.ax1x.com/2021/07/03/RREwm8.png",
-                      "https://z3.ax1x.com/2021/07/03/RRE9yV.png",
-                      "https://z3.ax1x.com/2021/07/03/RRAzzq.png",
-                      "https://z3.ax1x.com/2021/07/03/RREieU.png"],
+      endPointIcon : [],
       realTime : true,
       blinkImg : require("../../assets/img/greenLight.png"),
       mapStyle: {
@@ -317,6 +313,12 @@ export default {
       Modal
     },
   created() {
+    this.endPointIcon=[this.mapBaseImgUrl+"RREFwF.png",
+                      this.mapBaseImgUrl+"RRECLT.png",
+                      this.mapBaseImgUrl+"RREwm8.png",
+                      this.mapBaseImgUrl+"RRE9yV.png",
+                      this.mapBaseImgUrl+"RRAzzq.png",
+                      this.mapBaseImgUrl+"RREieU.png"];
     //this.getInfo()
     this.getDeviceGps()
     this.getLineList();
@@ -604,7 +606,7 @@ export default {
           startPoint.filedId = line.channel_code
           startPoint.type = "start"
           startPoint.id = line.channel_code + "start"
-          startPoint.icon = "https://z3.ax1x.com/2021/06/21/RELhIs.png"
+          startPoint.icon = this.mapBaseImgUrl+"RELhIs.png"
           this.linePoint.push(startPoint);
         }
         i = i % 6
@@ -689,11 +691,11 @@ export default {
               alarmPoint.fieldId = it.channel_code
               alarmPoint.address = it.address
               if(it.alarm_level == "严重告警"){
-                alarmPoint.icon = "https://z3.ax1x.com/2021/06/20/RFTa9g.png"
+                alarmPoint.icon = this.mapBaseImgUrl+"RFTa9g.png"
               }else if(it.alarm_level == "中级告警"){
-                alarmPoint.icon = "https://z3.ax1x.com/2021/06/20/RFTwcj.png"
+                alarmPoint.icon = this.mapBaseImgUrl+"RFTwcj.png"
               }else{
-                alarmPoint.icon = "https://z3.ax1x.com/2021/06/20/RFTd3Q.png";
+                alarmPoint.icon = this.mapBaseImgUrl+"RFTd3Q.png";
               }
               this.alarmPoints.push(alarmPoint);
             }
@@ -723,21 +725,21 @@ export default {
             alarmPoint.address = it.address
             if(it.alarm_level == "严重告警"){
               if(it.is_now_shake){
-                alarmPoint.icon = "https://z3.ax1x.com/2021/06/21/RELfaj.gif"
+                alarmPoint.icon = this.mapBaseImgUrl+"RELfaj.gif"
               }else{
-                alarmPoint.icon = "https://z3.ax1x.com/2021/06/20/RFTa9g.png"
+                alarmPoint.icon = this.mapBaseImgUrl+"RFTa9g.png"
               }
             }else if(it.alarm_level == "中级告警"){
               if(it.is_now_shake){
-                alarmPoint.icon = "https://z3.ax1x.com/2021/06/21/RELWZQ.gif"
+                alarmPoint.icon = this.mapBaseImgUrl+"RELWZQ.gif"
               }else{
-                alarmPoint.icon = "https://z3.ax1x.com/2021/06/20/RFTwcj.png"
+                alarmPoint.icon = this.mapBaseImgUrl+"RFTwcj.png"
               }
             }else{
               if(it.is_now_shake){
-                alarmPoint.icon = "https://z3.ax1x.com/2021/06/21/REL2qg.gif";
+                alarmPoint.icon = this.mapBaseImgUrl+"REL2qg.gif";
               }else{
-                alarmPoint.icon = "https://z3.ax1x.com/2021/06/20/RFTd3Q.png";
+                alarmPoint.icon = this.mapBaseImgUrl+"RFTd3Q.png";
               }
             }
             this.alarmPoints.push(alarmPoint);
@@ -773,7 +775,7 @@ export default {
           this.deviceErrorChannels = [];
           rs.channels.forEach(it => {
             if(it.fiber_info != "正常" && (this.currentLine == "全部" || this.realTime || it.channel_code == this.currentLine)){
-              this.deviceErrorChannels.push({"id":it.id,"lng":it.longitude,"lat":it.latitude,"fiberInfo":it.fiber_info,"address":it.address,"icon":"https://z3.ax1x.com/2021/07/02/RcXvcR.png","deviceCode":it.device_code});
+              this.deviceErrorChannels.push({"id":it.id,"lng":it.longitude,"lat":it.latitude,"fiberInfo":it.fiber_info,"address":it.address,"icon":this.mapBaseImgUrl+"RcXvcR.png","deviceCode":it.device_code});
             }
           })
         }
