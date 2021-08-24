@@ -1,0 +1,1 @@
+修改/src/main.js文件中的 Vue.prototype.selfImgBaseUrl

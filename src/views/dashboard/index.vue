@@ -207,7 +207,6 @@ export default {
   name: 'Dashboard',
   data() {
     return {
-      mapBaseImgUrl:'http://139.159.199.30:9528/img/',
       fullscreen: false,
       value1: '',
       time: '',
@@ -313,12 +312,12 @@ export default {
       Modal
     },
   created() {
-    this.endPointIcon=[this.mapBaseImgUrl+"RREFwF.png",
-                      this.mapBaseImgUrl+"RRECLT.png",
-                      this.mapBaseImgUrl+"RREwm8.png",
-                      this.mapBaseImgUrl+"RRE9yV.png",
-                      this.mapBaseImgUrl+"RRAzzq.png",
-                      this.mapBaseImgUrl+"RREieU.png"];
+    this.endPointIcon=[this.selfImgBaseUrl+"RREFwF.png",
+                      this.selfImgBaseUrl+"RRECLT.png",
+                      this.selfImgBaseUrl+"RREwm8.png",
+                      this.selfImgBaseUrl+"RRE9yV.png",
+                      this.selfImgBaseUrl+"RRAzzq.png",
+                      this.selfImgBaseUrl+"RREieU.png"];
     //this.getInfo()
     this.getDeviceGps()
     this.getLineList();
@@ -606,7 +605,7 @@ export default {
           startPoint.filedId = line.channel_code
           startPoint.type = "start"
           startPoint.id = line.channel_code + "start"
-          startPoint.icon = this.mapBaseImgUrl+"RELhIs.png"
+          startPoint.icon = this.selfImgBaseUrl+"RELhIs.png"
           this.linePoint.push(startPoint);
         }
         i = i % 6
@@ -691,11 +690,11 @@ export default {
               alarmPoint.fieldId = it.channel_code
               alarmPoint.address = it.address
               if(it.alarm_level == "严重告警"){
-                alarmPoint.icon = this.mapBaseImgUrl+"RFTa9g.png"
+                alarmPoint.icon = this.selfImgBaseUrl+"RFTa9g.png"
               }else if(it.alarm_level == "中级告警"){
-                alarmPoint.icon = this.mapBaseImgUrl+"RFTwcj.png"
+                alarmPoint.icon = this.selfImgBaseUrl+"RFTwcj.png"
               }else{
-                alarmPoint.icon = this.mapBaseImgUrl+"RFTd3Q.png";
+                alarmPoint.icon = this.selfImgBaseUrl+"RFTd3Q.png";
               }
               this.alarmPoints.push(alarmPoint);
             }
@@ -725,21 +724,21 @@ export default {
             alarmPoint.address = it.address
             if(it.alarm_level == "严重告警"){
               if(it.is_now_shake){
-                alarmPoint.icon = this.mapBaseImgUrl+"RELfaj.gif"
+                alarmPoint.icon = this.selfImgBaseUrl+"RELfaj.gif"
               }else{
-                alarmPoint.icon = this.mapBaseImgUrl+"RFTa9g.png"
+                alarmPoint.icon = this.selfImgBaseUrl+"RFTa9g.png"
               }
             }else if(it.alarm_level == "中级告警"){
               if(it.is_now_shake){
-                alarmPoint.icon = this.mapBaseImgUrl+"RELWZQ.gif"
+                alarmPoint.icon = this.selfImgBaseUrl+"RELWZQ.gif"
               }else{
-                alarmPoint.icon = this.mapBaseImgUrl+"RFTwcj.png"
+                alarmPoint.icon = this.selfImgBaseUrl+"RFTwcj.png"
               }
             }else{
               if(it.is_now_shake){
-                alarmPoint.icon = this.mapBaseImgUrl+"REL2qg.gif";
+                alarmPoint.icon = this.selfImgBaseUrl+"REL2qg.gif";
               }else{
-                alarmPoint.icon = this.mapBaseImgUrl+"RFTd3Q.png";
+                alarmPoint.icon = this.selfImgBaseUrl+"RFTd3Q.png";
               }
             }
             this.alarmPoints.push(alarmPoint);
@@ -775,7 +774,7 @@ export default {
           this.deviceErrorChannels = [];
           rs.channels.forEach(it => {
             if(it.fiber_info != "正常" && (this.currentLine == "全部" || this.realTime || it.channel_code == this.currentLine)){
-              this.deviceErrorChannels.push({"id":it.id,"lng":it.longitude,"lat":it.latitude,"fiberInfo":it.fiber_info,"address":it.address,"icon":this.mapBaseImgUrl+"RcXvcR.png","deviceCode":it.device_code});
+              this.deviceErrorChannels.push({"id":it.id,"lng":it.longitude,"lat":it.latitude,"fiberInfo":it.fiber_info,"address":it.address,"icon":this.selfImgBaseUrl+"RcXvcR.png","deviceCode":it.device_code});
             }
           })
         }

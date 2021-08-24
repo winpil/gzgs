@@ -49,6 +49,9 @@ Object.keys(filters).forEach(key => {
   Vue.filter(key, filters[key])
 })
 
+//外网就用外网  内网就用内网的IP
+Vue.prototype.selfImgBaseUrl = 'http://139.159.199.30:9528/img/'
+
 Vue.config.productionTip = false
 
 new Vue({
