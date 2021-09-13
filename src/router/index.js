@@ -102,10 +102,10 @@ export const constantRoutes = [
 export const asyncRoutes = [
   /** when your routing map is too long, you can split it into small modules **/
 
-  /*{
+  {
     path: '/devices',
     component: Layout,
-    meta: {roles: [2,3]},
+    meta: {title: 'device', icon: 'el-icon-s-platform' ,roles: [2,3]},
     children: [
       {
         path: 'index',
@@ -120,7 +120,7 @@ export const asyncRoutes = [
         meta: { title: 'smt_device', icon: 'el-icon-s-platform', roles: [2,3] }
       } 
     ]
-  },*/
+  },
 
   {
     path: '/lines',
@@ -147,16 +147,16 @@ export const asyncRoutes = [
         name: 'alarm',
         meta: { title: 'alarm_query', icon: 'form' , roles: [2,3] }
       },
-      // {
-      //   path: 'log',
-      //   component: () => import('@/views/pages/alarms/alarm-log.vue'),
-      //   name: 'log',
-      //   meta: { title: 'alarm_log', icon: 'documentation' }
-      // }
+       {
+         path: 'log',
+         component: () => import('@/views/pages/alarms/alarm-log.vue'),
+         name: 'log',
+         meta: { title: 'alarm_log', icon: 'documentation' }
+       }
     ],
   },
 
-  /*{
+  {
     path: '/data',
     component: Layout,
     meta:{ roles: [2,3]},
@@ -178,7 +178,7 @@ export const asyncRoutes = [
       name: 'area',
       meta: { title: 'area', icon: 'international' , roles: [2,3] }
     }]
-  }, */
+  }, 
 
   {
     path: '/users',
@@ -193,7 +193,7 @@ export const asyncRoutes = [
     ]
   },
 
-  /* {
+  {
     path: '/backup',
     component: Layout,
     children: [
@@ -218,20 +218,20 @@ export const asyncRoutes = [
         meta: { title: 'importExcel', icon: 'tree-table' , roles: [2,3] }
       }
     ]
-  }, */
+  }, 
 
-  // {
-  //   path: '/roles',
-  //   component: Layout,
-  //   children: [
-  //     {
-  //       path: 'index',
-  //       component: () => import('@/views/pages/permission/role.vue'),
-  //       name: 'roles',
-  //       meta: { title: '角色管理', icon: 'lock' }
-  //     }
-  //   ]
-  // },
+   {
+     path: '/roles',
+     component: Layout,
+     children: [
+       {
+         path: 'index',
+         component: () => import('@/views/pages/permission/role.vue'),
+         name: 'roles',
+         meta: { title: '角色管理', icon: 'lock' }
+       }
+     ]
+   },
 
   // 404 page must be placed at the end !!!
   { path: '*', redirect: '/404', hidden: true }
