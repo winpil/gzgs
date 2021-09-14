@@ -233,6 +233,19 @@ export const asyncRoutes = [
      ]
    },
 
+   {
+    path: '/systemSelfTest',
+    component: Layout,
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/pages/systemSelfTest/systemSelfTest.vue'),
+        name: 'systemSelfTest',
+        meta: { title: '系统自检', icon: 'edit' }
+      }
+    ]
+  },
+
   // 404 page must be placed at the end !!!
   { path: '*', redirect: '/404', hidden: true }
 ]
