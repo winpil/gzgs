@@ -241,7 +241,7 @@ export const asyncRoutes = [
         path: 'index',
         component: () => import('@/views/pages/systemSelfTest/systemSelfTest.vue'),
         name: 'systemSelfTest',
-        meta: { title: '系统自检', icon: 'edit' }
+        meta: { title: '系统自检', icon: 'el-icon-refresh' }
       }
     ]
   },
