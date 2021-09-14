@@ -14,7 +14,7 @@
     <div class="bottom-content f-width abs">
       <div class="content-mid f-height abs" style="width: 76.5%;"> 
         <div class="f-width rel" style="height: 97.5%;margin-bottom: 1.5vh;">
-          <!-- 线路信息窗口开始 -->
+          <!-- 线路信息窗口开始  -->
           <div class=“gs-info-window-line” 
           :style="{'position': 'absolute', 'background': 'rgba(8, 32, 51, 0.85)', 'z-index': '12', 'border-radius': '6px', 'color': 'rgb(35 206 253)', 'left': '10px', 'top': '10px','font-size': '14px'}"
           ref="infoWindow" 
