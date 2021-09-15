@@ -1,6 +1,6 @@
 <template>
     <div>
-        告警记录
+        权限管理
     </div>
 </template>
 

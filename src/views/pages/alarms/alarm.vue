@@ -322,7 +322,7 @@ export default {
       tableKey: 0,
       list: [],
       total: 0,
-      pageSizes : [15,20,30,50],
+      pageSizes : [10,20,30,50],
       listLoading: true,
       postRules: {
         name: [{ required: true, message: '请输入名称代号', trigger: 'blur' }],
@@ -339,7 +339,7 @@ export default {
       },
       queryForm: {
         page: 1,
-        limit: 15,
+        limit: 10,
         keyword: '',
         dateTime: ''
       },
@@ -437,7 +437,9 @@ export default {
       params.page = this.queryForm.page
       params.limit = this.queryForm.limit
       if(this.queryForm.keyword && this.queryForm.keyword.length > 0){
-        params.channel = this.queryForm.keyword
+        //params.channel = this.queryForm.keyword
+        params.area_id = this.queryForm.keyword
+        
       }
       if(this.queryForm.dateTime){
         params.begin_time = (this.queryForm.dateTime[0].getTime()+"").substr(0,10)

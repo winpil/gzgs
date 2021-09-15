@@ -1,6 +1,6 @@
 <template>
     <div>
-        告警记录
+        告警阈值参数
     </div>
 </template>
 

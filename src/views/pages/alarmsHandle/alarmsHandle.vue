@@ -1,6 +1,6 @@
 <template>
     <div>
-        告警记录
+        告警事件处理
     </div>
 </template>
 

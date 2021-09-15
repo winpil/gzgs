@@ -1,6 +1,6 @@
 <template>
     <div>
-        告警记录
+        操作日志
     </div>
 </template>
 

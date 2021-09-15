@@ -176,7 +176,7 @@ export default {
       },
       queryForm: {
         page: 1,
-        limit: 15,
+        limit: 10,
         keyword: ''
       },
       postForm: {

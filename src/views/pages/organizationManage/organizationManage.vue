@@ -1,6 +1,6 @@
 <template>
     <div>
-        告警记录
+        组织机构管理
     </div>
 </template>
 

@@ -1,6 +1,6 @@
 <template>
     <div>
-        告警记录
+        设备参数
     </div>
 </template>
 

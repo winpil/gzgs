@@ -1,6 +1,6 @@
 <template>
     <div>
-        告警记录
+        按条件展示实时振动波形图标
     </div>
 </template>
 

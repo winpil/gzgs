@@ -119,7 +119,7 @@ export default {
       listLoading: true,
       queryForm: {
         page: 1,
-        limit: 15,
+        limit: 10,
         keyword: '',
         dateTime: ''
       },

@@ -2,13 +2,13 @@
   <div class="app-container">
     <div v-if="showFlag === pageType.list">
       <div class="filter-container">
-        <!-- <el-input v-model="queryForm.keyword" clearable placeholder="线路ID/线路名称" style="width: 300px;margin-right: 10px;" class="filter-item" @keyup.enter.native="handleFilter" /> -->
-        <!-- <el-button class="filter-item" style="margin-left: 10px;float:right;margin-right: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
+         <el-input v-model="queryForm.keyword" clearable placeholder="线路ID/线路名称" style="width: 300px;margin-right: 10px;" class="filter-item" @keyup.enter.native="handleFilter" /> 
+        <el-button class="filter-item" style="margin-left: 10px;float:right;margin-right: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
           {{ $t('table.add') }}
-        </el-button> -->
-        <!-- <el-button class="filter-item" style="float: right;" type="primary" icon="el-icon-search" @click="handleFilter">
+        </el-button>
+         <el-button class="filter-item" style="float: right;" type="primary" icon="el-icon-search" @click="handleFilter">
           {{ $t('table.search') }}
-        </el-button> -->
+        </el-button> 
         <!-- <el-button class="filter-item" style="margin-left: 10px;float:right;" type="primary" icon="el-icon-edit" @click="handleShowImport">
           数据导入
         </el-button> -->
@@ -29,6 +29,10 @@
         </el-table-column>
         <el-table-column label="线路名称" min-width="180px" align="center" prop="name">
         </el-table-column>
+        <el-table-column label="设备编号" min-width="180px" align="center" prop="device_code">
+        </el-table-column>
+        <el-table-column label="设备通道编号" min-width="80px" align="center" prop="channel_code">
+        </el-table-column>
         <el-table-column label="责任人一" min-width="180px" align="center" prop="head1">
         </el-table-column>
         <el-table-column label="联系电话一" min-width="180px" align="center" prop="phone1">
@@ -44,10 +48,10 @@
             </el-button>
             <!-- <el-button type="primary" size="mini" @click="handleDetail(row)">
               详情
-            </el-button>
+            </el-button> -->
             <el-button size="mini" type="danger" @click="handleDelete(row,$index)">
               {{ $t('table.delete') }}
-            </el-button> -->
+            </el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -96,6 +100,21 @@
                 </el-row>
                 <el-row>
                   <el-col :span="8">
+                    <el-form-item label-width="120px" label="设备编号:" class="postInfo-container-item" prop="device_code">
+                      <el-input placeholder="请输入设备编号" v-model="postForm.device_code" :disabled="showFlag === pageType.detail" clearable></el-input>
+                    </el-form-item>
+                  </el-col>
+
+                  <el-col :span="10">
+                    <el-form-item label-width="120px" label="设备通道编号:" class="postInfo-container-item" prop="channel_code">
+                      <el-input placeholder="请输入设备通道编号" v-model="postForm.channel_code" :disabled="showFlag === pageType.detail" clearable></el-input>
+                    </el-form-item>
+                  </el-col>
+                  <el-col :span="6" style="min-height: 1px;">
+                  </el-col>
+                </el-row>
+                <el-row>
+                  <el-col :span="8">
                     <el-form-item label-width="120px" label="责任人一:" class="postInfo-container-item" prop="head1">
                       <el-input placeholder="请输入责任人一" v-model="postForm.head1" :disabled="showFlag === pageType.detail" clearable></el-input>
                     </el-form-item>
@@ -103,7 +122,7 @@
 
                   <el-col :span="10">
                     <el-form-item label-width="120px" label="联系电话一:" class="postInfo-container-item" prop="phone1">
-                      <el-input placeholder="请输入联系电话一" v-model="postForm.phone1" :disabled="showFlag === pageType.detail" clearable></el-input>
+                      <el-input maxlength="11" placeholder="请输入联系电话一" v-model="postForm.phone1" :disabled="showFlag === pageType.detail" clearable></el-input>
                     </el-form-item>
                   </el-col>
                   <el-col :span="6" style="min-height: 1px;">
@@ -118,7 +137,7 @@
 
                   <el-col :span="10">
                     <el-form-item label-width="120px" label="联系电话二:" class="postInfo-container-item" prop="phone2">
-                      <el-input placeholder="请输入联系电话二" v-model="postForm.phone2" :disabled="showFlag === pageType.detail" clearable></el-input>
+                      <el-input maxlength="11" placeholder="请输入联系电话二" v-model="postForm.phone2" :disabled="showFlag === pageType.detail" clearable></el-input>
                     </el-form-item>
                   </el-col>
                   <el-col :span="6" style="min-height: 1px;">
@@ -175,6 +194,10 @@ export default {
       total: 0,
       listLoading: true,
       postRules: {
+
+        channel_code:[{ required: true, message: '请输入设备通道编号', trigger: 'blur' }],
+        device_code:[{ required: true, message: '请输入设备编号', trigger: 'blur' }],
+        
         zone: [{ required: true, message: '请输入线路ID', trigger: 'blur' }],
         name: [{ required: true, message: '请输入线路名称', trigger: 'blur' }],
         head1: [{ required: true, message: '请输入责任人一', trigger: 'blur' }],
@@ -191,10 +214,12 @@ export default {
       },
       queryForm: {
         page: 1,
-        limit: 15,
+        limit: 10,
         keyword: ''
       },
       postForm: {
+        channel_code:'',
+        device_code:'',
         zone: '',
         name: '',
         head1: '',
