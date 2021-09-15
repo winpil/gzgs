@@ -274,7 +274,7 @@ export const asyncRoutes = [
         path: 'index',
         component: () => import('@/views/pages/alarmsHandle/alarmsHandle.vue'),
         name: 'alarmsHandle',
-        meta: { title: '告警事件处理', icon: 'el-icon-refresh' }
+        meta: { title: '告警事件处理', icon: 'el-icon-coordinate' }
       }
     ]
   },
