@@ -60,7 +60,8 @@
           width="width: calc(85% - 110px)"
           autocomplete="on"
         />
-        <img :src="imgUrl" @click="resetImg" class="vertify_img" />
+        <v-sidentify :identifyCode="identifyCode"></v-sidentify>
+        <!-- <img :src="imgUrl" @click="resetImg" class="vertify_img" /> -->
       </el-form-item>
       <el-form-item prop="vcode">
         <span class="svg-container">
@@ -201,13 +202,14 @@
 </template>
 
 <script>
+ import Sidentify from '@/components/Sidentify'  //**引入验证码组件**
 import { validUsername } from '@/utils/validate'
 import LangSelect from '@/components/LangSelect'
 import SocialSign from './components/SocialSignin'
 
 export default {
   name: 'Login',
-  components: { LangSelect, SocialSign },
+  components: { LangSelect, SocialSign,'v-sidentify':Sidentify },
   data() {
     const validateUsername = (rule, value, callback) => {
       if (!validUsername(value)) {
@@ -254,6 +256,8 @@ export default {
       otherQuery: {},
       forgetPasswordVisible:false,
       //获取手机验证码倒计时
+      identifyCode:'',
+      identifyCodes: "1234567890",
       yzmDjsMsg:'获取验证码',
       timer:{},
       disabled:false,
@@ -274,9 +278,12 @@ export default {
     }
   },
   created() {
+    this.refreshCode();
     // window.addEventListener('storage', this.afterQRScan)
   },
   mounted() {
+    this.identifyCode = "";
+    this.makeCode(this.identifyCodes, 4);
     if (this.loginForm.account === '') {
       this.$refs.account.focus()
     } else if (this.loginForm.password === '') {
@@ -287,6 +294,20 @@ export default {
     // window.removeEventListener('storage', this.afterQRScan)
   },
   methods: {
+     randomNum(min, max) {
+      return Math.floor(Math.random() * (max - min) + min);
+    },
+    refreshCode() {
+      this.identifyCode = "";
+      this.makeCode(this.identifyCodes, 4);
+    },
+  makeCode(o, l) {
+     for (let i = 0; i < l; i++) {
+         this.identifyCode += this.identifyCodes[
+           this.randomNum(0, this.identifyCodes.length)
+         ];
+     }
+  },
     forgetPasswordLogin(){
 
     },
