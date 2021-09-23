@@ -6,18 +6,18 @@
         <h3 class="title">
           {{ $t('login.title') }}
         </h3>
-        <lang-select class="set-language" />
+        <!-- <lang-select class="set-language" /> -->
       </div>
 
-      <el-form-item prop="username">
+      <el-form-item prop="account">
         <span class="svg-container">
           <svg-icon icon-class="user" />
         </span>
         <el-input
-          ref="username"
+          ref="account"
           v-model="loginForm.account"
-          :placeholder="$t('login.username')"
-          name="username"
+          placeholder="账号/手机号"
+          name="account"
           type="text"
           tabindex="1"
           autocomplete="on"
@@ -40,16 +40,55 @@
             autocomplete="on"
             @keyup.native="checkCapslock"
             @blur="capsTooltip = false"
-            @keyup.enter.native="handleLogin"
           />
           <span class="show-pwd" @click="showPwd">
             <svg-icon :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'" />
           </span>
         </el-form-item>
       </el-tooltip>
+      <el-form-item prop="pcode">
+        <span class="svg-container">
+          <svg-icon icon-class="international" />
+        </span>
+        <el-input
+          ref="pcode"
+          v-model="loginForm.pcode"
+          placeholder="点击图片更换验证码"
+          name="pcode"
+          type="text"
+          tabindex="3"
+          width="width: calc(85% - 110px)"
+          autocomplete="on"
+        />
+        <img :src="imgUrl" @click="resetImg" class="vertify_img" />
+      </el-form-item>
+      <el-form-item prop="vcode">
+        <span class="svg-container">
+          <svg-icon icon-class="component" />
+        </span>
+        <el-input
+          ref="vCode"
+          v-model="loginForm.vCode"
+          placeholder="验证码"
+          name="vCode"
+          type="text"
+          tabindex="4"
+          width="width: calc(85% - 210px)"
+          autocomplete="on"
+        />
+        <span class="yzmDjsMsg_class" @click="getCode('loginForm')">
+          {{ yzmDjsMsg }}
+        </span>
+      </el-form-item>
 
-      <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">
+      <el-button :loading="loading" type="primary" style="width:32%;margin-bottom:30px;" @click.native.prevent="handleLogin">
         {{ $t('login.logIn') }}
+      </el-button>
+      <el-button  style="width:32%;margin-bottom:30px;" @click.native.prevent="resetForm">
+        重置
+      </el-button>
+      <el-button  style="width:31%;margin-bottom:30px;" @click="forgetPasswordFun">
+        忘记密码
       </el-button>
 
       <!-- <div style="position:relative">
@@ -69,6 +108,87 @@
         </el-button>
       </div> -->
     </el-form>
+
+    <el-dialog :before-close="forgetPasswordClose" width="600px" title="忘记密码" :close-on-click-modal="false" :visible.sync="forgetPasswordVisible">
+      <el-form ref="forgetPasswordForm" :model="forgetPasswordForm" :rules="forgetPasswordRules" >
+        <el-form-item prop="account">
+          <span class="svg-container">
+            <svg-icon icon-class="user" />
+          </span>
+          <el-input
+            ref="account"
+            v-model="forgetPasswordForm.account"
+            placeholder="账号/手机号"
+            name="account"
+            type="text"
+            tabindex="1"
+            autocomplete="on"
+          />
+        </el-form-item>
+        <el-form-item prop="vcode">
+          <span class="svg-container">
+            <svg-icon icon-class="component" />
+          </span>
+          <el-input
+            ref="vCode"
+            v-model="forgetPasswordForm.vCode"
+            placeholder="验证码"
+            name="vCode"
+            type="text"
+            tabindex="4"
+            width="width: calc(85% - 210px)"
+            autocomplete="on"
+          />
+          <span class="yzmDjsMsg_class" @click="getCode('forgetPasswordForm')">
+            {{ yzmDjsMsg }}
+          </span>
+        </el-form-item>
+        <el-form-item prop="password">
+          <span class="svg-container">
+            <svg-icon icon-class="password" />
+          </span>
+          <el-input
+            :key="passwordType"
+            ref="password"
+            v-model="forgetPasswordForm.password"
+            :type="passwordType"
+            placeholder="新密码"
+            name="password"
+            tabindex="2"
+            autocomplete="on"
+            @keyup.native="checkCapslock"
+            @blur="capsTooltip = false"
+          />
+          <span class="show-pwd" @click="showPwd">
+            <svg-icon :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'" />
+          </span>
+        </el-form-item>
+        <el-form-item prop="surePassword">
+          <span class="svg-container">
+            <svg-icon icon-class="password" />
+          </span>
+          <el-input
+            :key="passwordType"
+            ref="surePassword"
+            v-model="forgetPasswordForm.surePassword"
+            :type="passwordType"
+            placeholder="确认密码"
+            name="surePassword"
+            tabindex="2"
+            autocomplete="on"
+            @keyup.native="checkCapslock"
+            @blur="capsTooltip = false"
+          />
+          <span class="show-pwd" @click="showPwd">
+            <svg-icon :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'" />
+          </span>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click.native.prevent="forgetPasswordClose" >取 消</el-button>
+        <el-button type="primary" @click.native.prevent="forgetPasswordLogin" >提 交</el-button>
+      </div>
+    </el-dialog>
 
     <el-dialog :title="$t('login.thirdparty')" :visible.sync="showDialog">
       {{ $t('login.thirdpartyTips') }}
@@ -104,20 +224,41 @@ export default {
       }
     }
     return {
+      forgetPasswordForm:{
+        account:'',
+        password:'',
+        surePassword:'',
+        pCode:'',
+      },
       loginForm: {
         account: 'gsadmin',
-        password: 'gsadmin'
+        password: 'gsadmin',
+        pCode:'',
+        vCode:'',
       },
       loginRules: {
-        username: [{ required: true, trigger: 'blur', validator: validateUsername }],
-        password: [{ required: true, trigger: 'blur', validator: validatePassword }]
+        account: [{ required: true, trigger: 'blur', validator: validateUsername }],
+        password: [{ required: true, trigger: 'blur', validator: validatePassword }],
+        
+      },
+      forgetPasswordRules:{
+        account: [{ required: true, trigger: 'blur', validator: validateUsername }],
+        password: [{ required: true, trigger: 'blur', validator: validatePassword }],
+        surePassword: [{ required: true, trigger: 'blur', validator: validatePassword }]
       },
       passwordType: 'password',
       capsTooltip: false,
       loading: false,
       showDialog: false,
       redirect: undefined,
-      otherQuery: {}
+      otherQuery: {},
+      forgetPasswordVisible:false,
+      //获取手机验证码倒计时
+      yzmDjsMsg:'获取验证码',
+      timer:{},
+      disabled:false,
+      //验证码图片
+      imgUrl:'https://imghtml.baoday.cn/upload/article/000/000/006/5dbff8e2babb9202.jpg',
     }
   },
   watch: {
@@ -146,6 +287,57 @@ export default {
     // window.removeEventListener('storage', this.afterQRScan)
   },
   methods: {
+    forgetPasswordLogin(){
+
+    },
+    forgetPasswordClose(){
+      this.yzmDjsMsg = '获取验证码';
+      this.disabled = false;
+      clearInterval(this.timer);
+      this.forgetPasswordVisible=false;
+    },
+    forgetPasswordFun(){
+      clearInterval(this.timer);
+      this.yzmDjsMsg = '获取验证码';
+      this.disabled = false;
+      this.forgetPasswordVisible=true;
+    },
+    resetImg(){
+      //重新获取图片的验证码
+    },
+    tackBtn(){       //验证码倒数60秒
+      let time = 60;
+      let that=this;
+      this.timer = setInterval(() => {
+          if(time == 0){
+              clearInterval(that.timer);
+              this.yzmDjsMsg = '获取验证码';
+              this.disabled = false;
+          }else{
+              this.disabled = true;
+              this.yzmDjsMsg = time + '秒后重试';
+              time--;
+          }
+      }, 1000);
+    },
+    getCode(checkForm){
+      // debugger;
+        if(this.disabled){
+          return ;
+        }
+        this.$refs[checkForm].validateField('account', (err) =>{
+        if(err){
+            this.$message({
+              message: '请输入正确的账号/手机号',
+              type: 'warning'
+            });
+            this.$refs.account.focus();
+            return;
+          }else{
+            this.tackBtn();   //验证码倒数60秒
+          }
+        })        
+    },
     checkCapslock(e) {
       const { key } = e
       this.capsTooltip = key && key.length === 1 && (key >= 'A' && key <= 'Z')
@@ -159,6 +351,9 @@ export default {
       this.$nextTick(() => {
         this.$refs.password.focus()
       })
+    },
+    resetForm(){
+      this.$refs.loginForm.resetFields();
     },
     handleLogin() {
       console.log('000')
@@ -320,7 +515,27 @@ $light_gray:#eee;
       cursor: pointer;
     }
   }
-
+.yzmDjsMsg_class{
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 110px;
+  height: 50px;
+  cursor: pointer;
+  color: #fff;
+  line-height: 50px;
+  text-align: right;
+  padding-right: 15px;
+  font-size: inherit;
+}
+.vertify_img {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 110px;
+  height:50px;
+  cursor: pointer;
+}
   .show-pwd {
     position: absolute;
     right: 10px;
