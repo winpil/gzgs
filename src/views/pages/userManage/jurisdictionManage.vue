@@ -1,6 +1,6 @@
 <template>
     <div>
-        权限管理
+        巡检人员设置
     </div>
 </template>
 
