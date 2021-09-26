@@ -63,15 +63,29 @@
         <v-sidentify @click.native="resetImg" :identifyCode="identifyCode"></v-sidentify>
         <!-- <img :src="imgUrl" @click="resetImg" class="vertify_img" /> -->
       </el-form-item>
-      <el-form-item prop="vcode">
+      <el-form-item prop="phone">
+        <span class="svg-container">
+          <svg-icon icon-class="example" />
+        </span>
+        <el-input
+          ref="phone"
+          v-model="loginForm.phone"
+          placeholder="手机号"
+          name="phone"
+          type="text"
+          tabindex="6"
+          autocomplete="on"
+        />
+      </el-form-item>
+      <el-form-item prop="phone_auth_code">
         <span class="svg-container">
           <svg-icon icon-class="component" />
         </span>
         <el-input
-          ref="vCode"
-          v-model="loginForm.vCode"
+          ref="phone_auth_code"
+          v-model="loginForm.phone_auth_code"
           placeholder="验证码"
-          name="vCode"
+          name="phone_auth_code"
           type="text"
           tabindex="4"
           width="width: calc(85% - 210px)"
@@ -126,15 +140,15 @@
             autocomplete="on"
           />
         </el-form-item>
-        <el-form-item prop="vcode">
+        <el-form-item prop="phone_auth_code">
           <span class="svg-container">
             <svg-icon icon-class="component" />
           </span>
           <el-input
-            ref="vCode"
-            v-model="forgetPasswordForm.vCode"
+            ref="phone_auth_code"
+            v-model="forgetPasswordForm.phone_auth_code"
             placeholder="验证码"
-            name="vCode"
+            name="phone_auth_code"
             type="text"
             tabindex="4"
             width="width: calc(85% - 210px)"
@@ -207,7 +221,7 @@ import { validUsername } from '@/utils/validate'
 import LangSelect from '@/components/LangSelect'
 import SocialSign from './components/SocialSignin'
 
-import { authCode } from '@/api/login/user.js'
+import { authCode,login } from '@/api/login/user.js'
 
 export default {
   name: 'Login',
@@ -232,18 +246,20 @@ export default {
         account:'',
         password:'',
         surePassword:'',
-        pCode:'',
+        phone:'',
+        phone_auth_code:'',
       },
       loginForm: {
-        account: 'gsadmin',
-        password: 'gsadmin',
+        account: 'admin',
+        password: 'gs-root',
         pCode:'',
-        vCode:'',
+        phone:'18390143861',
+        phone_auth_code:'',
       },
       loginRules: {
         account: [{ required: true, trigger: 'blur', validator: validateUsername }],
         password: [{ required: true, trigger: 'blur', validator: validatePassword }],
-        
+        phone: [{ required: true, trigger: 'blur', validator: validateUsername }],
       },
       forgetPasswordRules:{
         account: [{ required: true, trigger: 'blur', validator: validateUsername }],
@@ -353,7 +369,7 @@ export default {
           return ;
         }
         let that=this;
-        this.$refs[checkForm].validateField('account', (err) =>{
+        this.$refs[checkForm].validateField('phone', (err) =>{
         if(err){
             this.$message({
               message: '请输入正确的账号/手机号',
@@ -370,7 +386,7 @@ export default {
               this.$refs.pcode.focus();
               return ;
             }
-            let data={purpose:1,phone:that[checkForm].account};
+            let data={purpose:1,phone:that[checkForm].phone};
             this.tackBtn(data);   //验证码倒数60秒
           }
         })        
@@ -394,12 +410,14 @@ export default {
     },
     handleLogin() {
       console.log('000')
+      console.log(this.loginForm)
+      let that=this
       this.$refs.loginForm.validate(valid => {
         console.log('111')
         if (valid) {
           console.log('222')
           this.loading = true
-          this.$store.dispatch('user/login', this.loginForm)
+          this.$store.dispatch('user/login', that.loginForm)
             .then(() => {
               console.log('333')
               this.$router.push({ path: this.redirect || '/', query: this.otherQuery })

@@ -8,6 +8,8 @@
 
 <script>
 import echarts from 'echarts'
+import { queryDataTuBiao } from '@/api/data/data.js'
+
 export default {
   props: {
     className: {
@@ -33,7 +35,24 @@ export default {
     }
   },
   mounted() {
-    this.initChart()
+    queryDataTuBiao({'alert_id':'20201126144247720000'}).then(res => {
+        debugger
+        if (res.retcode == 200) {
+          var yData=res.result
+          var yMax=0
+          for(var i=0;i<yData.length;i++){
+            if(yMax<yData[i]){
+              yMax=yData[i]
+            }
+          }
+          var xData=[]
+          xData.push(0)
+          for(var i=1;i<=yMax;i++){
+            xData.push(i*10)
+          }
+          this.initChart(xData,yData)
+        }
+      })
   },
   beforeDestroy() {
     if (!this.chart) {
@@ -43,70 +62,23 @@ export default {
     this.chart = null
   },
   methods: {
-    initChart() {
+    initChart(xData,yData) {
       this.chart = echarts.init(document.getElementById(this.id))
-      const xData = (function() {
-        const data = []
-        for (let i = 1; i < 13; i++) {
-          data.push(i + 'month')
-        }
-        return data
-      }())
       this.chart.setOption({
-        legend: {
-            data:['按条件展示实时振动波形图标']
+        xAxis: {
+          type: 'category',
+          data: xData
         },
-        toolbox: {
-            show : true,
-            feature : {
-                mark : {show: false},
-                dataView : {show: false, readOnly: false},
-                magicType : {show: true, type: ['line', 'bar']},
-                restore : {show: false},
-                saveAsImage : {show: true}
-            }
+        yAxis: {
+          type: 'value'
         },
-        calculable : true,
-        tooltip : {
-            trigger: 'axis',
-            formatter: "Temperature : <br/>{b}km : {c}°C"
-        },
-        xAxis : [
-            {
-                type : 'value',
-                axisLabel : {
-                    formatter: '{value} °C'
-                }
-            }
-        ],
-        yAxis : [
-            {
-                type : 'category',
-                axisLine : {onZero: false},
-                axisLabel : {
-                    formatter: '{value} km'
-                },
-                boundaryGap : false,
-                data : ['0', '10', '20', '30', '40', '50', '60', '70', '80']
-            }
-        ],
-        series : [
-            {
-                name:'按条件展示实时振动波形图标',
-                type:'line',
-                smooth:true,
-                itemStyle: {
-                    normal: {
-                        color : '#1890ff',
-                        lineStyle: {
-                            color : '#1890ff'
-                        }
-                    }
-                },
-                data:[15, -50, -56.5, -46.5, -22.1, -2.5, -27.7, -55.7, -76.5]
-            }
+        series: [
+          {
+            data: yData,
+            type: 'line'
+          }
         ]
-        })
+      })
     }
   }
 }

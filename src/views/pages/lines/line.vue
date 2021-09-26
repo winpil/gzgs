@@ -2,7 +2,9 @@
   <div class="app-container">
     <div v-if="showFlag === pageType.list">
       <div class="filter-container">
-         <el-input v-model="queryForm.keyword" clearable placeholder="线路ID/线路名称" style="width: 300px;margin-right: 10px;" class="filter-item" @keyup.enter.native="handleFilter" /> 
+        <el-input v-model="queryForm.device_code" clearable placeholder="设备号" style="width: 300px;margin-right: 10px;" class="filter-item" @keyup.enter.native="handleFilter" /> 
+        <el-input v-model="queryForm.channel_name" clearable placeholder="线路名称" style="width: 300px;margin-right: 10px;" class="filter-item" @keyup.enter.native="handleFilter" /> 
+        
         <el-button class="filter-item" style="margin-left: 10px;float:right;margin-right: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
           {{ $t('table.add') }}
         </el-button>
@@ -25,21 +27,19 @@
       >
         <el-table-column label="序号" type="index" align="center" width="80">
         </el-table-column>
-        <el-table-column label="线路ID" min-width="180px" align="center" prop="zone">
+        <el-table-column label="设备号" min-width="180px" align="center" prop="device_code">
         </el-table-column>
-        <el-table-column label="线路名称" min-width="180px" align="center" prop="name">
+        <el-table-column label="添加时间" min-width="180px" align="center" prop="addtime">
         </el-table-column>
-        <el-table-column label="设备编号" min-width="180px" align="center" prop="device_code">
+        <el-table-column label="线路编号" min-width="180px" align="center" prop="channel_code">
         </el-table-column>
-        <el-table-column label="设备通道编号" min-width="80px" align="center" prop="channel_code">
+        <el-table-column label="线路名称" min-width="180px" align="center" prop="channel_name">
         </el-table-column>
-        <el-table-column label="责任人一" min-width="180px" align="center" prop="head1">
+        <el-table-column label="线路长度" min-width="80px" align="center" prop="length">
         </el-table-column>
-        <el-table-column label="联系电话一" min-width="180px" align="center" prop="phone1">
+        <el-table-column label="巡检员" min-width="180px" align="center" prop="check_name">
         </el-table-column>
-        <el-table-column label="责任人二" min-width="180px" align="center" prop="head2">
-        </el-table-column>
-        <el-table-column label="联系电话二" min-width="180px" align="center" prop="phone2">
+        <el-table-column label="巡检员手机号" min-width="180px" align="center" prop="check_phone">
         </el-table-column>
         <el-table-column fixed="right" :label="$t('table.actions')" align="center" width="220" class-name="small-padding fixed-width">
           <template slot-scope="{row,$index}">
@@ -56,7 +56,7 @@
         </el-table-column>
       </el-table>
 
-      <pagination v-show="total>0" :total="total" :page.sync="queryForm.page" :limit.sync="queryForm.limit" @pagination="getList" />
+      <!-- <pagination v-show="total>0" :total="total" :page.sync="queryForm.page" :limit.sync="queryForm.limit" @pagination="getList" /> -->
     </div>
 
     <div v-else-if="showFlag === pageType.add || showFlag === pageType.edit || showFlag === pageType.detail">
@@ -78,71 +78,39 @@
         <div class="createPost-main-container">
           <el-row>
             <el-col :span="24" class="form-wrapper">
-              <el-row class="fit-padding" >
-                <el-col :span="18">
-                  <el-form-item class="md-input" prop="zone">
-                    <MDinput v-model="postForm.zone" :maxlength="4" name="name" required :disabled="showFlag !== pageType.add">
-                      {{mdcontent}}
-                    </MDinput>
-                  </el-form-item>
-                </el-col>
-                <el-col :span="6"></el-col>
-              </el-row>
               <div class="postInfo-container fit-padding" >
                 <el-row>
-                  <el-col :span="18">
-                    <el-form-item label-width="120px" label="线路名称:" class="postInfo-container-item" prop="name">
-                      <el-input placeholder="请输入线路名称" v-model="postForm.name" style="min-width: 120px;" clearable :disabled="showFlag === pageType.detail"></el-input>
+                  <el-col :span="9">
+                    <el-form-item label-width="120px" label="设备号:" class="postInfo-container-item" prop="device_code">
+                      <el-input placeholder="请输入设备号" v-model="postForm.device_code" style="min-width: 120px;" clearable :disabled="showFlag === pageType.detail"></el-input>
                     </el-form-item>
                   </el-col>
-                  <el-col :span="6" style="min-height: 1px;">
-                  </el-col>
-                </el-row>
-                <el-row>
-                  <el-col :span="8">
-                    <el-form-item label-width="120px" label="设备编号:" class="postInfo-container-item" prop="device_code">
-                      <el-input placeholder="请输入设备编号" v-model="postForm.device_code" :disabled="showFlag === pageType.detail" clearable></el-input>
+                  <el-col :span="9">
+                    <el-form-item label-width="120px" label="线路编号:" class="postInfo-container-item" prop="channel_code">
+                      <el-input placeholder="请输入线路编号" v-model="postForm.channel_code" style="min-width: 120px;" clearable :disabled="showFlag === pageType.detail"></el-input>
                     </el-form-item>
                   </el-col>
-
-                  <el-col :span="10">
-                    <el-form-item label-width="120px" label="设备通道编号:" class="postInfo-container-item" prop="channel_code">
-                      <el-input placeholder="请输入设备通道编号" v-model="postForm.channel_code" :disabled="showFlag === pageType.detail" clearable></el-input>
+                  <el-col :span="9">
+                    <el-form-item label-width="120px" label="线路名称:" class="postInfo-container-item" prop="channel_name">
+                      <el-input placeholder="请输入线路名称" v-model="postForm.channel_name" style="min-width: 120px;" clearable :disabled="showFlag === pageType.detail"></el-input>
                     </el-form-item>
                   </el-col>
-                  <el-col :span="6" style="min-height: 1px;">
-                  </el-col>
-                </el-row>
-                <el-row>
-                  <el-col :span="8">
-                    <el-form-item label-width="120px" label="责任人一:" class="postInfo-container-item" prop="head1">
-                      <el-input placeholder="请输入责任人一" v-model="postForm.head1" :disabled="showFlag === pageType.detail" clearable></el-input>
+                  <el-col :span="9">
+                    <el-form-item label-width="120px" label="线路长度:" class="postInfo-container-item" prop="length">
+                      <el-input placeholder="请输入线路长度" v-model="postForm.length" style="min-width: 120px;" clearable :disabled="showFlag === pageType.detail"></el-input>
                     </el-form-item>
                   </el-col>
-
-                  <el-col :span="10">
-                    <el-form-item label-width="120px" label="联系电话一:" class="postInfo-container-item" prop="phone1">
-                      <el-input maxlength="11" placeholder="请输入联系电话一" v-model="postForm.phone1" :disabled="showFlag === pageType.detail" clearable></el-input>
+                  <el-col :span="9">
+                    <el-form-item label-width="120px" label="巡检员:" class="postInfo-container-item" prop="check_name">
+                      <el-input placeholder="请输入巡检员" v-model="postForm.check_name" style="min-width: 120px;" clearable :disabled="showFlag === pageType.detail"></el-input>
                     </el-form-item>
                   </el-col>
-                  <el-col :span="6" style="min-height: 1px;">
-                  </el-col>
-                </el-row>
-                <el-row>
-                  <el-col :span="8">
-                    <el-form-item label-width="120px" label="责任人二:" class="postInfo-container-item" prop="head2">
-                      <el-input placeholder="请输入责任人二" v-model="postForm.head2" :disabled="showFlag === pageType.detail" clearable></el-input>
+                  <el-col :span="9">
+                    <el-form-item label-width="120px" label="巡检员手机号:" class="postInfo-container-item" prop="check_phone">
+                      <el-input placeholder="请输入巡检员手机号" v-model="postForm.check_phone" style="min-width: 120px;" clearable :disabled="showFlag === pageType.detail"></el-input>
                     </el-form-item>
                   </el-col>
-
-                  <el-col :span="10">
-                    <el-form-item label-width="120px" label="联系电话二:" class="postInfo-container-item" prop="phone2">
-                      <el-input maxlength="11" placeholder="请输入联系电话二" v-model="postForm.phone2" :disabled="showFlag === pageType.detail" clearable></el-input>
-                    </el-form-item>
-                  </el-col>
-                  <el-col :span="6" style="min-height: 1px;">
-                  </el-col>
-                </el-row>
+                </el-row> 
               </div>
             </el-col>
           </el-row>
@@ -163,7 +131,7 @@
 </template>
 
 <script>
-import { createLine, queryLine, updateLine, delLine, insertZones } from '@/api/line/line.js'
+import { lineInfo,lineCRUD,createLine, queryLine, updateLine, delLine, insertZones } from '@/api/line/line.js'
 import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 import Tinymce from '@/components/Tinymce'
@@ -194,16 +162,12 @@ export default {
       total: 0,
       listLoading: true,
       postRules: {
-
-        channel_code:[{ required: true, message: '请输入设备通道编号', trigger: 'blur' }],
         device_code:[{ required: true, message: '请输入设备编号', trigger: 'blur' }],
-        
-        zone: [{ required: true, message: '请输入线路ID', trigger: 'blur' }],
-        name: [{ required: true, message: '请输入线路名称', trigger: 'blur' }],
-        head1: [{ required: true, message: '请输入责任人一', trigger: 'blur' }],
-        phone1: [{ required: true, message: '请输入联系电话一', trigger: 'blur' }],
-        head2: [{ required: true, message: '请输入责任人二', trigger: 'blur' }],
-        phone2: [{ required: true, message: '请输入联系电话二', trigger: 'blur' }],
+        channel_code:[{ required: true, message: '请输入线路编号', trigger: 'blur' }],
+        channel_name: [{ required: true, message: '请输入线路名称', trigger: 'blur' }],
+        length: [{ required: true, message: '请输入线路长度', trigger: 'blur' }],
+        check_name: [{ required: true, message: '请输入巡检员', trigger: 'blur' }],
+        check_phone: [{ required: true, message: '请输入巡检员手机号', trigger: 'blur' }],
       },
       showFlag: 0,
       pageType: {
@@ -215,17 +179,17 @@ export default {
       queryForm: {
         page: 1,
         limit: 10,
-        keyword: ''
+        keyword: '',
+        channel_name:'',
+        device_code:'',
       },
       postForm: {
-        channel_code:'',
         device_code:'',
-        zone: '',
-        name: '',
-        head1: '',
-        phone1: '',
-        head2: '',
-        phone2: ''
+        channel_code:'',
+        channel_name:'',
+        length:'',
+        check_name:'',
+        check_phone:'',
       },
       areaList: [],
       currentRow: {},
@@ -253,7 +217,8 @@ export default {
     // 获取设备列表数据
     getList() {
       this.listLoading = true
-      queryLine(this.queryForm).then(res => {
+      // debugger
+      lineInfo(this.queryForm).then(res => {
         if (res.retcode == 200) {
           this.list = res.result
           if (this.list && this.list.length > 0) {
@@ -333,7 +298,8 @@ export default {
       // 若验证通过则继续请求
       if (validTemp) {
         if (this.showFlag === this.pageType.add) {
-          createLine(this.postForm).then(res => {
+          this.postForm.ope='add'
+          lineCRUD(this.postForm).then(res => {
             if (res.retcode === 200 || res.status === 'success') {
               this.$message({ type: 'success', message: '提交成功！'})
               setTimeout(() => {
@@ -343,7 +309,8 @@ export default {
             }
           })
         } else if (this.showFlag === this.pageType.edit) {
-          updateLine(this.postForm).then(res => {
+          this.postForm.ope='update'
+          lineCRUD(this.postForm).then(res => {
             if (res.retcode === 200 || res.status === 'success') {
               this.$message({ type: 'success', message: '提交成功！'})
               setTimeout(() => {
@@ -375,13 +342,15 @@ export default {
 
     handleDelete(row) {
       let params = {}
-      params.zone = row.zone
+      params.device_code = row.device_code
+      params.channel_code = row.channel_code
       this.$confirm('线路删除后将不可恢复，确认删除该线路？', '提示', {
         confirmButtonText: '删除',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        delLine(params).then(res => {
+        params.ope='delete'
+        lineCRUD(params).then(res => {
           if (res.retcode === 200) {
             this.$message({ type: 'success', message: '删除成功！' })
             setTimeout(() => {

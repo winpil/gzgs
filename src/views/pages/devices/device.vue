@@ -2,13 +2,13 @@
   <div class="app-container">
     <div v-if="showFlag === pageType.list">
       <div class="filter-container">
-        <el-input v-model="queryForm.keyword" clearable placeholder="设备号/区域/设备代号" style="width: 300px;margin-right: 10px;" class="filter-item" @keyup.enter.native="handleFilter" /> 
+        <!-- <el-input v-model="queryForm.keyword" clearable placeholder="设备号/区域/设备代号" style="width: 300px;margin-right: 10px;" class="filter-item" @keyup.enter.native="handleFilter" />  -->
         <el-button class="filter-item" style="margin-left: 10px;float:right;margin-right: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
           {{ $t('table.add') }}
         </el-button>
-        <el-button v-waves class="filter-item" style="float: right;" type="primary" icon="el-icon-search" @click="handleFilter">
+        <!-- <el-button v-waves class="filter-item" style="float: right;" type="primary" icon="el-icon-search" @click="handleFilter">
           {{ $t('table.search') }}
-        </el-button>
+        </el-button> -->
         <!-- <el-button class="filter-item" style="margin-left: 10px;float:right;" type="primary" icon="el-icon-edit" @click="handleShowImport">
           数据导入
         </el-button> -->
@@ -23,19 +23,37 @@
         highlight-current-row
         style="width: 100%;"
       >
-        <el-table-column label="ID" type="index" align="center" width="80">
+        <!-- <el-table-column label="ID" type="index" align="center" width="80">
+        </el-table-column> -->
+        <el-table-column label="设备号" min-width="150px" align="center" prop="device_code">
         </el-table-column>
-        <el-table-column label="设备号" min-width="150px" align="center" prop="gt_id">
+        <el-table-column label="设备名称" min-width="200px" align="center" prop="device_name">
         </el-table-column>
-        <el-table-column label="名称代号" min-width="150px" align="center" prop="name">
+        <el-table-column label="添加时间" min-width="180px" align="center" prop="addtime">
         </el-table-column>
-        <el-table-column label="设备长度" min-width="150px" align="center" prop="length">
+        <el-table-column label="时钟状态" min-width="80px" align="center" prop="host_clock">
         </el-table-column>
-        <el-table-column label="设备GPS经度" min-width="120px" align="center" prop="longitude">
+        <el-table-column label="风扇状态" min-width="80px" align="center" prop="host_fan">
         </el-table-column>
-        <el-table-column label="设备GPS纬度" min-width="120px" align="center" prop="latitude">
+        <el-table-column label="电源状态" min-width="80px" align="center" prop="host_power">
         </el-table-column>
-        <el-table-column label="设备所属区域" min-width="200px" align="center" prop="area_name">
+        <el-table-column label="省" min-width="120px" align="center" prop="province">
+        </el-table-column>
+        <el-table-column label="市" min-width="120px" align="center" prop="city">
+        </el-table-column>
+        <el-table-column label="经度" min-width="180px" align="center" prop="longitude">
+        </el-table-column>
+        <el-table-column label="纬度" min-width="180px" align="center" prop="latitude">
+        </el-table-column>
+        <el-table-column label="设备ip地址" min-width="120px" align="center" prop="ip">
+        </el-table-column>
+        <el-table-column label="设备端口" min-width="80px" align="center" prop="port">
+        </el-table-column>
+        <el-table-column label="CPU使用率" min-width="100px" align="center" prop="host_cpu">
+        </el-table-column>
+        <el-table-column label="内存使用率" min-width="100px" align="center" prop="host_mem">
+        </el-table-column>
+        <el-table-column label="设备温度" min-width="80px" align="center" prop="host_temp">
         </el-table-column>
         <el-table-column fixed="right" :label="$t('table.actions')" align="center" width="220" class-name="small-padding fixed-width">
           <template slot-scope="{row,$index}">
@@ -52,7 +70,7 @@
         </el-table-column>
       </el-table>
 
-      <pagination v-show="total>0" :total="total" :page.sync="queryForm.page" :limit.sync="queryForm.limit" @pagination="getList" />
+      <!-- <pagination v-show="total>0" :total="total" :page.sync="queryForm.page" :limit.sync="queryForm.limit" @pagination="getList" /> -->
     </div>
 
     <div v-else-if="showFlag === pageType.add || showFlag === pageType.edit || showFlag === pageType.detail">
@@ -74,54 +92,87 @@
         <div class="createPost-main-container">
           <el-row>
             <el-col :span="24" class="form-wrapper">
-              <el-row class="fit-padding" >
-                <el-col :span="18">
-                  <el-form-item class="md-input" prop="gt_id">
-                    <MDinput v-model="postForm.gt_id" :maxlength="100" name="name" required :disabled="showFlag !== pageType.add">
-                      {{mdcontent}}
-                    </MDinput>
-                  </el-form-item>
-                </el-col>
-                <el-col :span="6"></el-col>
-              </el-row>
               <div class="postInfo-container fit-padding" >
                 <el-row>
-                  <el-col :span="8">
-                    <el-form-item label-width="90px" label="名称代号:" class="postInfo-container-item" prop="name">
-                      <el-input placeholder="请输入名称代号" v-model="postForm.name" style="min-width: 120px;" clearable :disabled="showFlag === pageType.detail"></el-input>
+                  <el-col :span="9">
+                    <el-form-item label-width="90px" label="设备号:" class="postInfo-container-item" prop="device_code">
+                      <el-input placeholder="请输入设备号" v-model="postForm.device_code" style="min-width: 120px;" clearable :disabled="showFlag === pageType.detail"></el-input>
                     </el-form-item>
                   </el-col>
-
-                  <el-col :span="10">
-                    <el-form-item label-width="120px" label="选择区域:" class="postInfo-container-item" prop="area_id">
-                      <el-select v-model="postForm.area_id" style="width: 100%;" filterable default-first-option placeholder="请选择区域" :disabled="showFlag === pageType.detail">
-                        <el-option v-for="(item,index) in areaList" :key="item.area_id+index" :label="item.area_name" :value="item.area_id" />
-                      </el-select>
+                  <el-col :span="9">
+                    <el-form-item label-width="90px" label="设备名称:" class="postInfo-container-item" prop="device_name">
+                      <el-input placeholder="请输入设备名称" v-model="postForm.device_name" style="min-width: 120px;" clearable :disabled="showFlag === pageType.detail"></el-input>
                     </el-form-item>
                   </el-col>
-
-                  <el-col :span="6" style="min-height: 1px;">
-                  </el-col>
-                </el-row>
-                <el-row>
-                  <el-col :span="8">
-                    <el-form-item label-width="90px" label="设备长度:" class="postInfo-container-item" prop="length">
-                      <el-input placeholder="请输入设备长度" v-model="postForm.length" :disabled="showFlag === pageType.detail" clearable></el-input>
+                  <el-col v-if="showFlag === pageType.detail" :span="9">
+                    <el-form-item label-width="90px" label="时钟状态:" class="postInfo-container-item" prop="host_clock">
+                      <el-input placeholder="请输入时钟状态" v-model="postForm.host_clock" style="min-width: 120px;" clearable :disabled="showFlag === pageType.detail"></el-input>
                     </el-form-item>
                   </el-col>
-
-                  <el-col :span="10">
-                    <el-form-item label-width="120px" label="GPS信息:" class="postInfo-container-item">
-                      <el-form-item label-width="0px" style="display: inline-block;min-width:125px;width: 49%;margin-right: 2%;" prop="longitude">
-                        <el-input v-model="postForm.longitude" clearable :disabled="showFlag === pageType.detail" placeholder="请输入经度" style="display: inline-block;"></el-input>
-                      </el-form-item>
-                      <el-form-item label-width="0px" style="display: inline-block;min-width:125px;width: 49%;" prop="latitude">   
-                        <el-input v-model="postForm.latitude" clearable  :disabled="showFlag === pageType.detail" placeholder="请输入纬度" style="display: inline-block;"></el-input>
-                      </el-form-item>
+                  <el-col v-if="showFlag === pageType.detail" :span="9">
+                    <el-form-item label-width="90px" label="风扇状态:" class="postInfo-container-item" prop="host_fan">
+                      <el-input placeholder="请输入风扇状态" v-model="postForm.host_fan" style="min-width: 120px;" clearable :disabled="showFlag === pageType.detail"></el-input>
                     </el-form-item>
                   </el-col>
-
-                  <el-col :span="6" style="min-height: 1px;">
+                  <el-col v-if="showFlag === pageType.detail" :span="9">
+                    <el-form-item label-width="90px" label="电源状态:" class="postInfo-container-item" prop="host_power">
+                      <el-input placeholder="请输入电源状态" v-model="postForm.host_power" style="min-width: 120px;" clearable :disabled="showFlag === pageType.detail"></el-input>
+                    </el-form-item>
+                  </el-col>
+                  <el-col :span="9">
+                    <el-form-item label-width="90px" label="省:" class="postInfo-container-item" prop="province">
+                      <el-input placeholder="请输入省" v-model="postForm.province" style="min-width: 120px;" clearable :disabled="showFlag === pageType.detail"></el-input>
+                    </el-form-item>
+                  </el-col>
+                  <el-col :span="9">
+                    <el-form-item label-width="90px" label="市:" class="postInfo-container-item" prop="city">
+                      <el-input placeholder="请输入市" v-model="postForm.city" style="min-width: 120px;" clearable :disabled="showFlag === pageType.detail"></el-input>
+                    </el-form-item>
+                  </el-col>
+                  <el-col :span="9">
+                    <el-form-item label-width="90px" label="区:" class="postInfo-container-item" prop="country">
+                      <el-input placeholder="请输入区" v-model="postForm.country" style="min-width: 120px;" clearable :disabled="showFlag === pageType.detail"></el-input>
+                    </el-form-item>
+                  </el-col>
+                  <el-col :span="9">
+                    <el-form-item label-width="90px" label="地址:" class="postInfo-container-item" prop="address">
+                      <el-input placeholder="请输入地址" v-model="postForm.address" style="min-width: 120px;" clearable :disabled="showFlag === pageType.detail"></el-input>
+                    </el-form-item>
+                  </el-col>
+                  <el-col :span="9">
+                    <el-form-item label-width="90px" label="经度:" class="postInfo-container-item" prop="longitude">
+                      <el-input placeholder="请输入经度" v-model="postForm.longitude" style="min-width: 120px;" clearable :disabled="showFlag === pageType.detail"></el-input>
+                    </el-form-item>
+                  </el-col>
+                  <el-col :span="9">
+                    <el-form-item label-width="90px" label="纬度:" class="postInfo-container-item" prop="latitude">
+                      <el-input placeholder="请输入纬度" v-model="postForm.latitude" style="min-width: 120px;" clearable :disabled="showFlag === pageType.detail"></el-input>
+                    </el-form-item>
+                  </el-col>
+                  <el-col :span="9">
+                    <el-form-item label-width="90px" label="设备ip地址:" class="postInfo-container-item" prop="ip">
+                      <el-input placeholder="请输入设备ip地址" v-model="postForm.ip" style="min-width: 120px;" clearable :disabled="showFlag === pageType.detail"></el-input>
+                    </el-form-item>
+                  </el-col>
+                  <el-col :span="9">
+                    <el-form-item label-width="90px" label="设备端口:" class="postInfo-container-item" prop="port">
+                      <el-input placeholder="请输入设备端口" v-model="postForm.port" style="min-width: 120px;" clearable :disabled="showFlag === pageType.detail"></el-input>
+                    </el-form-item>
+                  </el-col>
+                  <el-col v-if="showFlag === pageType.detail" :span="9">
+                    <el-form-item label-width="90px" label="CPU使用率:" class="postInfo-container-item" prop="host_cpu">
+                      <el-input placeholder="请输入CPU使用率" v-model="postForm.host_cpu" style="min-width: 120px;" clearable :disabled="showFlag === pageType.detail"></el-input>
+                    </el-form-item>
+                  </el-col>
+                  <el-col v-if="showFlag === pageType.detail" :span="9">
+                    <el-form-item label-width="90px" label="内存使用率:" class="postInfo-container-item" prop="host_mem">
+                      <el-input placeholder="请输入内存使用率" v-model="postForm.host_mem" style="min-width: 120px;" clearable :disabled="showFlag === pageType.detail"></el-input>
+                    </el-form-item>
+                  </el-col>
+                  <el-col v-if="showFlag === pageType.detail" :span="9">
+                    <el-form-item label-width="90px" label="设备温度:" class="postInfo-container-item" prop="host_temp">
+                      <el-input placeholder="请输入设备温度" v-model="postForm.host_temp" style="min-width: 120px;" clearable :disabled="showFlag === pageType.detail"></el-input>
+                    </el-form-item>
                   </el-col>
                 </el-row>
               </div>
@@ -144,7 +195,7 @@
 </template>
 
 <script>
-import { createDeviceGt, queryDeviceGt, updateDeviceGt, delDeviceGt, insertGt } from '@/api/device/device.js'
+import { createDeviceGt, queryDeviceGt, updateDeviceGt, delDeviceGt, insertGt,deviceInfo,deviceCRUD } from '@/api/device/device.js'
 import { queryArea } from '@/api/area/area.js'
 import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils'
@@ -178,12 +229,12 @@ export default {
       total: 0,
       listLoading: true,
       postRules: {
-        name: [{ required: true, message: '请输入名称代号', trigger: 'blur' }],
-        area_id: [{ required: true, message: '请选择区域', trigger: 'change' }],
-        gt_id: [{ required: true, message: '请输入设备号', trigger: 'blur' }],
-        length: [{ required: true, message: '请输入设备长度', trigger: 'blur' }],
-        longitude: [{ required: true, message: '请输入设备经度', trigger: 'blur' }],
-        latitude: [{ required: true, message: '请输入设备纬度', trigger: 'blur' }],
+        // device_name: [{ required: true, message: '请输入设备名称', trigger: 'blur' }],
+        device_code: [{ required: true, message: '请输入设备号', trigger: 'blur' }],
+        // gt_id: [{ required: true, message: '请输入设备号', trigger: 'blur' }],
+        // length: [{ required: true, message: '请输入设备长度', trigger: 'blur' }],
+        // longitude: [{ required: true, message: '请输入设备经度', trigger: 'blur' }],
+        // latitude: [{ required: true, message: '请输入设备纬度', trigger: 'blur' }],
       },
       showFlag: 0,
       pageType: {
@@ -198,12 +249,24 @@ export default {
         keyword:''
       },
       postForm: {
-        gt_id: '',
-        area_id: '',
-        name: '',
-        length: '',
-        longitude: '',
-        latitude: ''
+          ope:'',
+          device_code:'',
+          addtime:'',
+          host_clock:'',
+          host_fan:'',
+          host_power:'',
+          device_name:'',
+          province:'',
+          city:'',
+          longitude:'',
+          latitude:'',
+          ip:'',
+          port:'',
+          host_cpu:'',
+          host_mem:'',
+          host_temp:'',
+          country:'',
+          address:'',
       },
       areaList: [],
       currentRow: {},
@@ -232,7 +295,8 @@ export default {
     // 获取设备列表数据
     getList() {
       this.listLoading = true
-      queryDeviceGt(this.queryForm).then(res => {
+      deviceInfo(this.queryForm).then(res => {
+        console.log(res)
         if (res.retcode == 200) {
           this.list = res.result
           if (this.list && this.list.length > 0) {
@@ -324,7 +388,8 @@ export default {
       // 若验证通过则继续请求
       if (validTemp) {
         if (this.showFlag === this.pageType.add) {
-          createDeviceGt(this.postForm).then(res => {
+          this.postForm.ope='add'
+          deviceCRUD(this.postForm).then(res => {
             if (res.retcode === 200) {
               this.$message({ type: 'success', message: '提交成功！'})
             } else {
@@ -336,7 +401,8 @@ export default {
             }, 500)
           })
         } else if (this.showFlag === this.pageType.edit) {
-          updateDeviceGt(this.postForm).then(res => {
+          this.postForm.ope='update'
+          deviceCRUD(this.postForm).then(res => {
             if (res.retcode === 200) {
               this.$message({ type: 'success', message: '提交成功！'})
             } else {
@@ -370,13 +436,14 @@ export default {
 
     handleDelete(row) {
       let params = {}
-      params.gt_id = row.gt_id
+      params.device_code = row.device_code
       this.$confirm('设备删除后将不可恢复，确认删除该设备？', '提示', {
         confirmButtonText: '删除',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        delDeviceGt(params).then(res => {
+        params.ope='delete'
+        deviceCRUD(params).then(res => {
           if (res.retcode === 200) {
             this.$message({ type: 'success', message: '删除成功！' })
             setTimeout(() => {

@@ -8,3 +8,10 @@ export function queryData(query) {
         params: query
       })
 }
+export function queryDataTuBiao(query) {
+  return request({
+      url: '/api/v1/waveform/',
+      method: 'get',
+      params: query
+    })
+}

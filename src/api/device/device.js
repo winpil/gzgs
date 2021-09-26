@@ -174,8 +174,15 @@ export function insertNodes(query) {
 // 获取设备信息
 export function deviceInfo(query) {
   return request({
-      url: '/api/v1/device_info/',
+      url: '/api/v1/device_data/',
       method: 'get',
+      data: query
+    })
+}
+export function deviceCRUD(query) {
+  return request({
+      url: '/api/v1/device_data/',
+      method: 'post',
       data: query
     })
 }

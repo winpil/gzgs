@@ -39,11 +39,13 @@ const mutations = {
 const actions = {
   // user login
   login({ commit }, userInfo) {
-    const { account, password } = userInfo
+    const { account, password,phone,phone_auth_code } = userInfo
     return new Promise((resolve, reject) => {
-      login({ account: account.trim(), password: password }).then(res => {
+      login({ account: account.trim(), password: password,phone:phone,phone_auth_code:phone_auth_code }).then(res => {
         if (res.retcode == 200) {
+          // debugger
           const data = { ...res }
+		  console.log(data)
           commit('SET_TOKEN', data.token)
           commit('SET_ACCOUNT', data.user)
           commit('SET_PASSWORD', data.password)
@@ -62,6 +64,7 @@ const actions = {
 
   // get user info
   getInfo({ commit, state }) {
+	  //debugger
     let a = localStorage.getItem('user')
     let p = localStorage.getItem('pass')
     return new Promise((resolve, reject) => {
@@ -102,8 +105,10 @@ const actions = {
 
   // user logout
   logout({ commit, state, dispatch }) {
+	  debugger
+	  let account=localStorage.getItem('user');
     return new Promise((resolve, reject) => {
-      logout({ user: state.account }).then(() => {
+      logout({ account:account }).then(() => {
         commit('SET_TOKEN', '')
         commit('SET_ROLES', [])
         removeToken()

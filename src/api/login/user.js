@@ -1,38 +1,44 @@
 import request from '@/utils/request'
-
+import axios from 'axios'
 export function login(data) {
   return request({
     url: '/api/v1/login/',
     method: 'post',
-    params: data
+    data: data
   })
 }
 
 export function getInfo(data) {
+  //debugger
   return request({
     url: '/api/v1/login/',
-    method: 'post',
+    method: 'get',
     params: data
   })
 }
 
-export function authCode(data) {
-  // let urlAndParam='/api/v1/auth_code?purpose=1&phone='+phone;
+export function authCode(param) {
   // return request({
-  //   url: urlAndParam,
-  //   method: 'get'
+  //   url: '/api/v1/auth_code/',
+  //   method: 'post',
+  //   data: param
   // })
-  return request({
-    url: '/api/v1/auth_code/',
-    method: 'post',
-    params: data
-  })
+  return axios({
+      method: "POST",
+      url: '/api/v1/auth_code/',
+      headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'token': 'phone_auth_code'
+      },
+      data:param,
+  });
 }
 
 export function logout(data) {
+	debugger
   return request({
     url: '/api/v1/logout/',
     method: 'post',
-    params: data
+    data: data
   })
 }

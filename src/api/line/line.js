@@ -53,3 +53,20 @@ export function insertZones(query) {
     data: query
   })
 }
+
+export function lineInfo(query) {
+  // debugger
+  return request({
+    url: '/api/v1/line_data/',
+    method: 'get',
+    query: query
+  })
+}
+
+export function lineCRUD(query) {
+  return request({
+    url: '/api/v1/line_data/',
+    method: 'post',
+    data: query
+  })
+}
