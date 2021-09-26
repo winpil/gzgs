@@ -16,6 +16,19 @@ export function getInfo(data) {
   })
 }
 
+export function authCode(data) {
+  // let urlAndParam='/api/v1/auth_code?purpose=1&phone='+phone;
+  // return request({
+  //   url: urlAndParam,
+  //   method: 'get'
+  // })
+  return request({
+    url: '/api/v1/auth_code/',
+    method: 'post',
+    params: data
+  })
+}
+
 export function logout(data) {
   return request({
     url: '/api/v1/logout/',

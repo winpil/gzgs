@@ -60,7 +60,7 @@
           width="width: calc(85% - 110px)"
           autocomplete="on"
         />
-        <v-sidentify :identifyCode="identifyCode"></v-sidentify>
+        <v-sidentify @click.native="resetImg" :identifyCode="identifyCode"></v-sidentify>
         <!-- <img :src="imgUrl" @click="resetImg" class="vertify_img" /> -->
       </el-form-item>
       <el-form-item prop="vcode">
@@ -207,6 +207,8 @@ import { validUsername } from '@/utils/validate'
 import LangSelect from '@/components/LangSelect'
 import SocialSign from './components/SocialSignin'
 
+import { authCode } from '@/api/login/user.js'
+
 export default {
   name: 'Login',
   components: { LangSelect, SocialSign,'v-sidentify':Sidentify },
@@ -262,7 +264,7 @@ export default {
       timer:{},
       disabled:false,
       //验证码图片
-      imgUrl:'https://imghtml.baoday.cn/upload/article/000/000/006/5dbff8e2babb9202.jpg',
+      // imgUrl:'https://imghtml.baoday.cn/upload/article/000/000/006/5dbff8e2babb9202.jpg',
     }
   },
   watch: {
@@ -325,8 +327,12 @@ export default {
     },
     resetImg(){
       //重新获取图片的验证码
+      this.refreshCode();
     },
-    tackBtn(){       //验证码倒数60秒
+    tackBtn(phone){       //验证码倒数60秒
+      authCode(phone).then(res => {
+        console.log(res);
+      });
       let time = 60;
       let that=this;
       this.timer = setInterval(() => {
@@ -346,6 +352,7 @@ export default {
         if(this.disabled){
           return ;
         }
+        let that=this;
         this.$refs[checkForm].validateField('account', (err) =>{
         if(err){
             this.$message({
@@ -355,7 +362,16 @@ export default {
             this.$refs.account.focus();
             return;
           }else{
-            this.tackBtn();   //验证码倒数60秒
+            if(checkForm=='loginForm' && that.identifyCode!=that.loginForm.pcode){
+              this.$message({
+                message: '请输入正确的图片验证码',
+                type: 'warning'
+              });
+              this.$refs.pcode.focus();
+              return ;
+            }
+            let data={purpose:1,phone:that[checkForm].account};
+            this.tackBtn(data);   //验证码倒数60秒
           }
         })        
     },
