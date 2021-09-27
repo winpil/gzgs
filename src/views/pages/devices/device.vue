@@ -276,7 +276,7 @@ export default {
   },
   created() {
     this.getList()
-    this.getAreaList()
+    //this.getAreaList()
   },
 
   computed: {

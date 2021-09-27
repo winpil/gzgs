@@ -59,7 +59,7 @@ export function lineInfo(query) {
   return request({
     url: '/api/v1/line_data/',
     method: 'get',
-    query: query
+    params: query
   })
 }
 

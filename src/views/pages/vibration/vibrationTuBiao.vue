@@ -36,7 +36,7 @@ export default {
   },
   mounted() {
     queryDataTuBiao({'alert_id':'20201126144247720000'}).then(res => {
-        debugger
+        // debugger
         if (res.retcode == 200) {
           var yData=res.result
           var yMax=0
