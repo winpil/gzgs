@@ -140,6 +140,20 @@
             autocomplete="on"
           />
         </el-form-item>
+        <el-form-item prop="phone">
+          <span class="svg-container">
+            <svg-icon icon-class="example" />
+          </span>
+          <el-input
+            ref="phone"
+            v-model="forgetPasswordForm.phone"
+            placeholder="手机号"
+            name="phone"
+            type="text"
+            tabindex="6"
+            autocomplete="on"
+          />
+        </el-form-item>
         <el-form-item prop="phone_auth_code">
           <span class="svg-container">
             <svg-icon icon-class="component" />
@@ -221,7 +235,7 @@ import { validUsername } from '@/utils/validate'
 import LangSelect from '@/components/LangSelect'
 import SocialSign from './components/SocialSignin'
 
-import { authCode,login } from '@/api/login/user.js'
+import { authCode,login,forgetPassword } from '@/api/login/user.js'
 
 export default {
   name: 'Login',
@@ -264,6 +278,7 @@ export default {
       forgetPasswordRules:{
         account: [{ required: true, trigger: 'blur', validator: validateUsername }],
         password: [{ required: true, trigger: 'blur', validator: validatePassword }],
+        phone: [{ required: true, trigger: 'blur', validator: validateUsername }],
         surePassword: [{ required: true, trigger: 'blur', validator: validatePassword }]
       },
       passwordType: 'password',
@@ -327,7 +342,22 @@ export default {
      }
   },
     forgetPasswordLogin(){
-
+      if(this.forgetPasswordForm.surePassword!=this.forgetPasswordForm.password){
+         this.$message({
+            message: '两次密码不一样',
+            type: 'warning'
+          });
+        this.$refs.surePassword.focus();            
+        return 
+      }
+      this.forgetPasswordForm.new_pwd=this.forgetPasswordForm.password
+      forgetPassword(this.forgetPasswordForm).then(res => {
+        // debugger
+        if (res.data.retcode == 200) {
+          this.$message({ type: 'success', message: '密码修改成功！'})
+          this.forgetPasswordClose();
+        }
+      })
     },
     forgetPasswordClose(){
       this.yzmDjsMsg = '获取验证码';
@@ -375,7 +405,7 @@ export default {
               message: '请输入正确的账号/手机号',
               type: 'warning'
             });
-            this.$refs.account.focus();
+            this.$refs.phone.focus();
             return;
           }else{
             if(checkForm=='loginForm' && that.identifyCode!=that.loginForm.pcode){

@@ -34,8 +34,28 @@ export function authCode(param) {
   });
 }
 
+export function changePwd(param) {
+  return request({
+    url: '/api/v1/change_pwd/',
+    method: 'post',
+    data: param
+  })
+}
+
+export function forgetPassword(param) {
+  return axios({
+    method: "POST",
+    url: '/api/v1/change_pwd/',
+    headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'token': 'login_forget_pwd'
+    },
+    data:param,
+  });
+}
+
 export function logout(data) {
-	debugger
+	//debugger
   return request({
     url: '/api/v1/logout/',
     method: 'post',
