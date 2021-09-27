@@ -39,7 +39,7 @@ module.exports = {
     proxy: {
       '/api': {
 　　　　　　//target: 'http://127.0.0.1:8000/', //process.env.VUE_APP_BASE_API,  //这里后台的地址模拟的;应该填写你们真实的后台接口
-      		target: 'http://139.159.199.30:8802/',
+      		target: 'http://139.159.199.30:8803/',
           secure: false,
 　　　　　　changeOrigin: true,  //允许跨域
       }
