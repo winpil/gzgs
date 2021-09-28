@@ -176,12 +176,28 @@ export function deviceInfo(query) {
   return request({
       url: '/api/v1/device_data/',
       method: 'get',
-      data: query
+      params: query
     })
 }
 export function deviceCRUD(query) {
   return request({
       url: '/api/v1/device_data/',
+      method: 'post',
+      data: query
+    })
+}
+//获取线路信息
+export function lineChange(query) {
+  return request({
+      url: '/api/v1/line_change/',
+      method: 'get',
+      params: query
+    })
+}
+//更新告警状态
+export function alertDeal(query) {
+  return request({
+      url: '/api/v1/alert_deal/',
       method: 'post',
       data: query
     })

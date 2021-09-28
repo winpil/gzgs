@@ -1,5 +1,5 @@
 <template>
-  <div class="gs-home-wrapper" @click.capture="showWindow = false" ref="doc" >
+  <div class="gs-home-wrapper" ref="doc" >
     <img src="../../assets/img/background.png" class="bg-img" alt="">
     <div class="top-title">
       <img src="../../assets/img/topleft.png" class="top-left-wrapper" alt="">
@@ -15,14 +15,14 @@
       <div class="content-mid f-height abs" style="width: 76.5%;"> 
         <div class="f-width rel" style="height: 97.5%;margin-bottom: 1.5vh;">
           <!-- 线路信息窗口开始 -->
-          <div class=“gs-info-window-line” 
-          :style="{'position': 'absolute', 'background': 'rgba(8, 32, 51, 0.85)', 'z-index': '12', 'border-radius': '6px', 'color': 'rgb(35 206 253)', 'left': '10px', 'top': '10px','font-size': '14px'}"
+          <div class="gs-info-window-line"
+          :style="{'position': 'absolute', 'background': 'rgba(8, 32, 51, 0.85)', 'z-index': '12', 'border-radius': '6px', 'color': 'rgb(35 206 253)', 'left': '10px', 'top': '50px','font-size': '14px'}"
           ref="infoWindow" 
           v-show="showWindow">
               <div class="line-info-title">
                 <span class="title-detail">
                   <span v-if="infoType == 0">断纤信息</span>  
-                  <span v-if="infoType == 1">线路名称：{{currentLineInfo.name}}</span>
+                  <span v-if="infoType == 1">线路名称：{{channel_name}}</span>
                   <span v-if="infoType == 2">告警信息</span>  
                 </span>
               </div>
@@ -31,26 +31,47 @@
                 <div class="content-detail"><span>断纤详情：</span> <span>{{currentErrorChannels.fiberInfo}}</span> </div>
               </div>
               <div class="line-info-content" v-if="infoType == 1">
-                <div class="content-detail"><span>线路ID：</span> <span>{{Number(currentLineInfo.channel_code)+1}}</span></div>
-                <div class="content-detail"><span>负责人1：</span> <span>{{currentLineInfo.head1}}</span> </div>
-                <div class="content-detail"><span>联系电话：</span> <span>{{currentLineInfo.phone1}}</span> </div>
-                <div class="content-detail"><span>负责人2：</span> <span>{{currentLineInfo.head2}}</span> </div>
-                <div class="content-detail"><span>联系电话：</span> <span>{{currentLineInfo.phone2}}</span> </div>
+              	<div class="content-detail"><span>设备编号：</span> <span>{{currentLineInfo.device}}</span></div>
+                <div class="content-detail"><span>线路ID：</span> <span>{{currentLineInfo.channel_code}}</span></div>
+                <div class="content-detail"><span>负责人：</span> <span>{{currentLineInfo.head}}</span> </div>
+                <div class="content-detail"><span>联系电话：</span> <span>{{currentLineInfo.phone}}</span> </div>
+                <div class="content-detail">
+					<el-button style="float: right;margin-right: 10px;" @click.capture="showWindow = false">关闭</el-button>
+				</div>
               </div>
               <div class="line-info-content" v-if="infoType == 2">
                 <div class="content-detail"><span>位置：</span> <span>{{currentAlarm.address}}</span></div>
                 <div class="content-detail"><span>距离：</span> <span>{{currentAlarm.position}}</span></div>
-                <div class="content-detail"><span>振动开始时间：</span> <span>{{currentAlarm.beginTime}}</span></div>
+                <div class="content-detail"><span>振动开始时间：</span> <span>{{currentAlarm.startTime}}</span></div>
                 <div class="content-detail"><span>振动结束时间：</span> <span>{{currentAlarm.endTime}}</span></div>
-                <div class="content-detail"><span>次数：</span> <span>{{currentAlarm.frequency}}</span> </div>
+                <div class="content-detail"><span>次数：</span> <span>{{currentAlarm.shake_count}}</span> </div>
                 <div class="content-detail"><span>类型：</span> <span>{{currentAlarm.alarmType}}</span> </div>
                 <div class="content-detail"><span>等级：</span> <span>{{currentAlarm.level}}</span> </div>
-                <div class="content-detail"><el-button style="float: right;margin-right: 10px;"  @click="addToWhiteList(currentAlarm.id)">加入白名单</el-button></div>
+                <div class="content-detail">
+                	<span>处理结果：</span>
+                  <input type="radio" v-model="dealResult" value="2" name="_dealResult">
+				  <label for="dealResult2">正</label>
+				  <input type="radio" style="margin-left: 20px;" v-model="dealResult" value="1" name="_dealResult">
+				  <label for="dealResult1">误</label>
+				  <input type="radio" style="margin-left: 20px;" v-model="dealResult" value="0" name="_dealResult">
+				  <label for="dealResult0">未</label>
+				</div>
+				<div class="content-detail">
+					<el-button style="float: left;margin-left: 10px;" @click="saveDealResult()">确定</el-button>
+					<el-button style="float: left;margin-left: 10px;" @click.capture="showWindow = false">放弃</el-button>
+					<el-button style="float: left;margin-left: 10px;" >查看数据</el-button>
+				</div>
+                <!-- <div class="content-detail"><el-button style="float: right;margin-right: 10px;"  @click="addToWhiteList(currentAlarm.id)">加入白名单</el-button></div> -->
               </div>
           </div>
-          <div v-show="showBlink">
-              <img :src="blinkImg" :style="{'position': 'absolute', 'z-index': '12','right': '0px', 'top': '0px'}"/>
+          <div :style="{'position': 'absolute', 'z-index': '12','left': '10px', 'top': '10px'}">
+			<a :class="addChannelClass(item.channel_code)" v-for="item in channelList" :ref="'channel-' + item.channel_code" @click="changeChannel(item)">
+                {{item.channel_name}}
+            </a>
           </div>
+          <!-- <div v-show="showBlink">
+              <img :src="blinkImg" :style="{'position': 'absolute', 'z-index': '12','right': '0px', 'top': '0px'}"/>
+          </div> -->
           <!-- 线路信息窗口结束 -->
           <img src="../../assets/img/map.png" class="f-width f-height abs" style="left: 0; top: 0;z-index: 2;" alt="">
           <baidu-map :mapStyle="mapStyle" :mapClick="false" :scroll-wheel-zoom="true" :center="center" :zoom="zoom" @ready="handler" class="bm-view">
@@ -65,20 +86,20 @@
               <bm-polyline v-for="(item, index2) in lines2" :key="'lines'+ item.channel_code" :path="item.points" :stroke-color="item.lineColor"
                 @mouseover="lineIn(item,index2)" 
                 @mouseout="lineOut(item,index2)"
-                :stroke-opacity="0.75" :stroke-weight="4" :editing="false" @click="showLineInfo(item)" >
+                :stroke-opacity="0.75" :stroke-weight="8" :editing="false" @click="showLineInfo(item)" >
               </bm-polyline>    
             <!--</div>-->
-            <bm-polyline v-for="(field, index) in alarmlines" :key="'alarm' + index" :path="field.nodes" stroke-color="#ec2d2e"
+            <!-- <bm-polyline v-for="(field, index) in alarmlines" :key="'alarm' + index" :path="field.nodes" stroke-color="#ec2d2e"
               style="z-index: 100"
               :stroke-opacity="0.9" :stroke-weight="4" :editing="false" @click="test(field.zone)">
-            </bm-polyline>    
+            </bm-polyline>     -->
           </baidu-map>
         </div>
       </div>
       <div class="content-right f-height abs" style="width: 25%;right: 0;padding: 0 20px;">
-        <div class="f-width rel" style="height: 20%;margin-bottom: 1.5vh;position:relative;">
+        <div class="f-width rel" style="height: 8%;margin-bottom: 1.5vh;position:relative;">
           <img src="../../assets/img/condition.png" class="f-width f-height" alt="">
-          <div class="com-title-wrapper abs">
+          <!-- <div class="com-title-wrapper abs">
             <img src="../../assets/img/title.png" class="f-width f-height" alt="">
             <span class="com-title-content abs">实时数据</span>
           </div>
@@ -91,12 +112,12 @@
                 </div>
               </span>
             </div>
-          </div>
-          <div class="f-width f-height abs" style="top: 35%;left: 3.5%;margin-top:30px;" >
-            <el-button type="primary" @click="cleanAlarm" v-bind:disabled="!realTime">清空告警</el-button>
+          </div> -->
+          <div class="f-width f-height abs" style="width:93%;top: 10%;left: 3.5%;" >
+            <el-button type="primary" style="width:100%;" @click="cleanAlarm" v-bind:disabled="!realTime">清空告警</el-button>
           </div>
         </div>
-        <div class="f-width rel" style="height: 20%;margin-bottom: 1.5vh;position:relative;">
+        <!-- <div class="f-width rel" style="height: 20%;margin-bottom: 1.5vh;position:relative;">
           <img src="../../assets/img/condition.png" class="f-width f-height" alt="">
           <div class="com-title-wrapper abs">
             <img src="../../assets/img/title.png" class="f-width f-height" alt="">
@@ -122,40 +143,54 @@
               </el-option>
             </el-select>
           </div>
+        </div> -->
+        <div class="f-width rel" style="height: 20%;margin-bottom: 1.5vh;position:relative;">
+          <img src="../../assets/img/condition.png" class="f-width f-height" alt="">
+          <div class="com-title-wrapper abs">
+            <img src="../../assets/img/title.png" class="f-width f-height" alt="">
+            <span class="com-title-content abs">选择设备</span>
+          </div>
+          <div class="f-width f-height abs" style="top: 45%;left: 3.5%;" >
+            <el-select ref="selectDevice" class="map-select" size="mini" v-model="device_code" @change="changeDevice" :popper-append-to-body="false">
+              <el-option v-for="item in deviceList" :key="item.device_code"  :value="item.device_code" :label="item.device_name">
+                {{item.device_name}}
+              </el-option>
+            </el-select>
+          </div>
         </div>
-        <div class="f-width rel" style="height: 55.5%;">
+        <div class="f-width rel" style="height: 68%;">
           <img src="../../assets/img/event.png" class="f-width f-height" alt="">
           <div class="com-title-wrapper abs">
             <img src="../../assets/img/title.png" class="f-width f-height" alt="">
-            <span class="com-title-content abs">告警统计</span>
+            <span class="com-title-content abs">告警信息</span>
           </div>
-          <div class="f-width f-height abs" style="top: 15%;left: 3.5%;color:#fff;font-size: 15px;" >
-            线路：<el-select ref="selectLine2" class="map-select" size="mini" v-model="mapForm.line2" @change="changeLine2" :popper-append-to-body="false">
+          <!-- <div class="f-width f-height abs" style="top: 15%;left: 3.5%;color:#fff;font-size: 15px;" >
+                     线路：<el-select ref="selectLine2" class="map-select" size="mini" v-model="mapForm.line2" @change="changeLine2" :popper-append-to-body="false">
               <el-option v-for="item in lineList2" :key="item.field_id"  :value="item.field_id" :label="item.field_name">
                 {{item.field_name}}
               </el-option>
             </el-select>
-          </div>
-          <div class="abs f-width user_skills scrollbar" style="top: 20%;height: 100%;">
+          </div> -->
+          <div class="abs f-width user_skills scrollbar" style="top: 5%;height: 100%;">
             <el-scrollbar style="height:100%">
             <el-table
-              :data="alarmCountList"
+              :data="alarmPoints" @row-click="alarmClick"
               style="width: 94%;height:84%">
               <el-table-column
-                prop="name"
+                prop="level"
                 align="center"
                 width="77"
                 label="告警等级">
               </el-table-column>
               <el-table-column
-                prop="alarm_times"
+                prop="shake_count"
                 label="报警次数"
                 width="77"
                 align="center">
               </el-table-column>
               <el-table-column
-                prop="alarm_deal"
-                label="已处理次数"
+                prop="deal_result"
+                label="处理结果"
                 align="center">
               </el-table-column>
             </el-table>
@@ -171,6 +206,16 @@
         </Modal>
         <Modal :show="showDeviceMsg" :title="deviceMsgTitle" @hideModal="hideDeviceMsg" @submit="hideDeviceMsg">
           <p style="color:#fff">{{deviceErrorMsg}}</p>
+        </Modal>
+        <Modal :show="showDealResult" :title="dealResultTitle" @hideModal="hideDealResult" @submit="submitShowDeal">
+          <el-form ref="dealResultForm" :model="dealResultForm">
+            <el-form-item style="color:#FFF" label="处理人">
+              <el-input  v-model="dealResultForm.deal_name"></el-input>
+            </el-form-item>
+            <el-form-item style="color:#FFF" label="处理人手机">
+              <el-input  v-model="dealResultForm.deal_phone"></el-input>
+            </el-form-item>
+          </el-form>
         </Modal>
       </div>
     </div>    
@@ -197,11 +242,11 @@
 import { queryArea } from '@/api/area/area.js'
 import { queryAlarm,queryRealTimeAlarm,alertWhite,clearAlarm,queryAlarmCount } from '@/api/alarm/alarm.js'
 import { queryLineDetail } from '@/api/line/line.js'
-import { deviceInfo } from '@/api/device/device.js'
+import { deviceInfo,lineChange,alertDeal} from '@/api/device/device.js'
 import echarts from 'echarts'
 import { queryAreaGps, queryDeviceGps, getAreaInfo, getMapCenter, getDeviceInfo, queryZoneInfo, getAlarmFields } from '@/api/dashboard/dashboard.js'
 import Modal from './modal.vue'
-const NORMAL_COLOR = '#23cefd'
+const NORMAL_COLOR = '#0c1f53'
 const SPECIAL_COLOR = "black"
 export default {
   name: 'Dashboard',
@@ -229,6 +274,7 @@ export default {
       currentAlarm:{},
       currentErrorChannels:{},
       whiteListForm:{},
+      dealResultForm:{},
       infoType: '',
       areaList: [],
       lineList: [],
@@ -258,11 +304,19 @@ export default {
       showModal: false,
       deviceName:"",
       deviceMsgTitle:"设备故障",
+      dealResultTitle:"告警信息处理",
       showDeviceMsg: false,
       isDeviceError: false,
+      showDealResult: false,
       deviceErrorMsg:"正常运行",
       deviceErrorChannels : [],
       alarmCountList: [],
+      device_code:"",
+      channel_code:"",
+      channel_name:"",
+      deviceList:[],
+      channelList:[],
+      dealResult:0,	
       tableData: [{
             date: '2016-05-02',
             name: '王小虎',
@@ -305,7 +359,6 @@ export default {
             address: '2020/7/24'
           }]
     
-    
     }
   },
   components: {
@@ -319,23 +372,24 @@ export default {
                       this.selfImgBaseUrl+"RRAzzq.png",
                       this.selfImgBaseUrl+"RREieU.png"];
     //this.getInfo()
-    this.getDeviceGps()
-    this.getLineList();
+    this.getDeviceList();
+    //this.getDeviceGps();
+    //this.getLineList();
     //this.getCenter() // 获取地图坐标中线点
     //this.getAreaInfo() // 区域统计信息
-    this.getAreaList() // 获取地区列表
+    //this.getAreaList() // 获取地区列表
     // 获取事件列表数据
-    if(this.realTime){
+    /* if(this.realTime){
       this.getRealTableData();
     }else{
       this.getTableData();
-    }
-    this.getErrorChannels()
-    this.queryLineDetail() // 获取所有责任区的告警事件
+    } */
+    //this.getErrorChannels()
+    //this.queryLineDetail() // 获取所有责任区的告警事件
     this.time = (new Date()).toLocaleString()
   },
   mounted() {
-    setInterval(() => {
+    /* setInterval(() => {
       if(this.realTime){
         this.getRealTableData();
       }else{
@@ -344,16 +398,16 @@ export default {
     }, 1000*60)
     setInterval(() => {
       //this.getAlarmFields()
-    }, 5000)
+    }, 5000) */
     setInterval(() => {
       this.gettTime()
     }, 1000)
-    setInterval(() => {
+    /* setInterval(() => {
       this.getDeviceInfo()//获取设备状态
       this.builBlink()//亮灯
-    }, 1000)
+    }, 1000) */
     //设备故障时十分钟提醒一次
-    setInterval(() => {
+    /* setInterval(() => {
       if(this.isDeviceError){
         this.showDeviceMsg = true;
       }
@@ -365,7 +419,7 @@ export default {
       }
       this.mapForm.line2 = this.lineList2[this.mapForm.line2Index].field_id
       this.getAlarmCount();
-    }, 1000*15)
+    }, 1000*15) */
   },
   computed: {
     alarmCount() {
@@ -544,6 +598,104 @@ export default {
         }
       })
     },
+    //获取所有设备
+    getDeviceList() {
+    	  deviceInfo().then(res => {
+   		  if (res.retcode === 200 && res.result && res.result.length > 0) {
+   	          this.device_code = res.result[0].device_code;
+   	       	  this.center.lng = res.result[0].longitude;
+              this.center.lat = res.result[0].latitude;
+              this.deviceList = [];
+   	      	  res.result.forEach(it => {
+   	      		this.deviceList.push({"device_code":it.device_code,"device_name":it.device_name})
+   	          })
+   	          this.getChannelList();
+   	        }
+   	      })
+      },
+    //获取路线
+     getChannelList() {
+   	  let params = {}
+      params._q_ = this.device_code;
+   	  console.log(params);
+  	  deviceInfo(params).then(res => {
+ 		  if (res.retcode === 200 && res.result && res.result.length > 0) {
+ 			  this.channelList = [];
+ 			 this.channel_code = res.result[0].channels[0].channel_code
+ 			 this.channel_name = res.result[0].channels[0].channel_name
+ 	          res.result[0].channels.forEach(it => {
+ 	        	  	if(it.channel_name.length > 2){
+ 	        	  		it.channel_name = it.channel_name.substr(0,2)
+ 	        	  	}
+ 	   	      		this.channelList.push({"channel_code":it.channel_code,"channel_name":it.channel_name})
+   	          })
+   	          this.showChannel();
+ 	        }
+ 		 	this.getRealTableData();
+ 	      })
+       },
+      //显示线路
+      showChannel() {
+    	   let params = {}
+    	   params.device_code = this.device_code;
+    	   params.channel_code = this.channel_code;
+    	   lineChange(params).then(res => {
+   	 		  if (res.retcode === 200 && res.result && res.result.length > 0) {
+   	 			  console.log(res);
+   	 			  this.lines2 = []
+   	 			  let tempObj = {}
+   	 			  tempObj.points = []
+   	 			  this.linePoint = []
+	   	 		  res.result[0].nodes.forEach(node => {
+	   	 			if(this.linePoint.length == 0){//起点只要一个
+	   	 	          let startPoint = {};
+	   	 	          startPoint.lng = node.longitude
+	   	 	          startPoint.lat = node.latitude
+	   	 	          startPoint.filedId = res.result[0].channel_code
+	   	 	          startPoint.type = "start"
+	   	 	          startPoint.id = res.result[0].channel_code + "start"
+	   	 	          startPoint.icon = this.selfImgBaseUrl+"RELhIs.png"
+	   	 	          this.linePoint.push(startPoint);
+	   	 	        }
+	   	 			let nodeObj = {}
+		   	        nodeObj.lng = node.longitude
+		   	        nodeObj.lat = node.latitude
+		   	        nodeObj.order = node.order
+		   	        tempObj.points.push(nodeObj)
+	   	          })
+	   	          tempObj.channel_code = res.result[0].channel_code
+		        tempObj.name = res.result[0].person_name
+		        tempObj.head = res.result[0].person_name
+		        tempObj.phone = res.result[0].phone
+		        tempObj.device = res.result[0].device_code
+		        tempObj.lineColor = NORMAL_COLOR
+	   	          this.lines2.push(tempObj)
+   	 	      }
+  	 	   })
+      },
+      alarmClick(row, event, column) {
+    	  console.log(row, event, column)
+    	  this.showAlarmInfo(row)
+      },
+      addChannelClass(code) {
+    	  if(code == this.channel_code){
+    		  return "devicePoint2";
+    	  }else{
+    		  return "devicePoint";
+    	  }
+      },
+      saveDealResult() {
+    	  console.log(this.dealResult);
+    	  console.log(this.currentAlarm.id);
+    	  if(this.dealResult == 1 || this.dealResult == 2){
+    		  this.showDealResult = true;
+        	  this.dealResultForm.alert_id = this.currentAlarm.id
+        	  this.dealResultForm.deal_result = this.dealResult
+    	  }else{
+    		  this.$message({ type: 'warning', message: '未处理的故障不用提交' })
+    	  }
+    	  
+      },
     // 获取地区数据
     getAreaList() {
       let params = {}
@@ -679,14 +831,14 @@ export default {
               let alarmPoint = {};
               alarmPoint.lng = it.longitude
               alarmPoint.lat = it.latitude
-              alarmPoint.id = it.id
+              alarmPoint.id = it.alert_id
               alarmPoint.type = "alarm"
               alarmPoint.level = it.alarm_level
-              alarmPoint.beginTime = it.begin_time
+              alarmPoint.startTime  = it.start_time
               alarmPoint.endTime = it.end_time
               alarmPoint.position = it.position
               alarmPoint.alarmType = it.alarm_type
-              alarmPoint.frequency = it.frequency
+              alarmPoint.shake_count = it.shake_count
               alarmPoint.fieldId = it.channel_code
               alarmPoint.address = it.address
               if(it.alarm_level == "严重告警"){
@@ -709,39 +861,43 @@ export default {
           this.tableData = res.result
           this.alarmPoints = [];
           res.result.forEach(it => {
-            let alarmPoint = {};
-            alarmPoint.lng = it.longitude
-            alarmPoint.lat = it.latitude
-            alarmPoint.id = it.id
-            alarmPoint.type = "alarm"
-            alarmPoint.level = it.alarm_level
-            alarmPoint.beginTime = it.begin_time
-            alarmPoint.endTime = it.end_time
-            alarmPoint.position = it.position
-            alarmPoint.alarmType = it.alarm_type
-            alarmPoint.frequency = it.frequency
-            alarmPoint.fieldId = it.channel_code
-            alarmPoint.address = it.address
-            if(it.alarm_level == "严重告警"){
-              if(it.is_now_shake){
-                alarmPoint.icon = this.selfImgBaseUrl+"RELfaj.gif"
-              }else{
-                alarmPoint.icon = this.selfImgBaseUrl+"RFTa9g.png"
-              }
-            }else if(it.alarm_level == "中级告警"){
-              if(it.is_now_shake){
-                alarmPoint.icon = this.selfImgBaseUrl+"RELWZQ.gif"
-              }else{
-                alarmPoint.icon = this.selfImgBaseUrl+"RFTwcj.png"
-              }
-            }else{
-              if(it.is_now_shake){
-                alarmPoint.icon = this.selfImgBaseUrl+"REL2qg.gif";
-              }else{
-                alarmPoint.icon = this.selfImgBaseUrl+"RFTd3Q.png";
-              }
-            }
-            this.alarmPoints.push(alarmPoint);
+        	if(it.device_code == this.device_code && it.channel_code == this.channel_code){
+	            let alarmPoint = {};
+	            alarmPoint.lng = it.longitude
+	            alarmPoint.lat = it.latitude
+	            alarmPoint.id = it.alert_id
+	            alarmPoint.type = "alarm"
+	            alarmPoint.level = it.alarm_level
+	            alarmPoint.endTime = it.end_time
+	            alarmPoint.startTime  = it.start_time
+	            alarmPoint.position = it.position
+	            alarmPoint.alarmType = it.alarm_type
+	            alarmPoint.shake_count = it.shake_count
+	            alarmPoint.fieldId = it.channel_code
+	            alarmPoint.address = it.address
+	            alarmPoint.deal_result_code = it.deal_result_code
+	            alarmPoint.deal_result = it.deal_result
+	            if(it.alarm_level == "严重告警"){
+	              if(it.is_now_shake){
+	                alarmPoint.icon = this.selfImgBaseUrl+"RELfaj.gif"
+	              }else{
+	                alarmPoint.icon = this.selfImgBaseUrl+"RFTa9g.png"
+	              }
+	            }else if(it.alarm_level == "中级告警"){
+	              if(it.is_now_shake){
+	                alarmPoint.icon = this.selfImgBaseUrl+"RELWZQ.gif"
+	              }else{
+	                alarmPoint.icon = this.selfImgBaseUrl+"RFTwcj.png"
+	              }
+	            }else{
+	              if(it.is_now_shake){
+	                alarmPoint.icon = this.selfImgBaseUrl+"REL2qg.gif";
+	              }else{
+	                alarmPoint.icon = this.selfImgBaseUrl+"RFTd3Q.png";
+	              }
+	            }
+	            this.alarmPoints.push(alarmPoint);
+	          }
           })
         }
       })
@@ -898,6 +1054,7 @@ export default {
     },
     showAlarmInfo(it) {
       this.currentAlarm = it
+      this.dealResult = it.deal_result_code
       this.infoType = 2
       this.showWindow = true
       this.$forceUpdate()
@@ -938,6 +1095,18 @@ export default {
         this.getAlarmCount()
       })
     },
+    changeDevice(val){
+        console.log(val);
+        this.device_code = val;
+        this.getChannelList();
+      },
+      changeChannel(val){
+        console.log(val);
+        this.channel_code = val.channel_code
+        this.channel_name = val.channel_name
+        this.getRealTableData();
+     	this.showChannel();
+     },
     changeTime(val){
       console.log(val);
       this.currentDate = val;
@@ -967,8 +1136,8 @@ export default {
     },
     handler ({BMap, map}) {
       console.log('首页地图信息：', BMap, map)
-      this.center.lng = this.center.longitude
-      this.center.lat = this.center.latitude
+      /* this.center.lng = this.center.longitude
+      this.center.lat = this.center.latitude */
       this.zoom = 14
       window.map = map;
       map.ControlAnchor = 'BMAP_ANCHOR_TOP_LEFT'
@@ -982,7 +1151,7 @@ export default {
     lineOut(it,i) {
       //let tempArr = str.split('--')
       //this.lines[tempArr[0]].fields[tempArr[1]].lineColor = '#23cefd'
-      this.lines2[i].lineColor = '#23cefd'
+      this.lines2[i].lineColor = NORMAL_COLOR
     },
     showLineInfo(it) {
       if(it.type != "start"){
@@ -1179,10 +1348,30 @@ export default {
           this.$message({ type: 'warning', message: '请输入到期日！' })
       }
     },
+    submitShowDeal(){
+        console.log(this.dealResultForm);
+        if(this.dealResultForm.deal_name && this.dealResultForm.deal_name.length>0 && this.dealResultForm.deal_phone && this.dealResultForm.deal_phone.length>0){
+        	alertDeal(this.dealResultForm).then(res => {
+                if (res.retcode === 200) {
+                  this.getRealTableData();
+                  this.$message({ type: 'success', message: res.status })
+                  this.showDealResult = false
+                  this.showWindow = false
+                }
+              })
+        }else{
+            this.$message({ type: 'warning', message: '处理人和手机不能为空！' })
+        }
+        
+      },
     hideDeviceMsg (){
       // 取消弹窗回调
       this.showDeviceMsg = false
     },
+    hideDealResult(){
+        // 取消弹窗回调
+        this.showDealResult = false
+      },
     builBlink() {
       this.showBlink = !this.showBlink
     },
@@ -1524,5 +1713,31 @@ export default {
     height: 100%;
   }
 
+}
+.devicePoint{
+	display:inline-table;
+	border-radius:30px;
+	background-color:#46a6ff;
+	width:40px;
+	height:40px;
+	line-height:40px;
+	text-align:center;
+	vertical-align:middle;	
+	color:#fff;
+	margin-left:5px;
+	font-size:8px;
+}
+.devicePoint2{
+	display:inline-table;
+	border-radius:30px;
+	background-color:#42b983;
+	width:40px;
+	height:40px;
+	line-height:40px;
+	text-align:center;
+	vertical-align:middle;	
+	color:#fff;
+	margin-left:5px;
+	font-size:8px;
 }
 </style>
