@@ -81,6 +81,41 @@ export function alarmInfo(query) {
       params: query
     })
 }
+export function alertParamInfo(query) {
+  return request({
+      url: '/api/v1/alert_param/',
+      method: 'get',
+      params: query
+    })
+}
+export function alertParamCRUD(query) {
+  return request({
+      url: '/api/v1/alert_param/',
+      method: 'post',
+      data: query
+    })
+}
+export function workParamInfo(query) {
+  return request({
+      url: '/api/v1/work_param/',
+      method: 'get',
+      params: query
+    })
+}
+export function workParamCRUD(query) {
+  return request({
+      url: '/api/v1/work_param/',
+      method: 'post',
+      data: query
+    })
+}
+export function opeLogInfo(query) {
+  return request({
+      url: '/api/v1/ope_log/',
+      method: 'get',
+      params: query
+    })
+}
 export function shakeInfo(query) {
   return request({
       url: '/api/v1/shake_info/',
