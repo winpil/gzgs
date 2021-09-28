@@ -10,7 +10,14 @@ export function queryData(query) {
 }
 export function queryDataTuBiao(query) {
   return request({
-      url: '/api/v1/waveform/',
+      url: '/api/v1/show_data/',
+      method: 'get',
+      params: query
+    })
+}
+export function queryDataTuBiaoOption(query) {
+  return request({
+      url: '/api/v1/show_data/',
       method: 'get',
       params: query
     })
