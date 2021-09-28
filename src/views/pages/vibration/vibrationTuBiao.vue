@@ -118,7 +118,7 @@ export default {
           var xData=[]
           xData.push(0)
           for(var i=1;i<=yMax;i++){
-            xData.push(i*10)
+            xData.push(i)
           }
           this.initChart(xData,yData)
         }

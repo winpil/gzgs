@@ -15,6 +15,13 @@ export function queryDataTuBiao(query) {
       params: query
     })
 }
+export function queryDataTuBiaoMap(query) {
+  return request({
+      url: '/api/v1/waveform/',
+      method: 'get',
+      params: query
+    })
+}
 export function queryDataTuBiaoOption(query) {
   return request({
       url: '/api/v1/show_data/',

@@ -59,7 +59,7 @@
 				<div class="content-detail">
 					<el-button style="float: left;margin-left: 10px;" @click="saveDealResult()">确定</el-button>
 					<el-button style="float: left;margin-left: 10px;" @click.capture="showWindow = false">放弃</el-button>
-					<el-button style="float: left;margin-left: 10px;" >查看数据</el-button>
+					<el-button style="float: left;margin-left: 10px;" @click="seeWarnData" >查看数据</el-button>
 				</div>
                 <!-- <div class="content-detail"><el-button style="float: right;margin-right: 10px;"  @click="addToWhiteList(currentAlarm.id)">加入白名单</el-button></div> -->
               </div>
@@ -220,7 +220,14 @@
       </div>
     </div>    
 
-    
+    <el-dialog  width="1100px" title="振动波形展示" :close-on-click-modal="false" :visible.sync="chuliVisible">
+      <div :id="id" :class="className" :style="{height:height,width:width}" >
+
+        </div>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click.native.prevent="chuliVisible=false" >关 闭</el-button>
+      </div>
+    </el-dialog>
 
     <!-- 地区信息窗口开始 -->
     <div draggable="true" style="display: none;">
@@ -239,6 +246,7 @@
 </template>
 
 <script>
+import { queryDataTuBiaoMap } from '@/api/data/data.js'
 import { queryArea } from '@/api/area/area.js'
 import { queryAlarm,queryRealTimeAlarm,alertWhite,clearAlarm,queryAlarmCount } from '@/api/alarm/alarm.js'
 import { queryLineDetail } from '@/api/line/line.js'
@@ -250,8 +258,27 @@ const NORMAL_COLOR = '#0c1f53'
 const SPECIAL_COLOR = "black"
 export default {
   name: 'Dashboard',
-  data() {
+  props: {
+    className: {
+      type: String,
+      default: 'chart'
+    },
+    id: {
+      type: String,
+      default: 'id'
+    },
+    width: {
+      type: String,
+      default: '1000px'
+    },
+    height: {
+      type: String,
+      default: '600px'
+    }
+  },
+  data() {    
     return {
+      chuliVisible:false,
       fullscreen: false,
       value1: '',
       time: '',
@@ -695,6 +722,46 @@ export default {
     		  this.$message({ type: 'warning', message: '未处理的故障不用提交' })
     	  }
     	  
+      },
+      seeWarnData(){
+        debugger
+        this.chuliVisible=true
+        queryDataTuBiaoMap({'alert_id':this.currentAlarm.id}).then(res => {
+          debugger
+          if (res.retcode == 200) {
+            var yData=res.result
+            var yMax=0
+            for(var i=0;i<yData.length;i++){
+              if(yMax<yData[i]){
+                yMax=yData[i]
+              }
+            }
+            var xData=[]
+            xData.push(0)
+            for(var i=1;i<=yMax;i++){
+              xData.push(i)
+            }
+            this.initChart(xData,yData)
+          }
+        })
+      },
+      initChart(xData,yData) {
+        this.chart = echarts.init(document.getElementById(this.id))
+        this.chart.setOption({
+          xAxis: {
+            type: 'category',
+            data: xData
+          },
+          yAxis: {
+            type: 'value'
+          },
+          series: [
+            {
+              data: yData,
+              type: 'line'
+            }
+          ]
+        })
       },
     // 获取地区数据
     getAreaList() {

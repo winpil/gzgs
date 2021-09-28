@@ -69,30 +69,58 @@
               <div class="postInfo-container fit-padding" >
                 <el-row>
                   <el-col :span="9">
-                    <el-form-item label-width="120px" label="设备编号:" class="postInfo-container-item" prop="device_code">
-                      <el-input placeholder="请输入设备编号" v-model="postForm.device_code" style="min-width: 120px;" clearable :disabled="showFlag === pageType.detail"></el-input>
+                    <el-form-item label-width="120px" label="账号:" class="postInfo-container-item" prop="account">
+                      <el-input placeholder="请输入账号" v-model="postForm.account" style="min-width: 120px;" clearable :disabled="showFlag === pageType.detail"></el-input>
                     </el-form-item>
                   </el-col>
                   <el-col :span="9">
-                    <el-form-item label-width="120px" label="线路编号:" class="postInfo-container-item" prop="channel_code">
-                      <el-input placeholder="请输入线路编号" v-model="postForm.channel_code" style="min-width: 120px;" clearable :disabled="showFlag === pageType.detail"></el-input>
+                    <el-form-item label-width="120px" label="角色:" class="postInfo-container-item" prop="role">
+                      <el-input placeholder="请输入角色" v-model="postForm.role" style="min-width: 120px;" clearable :disabled="showFlag === pageType.detail"></el-input>
                     </el-form-item>
                   </el-col>
                   <el-col :span="9">
-                    <el-form-item label-width="120px" label="线路名称:" class="postInfo-container-item" prop="channel_name">
-                      <el-input placeholder="请输入线路名称" v-model="postForm.channel_name" style="min-width: 120px;" clearable :disabled="showFlag === pageType.detail"></el-input>
-                    </el-form-item>
-                  </el-col>
-                  <el-col :span="9">
-                    <el-form-item label-width="120px" label="姓名:" class="postInfo-container-item" prop="check_name">
+                    <el-form-item label-width="120px" label="姓名:" class="postInfo-container-item" prop="name">
                       <el-input placeholder="请输入姓名" v-model="postForm.name" style="min-width: 120px;" clearable :disabled="showFlag === pageType.detail"></el-input>
                     </el-form-item>
                   </el-col>
                   <el-col :span="9">
-                    <el-form-item label-width="120px" label="手机号:" class="postInfo-container-item" prop="check_phone">
+                    <el-form-item label-width="120px" label="手机号:" class="postInfo-container-item" prop="phone">
                       <el-input placeholder="请输入手机号" v-model="postForm.phone" style="min-width: 120px;" clearable :disabled="showFlag === pageType.detail"></el-input>
                     </el-form-item>
                   </el-col>
+                  <el-col  :span="9">
+                    <el-form-item label-width="120px" label="验证码:" class="postInfo-container-item" prop="phone_auth_code">
+                      <el-input
+                        ref="phone_auth_code"
+                        v-model="postForm.phone_auth_code"
+                        placeholder="验证码"
+                        name="phone_auth_code"
+                        type="text"
+                        tabindex="4"
+                        width="width: calc(85% - 210px)"
+                        autocomplete="on"
+                      />
+                      <span class="yzmDjsMsg_class" @click="getCode('loginForm')">
+                        {{ yzmDjsMsg }}
+                      </span>
+                    </el-form-item>
+                  </el-col>
+                   <el-col :span="9">
+                     <el-form-item label-width="120px" label="密码:" class="postInfo-container-item" prop="password">
+                      <el-input :type="passwordType" placeholder="请输入密码" v-model="postForm.password" style="min-width: 120px;" clearable :disabled="showFlag === pageType.detail"></el-input>
+                      <span class="show-pwd" @click="showPwd">
+                        <svg-icon :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'" />
+                      </span>
+                    </el-form-item>
+                   </el-col>
+                    <el-col :span="9">
+                      <el-form-item label-width="120px" label="确认密码:" class="postInfo-container-item" prop="surePassword">
+                        <el-input :type="passwordType" placeholder="请再次输入密码" v-model="postForm.surePassword" style="min-width: 120px;" clearable :disabled="showFlag === pageType.detail"></el-input>
+                        <span class="show-pwd" @click="showPwd">
+                          <svg-icon :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'" />
+                        </span>
+                      </el-form-item>
+                   </el-col>
                 </el-row> 
               </div>
             </el-col>
@@ -115,6 +143,7 @@
 
 <script>
 import { accountOpeInfo,accountOpeCRUD } from '@/api/user/user.js'
+import { authCode } from '@/api/login/user.js'
 import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 import Tinymce from '@/components/Tinymce'
@@ -140,17 +169,18 @@ export default {
   },
   data() {
     return {
+      passwordType:'password',
+      yzmDjsMsg:'',
       pageSizes: [10, 20, 30, 50],
       tableKey: 0,
       list: null,
       total: 0,
       listLoading: true,
       postRules: {
-        device_code:[{ required: true, message: '请输入设备编号', trigger: 'blur' }],
-        channel_code:[{ required: true, message: '请输入线路编号', trigger: 'blur' }],
-        channel_name: [{ required: true, message: '请输入线路名称', trigger: 'blur' }],
-        name: [{ required: true, message: '请输入巡检员', trigger: 'blur' }],
-        phone: [{ required: true, message: '请输入巡检员手机号', trigger: 'blur' }],
+        account:[{ required: true, message: '请输入账号', trigger: 'blur' }],
+        name: [{ required: true, message: '请输入姓名', trigger: 'blur' }],
+        phone: [{ required: true, message: '请输入手机号', trigger: 'blur' }],
+        phone_auth_code: [{ required: true, message: '请输入验证码', trigger: 'blur' }],
       },
       showFlag: 0,
       pageType: {
@@ -167,13 +197,20 @@ export default {
         name:'',
       },
       postForm: {
-        device_code:'',
-        channel_code:'',
-        channel_name:'',
+        account:'',
+        password:'',
+        surePassword:'',
         name:'',
         phone:'',
+        role:'',
         id:'',
+        phone_auth_code:'',
       },
+      identifyCode:'',
+      identifyCodes: "1234567890",
+      yzmDjsMsg:'获取验证码',
+      timer:{},
+      disabled:false,
       areaList: [],
       currentRow: {},
       dialogVisible: false,
@@ -197,6 +234,16 @@ export default {
     }
   },
   methods: {
+    showPwd() {
+      if (this.passwordType === 'password') {
+        this.passwordType = ''
+      } else {
+        this.passwordType = 'password'
+      }
+      this.$nextTick(() => {
+        this.$refs.password.focus()
+      })
+    },
     // 获取设备列表数据
     getList() {
       this.listLoading = true
@@ -278,6 +325,14 @@ export default {
           return false;
         }
       });
+      if(this.postForm.surePassword!=this.postForm.password){
+         this.$message({
+            message: '两次密码不一样',
+            type: 'warning'
+          });
+        this.$refs.surePassword.focus();            
+        return 
+      }
       // 若验证通过则继续请求
       if (validTemp) {
         if (this.showFlag === this.pageType.add) {
@@ -313,6 +368,8 @@ export default {
       Object.keys(this.postForm).forEach(item => {
         this.postForm[item] = row[item]
       })
+      // debugger
+      this.postForm.password=''
     //   debugger
     //   this.postForm.id=row.id
     //   debugger
@@ -325,7 +382,44 @@ export default {
         this.postForm[item] = row[item]
       })
     },
-
+    tackBtn(phone){       //验证码倒数60秒
+    debugger
+      authCode(phone).then(res => {
+        debugger
+        console.log(res);
+      });
+      debugger
+      let time = 60;
+      let that=this;
+      this.timer = setInterval(() => {
+          if(time == 0){
+              clearInterval(that.timer);
+              this.yzmDjsMsg = '获取验证码';
+              this.disabled = false;
+          }else{
+              this.disabled = true;
+              this.yzmDjsMsg = time + '秒后重试';
+              time--;
+          }
+      }, 1000);
+    },
+    getCode(checkForm){
+        if(this.disabled){
+          return ;
+        }
+        let that=this;
+        if(!this.postForm.phone){
+            this.$message({
+              message: '请输入正确的账号/手机号',
+              type: 'warning'
+            });
+            this.$refs.phone.focus();
+            return;
+          }else{
+            let data={purpose:1,phone:this.postForm.phone};
+            this.tackBtn(data);   //验证码倒数60秒
+          }    
+    },
     handleDelete(row) {
       let params = {}
       params.id = row.id
@@ -354,6 +448,15 @@ export default {
 </script>
 
 <style lang="less" scoped>
+.show-pwd {
+    position: absolute;
+    right: 10px;
+    top: 7px;
+    font-size: 16px;
+    color: #889aa4;
+    cursor: pointer;
+    user-select: none;
+  }
   .app-container {
     min-width: 800px;
     overflow: auto;
@@ -364,7 +467,19 @@ export default {
     margin-right: 10px;
     margin-top: 30px;
   }
-
+.yzmDjsMsg_class{
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 110px;
+  height: 50px;
+  cursor: pointer;
+  color: #000;
+  line-height: 65px;
+  text-align: right;
+  padding-right: 15px;
+  font-size: inherit;
+}
   .formBar {
     border-bottom: 1px solid #dfe6ec;
     overflow: hidden;
