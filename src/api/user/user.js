@@ -35,3 +35,48 @@ export function delUser(query) {
         params: query
       })
 }
+
+export function checkPersonInfo(query) {
+  return request({
+      url: '/api/v1/check_person/',
+      method: 'get',
+      params: query
+    })
+}
+export function checkPersonCRUD(query) {
+  return request({
+      url: '/api/v1/check_person/',
+      method: 'post',
+      data: query
+    })
+}
+
+export function accountOpeInfo(query) {
+  return request({
+      url: '/api/v1/account_ope/',
+      method: 'get',
+      params: query
+    })
+}
+export function accountOpeCRUD(query) {
+  return request({
+      url: '/api/v1/account_ope/',
+      method: 'post',
+      data: query
+    })
+}
+
+export function roleDataInfo(query) {
+  return request({
+      url: '/api/v1/role_data/',
+      method: 'get',
+      params: query
+    })
+}
+export function roleDataCRUD(query) {
+  return request({
+      url: '/api/v1/role_data/',
+      method: 'post',
+      data: query
+    })
+}

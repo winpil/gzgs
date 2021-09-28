@@ -2,13 +2,14 @@
   <div class="app-container">
     <div v-if="showFlag === pageType.list">
       <div class="filter-container">
-        <!-- <el-input v-model="queryForm.keyword" clearable placeholder="" style="width: 300px;margin-right: 10px;" class="filter-item" @keyup.enter.native="handleFilter" /> -->
+        <el-input v-model="queryForm.name" clearable placeholder="姓名" style="width: 300px;margin-right: 10px;" class="filter-item" @keyup.enter.native="handleFilter" /> 
+        
         <el-button class="filter-item" style="margin-left: 10px;float:right;margin-right: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
           {{ $t('table.add') }}
         </el-button>
-        <!-- <el-button v-waves class="filter-item" style="float: right;" type="primary" icon="el-icon-search" @click="handleFilter">
+         <el-button class="filter-item" style="float: right;" type="primary" icon="el-icon-search" @click="handleFilter">
           {{ $t('table.search') }}
-        </el-button> -->
+        </el-button> 
       </div>
 
       <el-table
@@ -20,28 +21,21 @@
         highlight-current-row
         style="width: 100%;"
       >
-        <el-table-column label="序号" type="index" align="center" width="80">
+        
+        <el-table-column label="账号" min-width="120px" align="center" prop="account">
+        </el-table-column>        
+        <el-table-column label="名称" min-width="120px" align="center" prop="name">
+        </el-table-column>        
+        <el-table-column label="角色" min-width="120px" align="center" prop="role">
         </el-table-column>
-        <el-table-column label="用户姓名" width="200px" align="center" prop="name">
+        <el-table-column label="手机号" min-width="180px" align="center" prop="phone">
         </el-table-column>
-        <el-table-column label="用户账号" min-width="200px" align="center" prop="user">
+        <el-table-column label="添加时间" min-width="180px" align="center" prop="addtime">
         </el-table-column>
-        <el-table-column label="用户密码" min-width="200px" align="center" prop="password">
-        </el-table-column>
-        <el-table-column label="权限等级" width="200px" align="center" prop="level">
-          <template slot-scope="{row}">
-            <span>{{ row.level === 3 ? '系统管理员' : (row.level === 2 ? '高级管理员' : '初级管理员')}}</span>
-          </template>
-        </el-table-column>
-        <el-table-column label="联系方式" min-width="200px" align="center" prop="phone">
-        </el-table-column>
-        <el-table-column fixed="right" :label="$t('table.actions')" align="center" width="250" class-name="small-padding fixed-width">
+        <el-table-column fixed="right" :label="$t('table.actions')" align="center" width="220" class-name="small-padding fixed-width">
           <template slot-scope="{row,$index}">
             <el-button type="primary" size="mini" @click="handleUpdate(row)">
               {{ $t('table.edit') }}
-            </el-button>
-            <el-button type="primary" size="mini" @click="handleDetail(row)">
-              详情
             </el-button>
             <el-button size="mini" type="danger" @click="handleDelete(row,$index)">
               {{ $t('table.delete') }}
@@ -50,7 +44,7 @@
         </el-table-column>
       </el-table>
 
-      <pagination v-show="total>0" :total="total" :page.sync="queryForm.page" :limit.sync="queryForm.limit" @pagination="getList" />
+      <pagination :page-sizes="pageSizes" v-show="total>0" :total="total" :page.sync="queryForm.page" :limit.sync="queryForm.limit" @pagination="getList" />
     </div>
 
     <div v-else-if="showFlag === pageType.add || showFlag === pageType.edit || showFlag === pageType.detail">
@@ -64,7 +58,7 @@
         <el-button v-if="showFlag !== pageType.detail" class="filter-item" style="margin-left: 10px;float:right;" type="primary" icon="el-icon-refresh-right" @click="handleReset">
           重置
         </el-button>
-        <el-button v-if="showFlag !== pageType.detail" v-waves class="filter-item" style="float: right;" type="primary" icon="el-icon-document-checked" @click="handleSubmit">
+        <el-button v-if="showFlag !== pageType.detail" class="filter-item" style="float: right;" type="primary" icon="el-icon-document-checked" @click="handleSubmit">
           提交
         </el-button>
       </div>
@@ -72,63 +66,55 @@
         <div class="createPost-main-container">
           <el-row>
             <el-col :span="24" class="form-wrapper">
-              <el-row class="fit-padding" >
-                <el-col :span="18">
-                  <el-form-item class="md-input" prop="user">
-                    <MDinput v-model="postForm.user" :maxlength="100" name="user" required :disabled="showFlag !== pageType.add">
-                      {{mdcontent}}
-                    </MDinput>
-                  </el-form-item>
-                </el-col>
-                <el-col :span="6"></el-col>
-              </el-row>
               <div class="postInfo-container fit-padding" >
                 <el-row>
-                  <el-col :span="8">
-                    <el-form-item label-width="90px" label="用户名称:" class="postInfo-container-item" prop="name">
-                      <el-input placeholder="请输入用户名称" v-model="postForm.name" style="min-width: 120px;" clearable :disabled="showFlag === pageType.detail"></el-input>
+                  <el-col :span="9">
+                    <el-form-item label-width="120px" label="设备编号:" class="postInfo-container-item" prop="device_code">
+                      <el-input placeholder="请输入设备编号" v-model="postForm.device_code" style="min-width: 120px;" clearable :disabled="showFlag === pageType.detail"></el-input>
                     </el-form-item>
                   </el-col>
-
-                  <el-col :span="10">
-                    <el-form-item label-width="120px" label="用户密码:" class="postInfo-container-item" prop="password">
-                      <el-input placeholder="请输入用户密码" v-model="postForm.password" :disabled="showFlag === pageType.detail" clearable></el-input>
+                  <el-col :span="9">
+                    <el-form-item label-width="120px" label="线路编号:" class="postInfo-container-item" prop="channel_code">
+                      <el-input placeholder="请输入线路编号" v-model="postForm.channel_code" style="min-width: 120px;" clearable :disabled="showFlag === pageType.detail"></el-input>
                     </el-form-item>
                   </el-col>
-
-                  <el-col :span="6" style="min-height: 1px;">
-                  </el-col>
-                </el-row>
-                <el-row>
-                  <el-col :span="8">
-                    <el-form-item label-width="90px" label="联系方式:" class="postInfo-container-item" prop="phone">
-                      <el-input placeholder="请输入联系方式" v-model="postForm.phone" :disabled="showFlag === pageType.detail" clearable></el-input>
+                  <el-col :span="9">
+                    <el-form-item label-width="120px" label="线路名称:" class="postInfo-container-item" prop="channel_name">
+                      <el-input placeholder="请输入线路名称" v-model="postForm.channel_name" style="min-width: 120px;" clearable :disabled="showFlag === pageType.detail"></el-input>
                     </el-form-item>
                   </el-col>
-
-                  <el-col :span="10">
-                    <el-form-item label-width="120px" label="权限等级:" class="postInfo-container-item" prop="level">
-                      <el-select v-model="postForm.level" style="width: 100%;" filterable default-first-option placeholder="请选择权限等级" :disabled="showFlag === pageType.detail">
-                        <el-option v-for="(item,index) in levelList" :key="item.id+index" :label="item.name" :value="item.id" />
-                      </el-select>
+                  <el-col :span="9">
+                    <el-form-item label-width="120px" label="姓名:" class="postInfo-container-item" prop="check_name">
+                      <el-input placeholder="请输入姓名" v-model="postForm.name" style="min-width: 120px;" clearable :disabled="showFlag === pageType.detail"></el-input>
                     </el-form-item>
                   </el-col>
-
-                  <el-col :span="6" style="min-height: 1px;">
+                  <el-col :span="9">
+                    <el-form-item label-width="120px" label="手机号:" class="postInfo-container-item" prop="check_phone">
+                      <el-input placeholder="请输入手机号" v-model="postForm.phone" style="min-width: 120px;" clearable :disabled="showFlag === pageType.detail"></el-input>
+                    </el-form-item>
                   </el-col>
-                </el-row>
+                </el-row> 
               </div>
             </el-col>
           </el-row>
         </div>
       </el-form>
     </div>
+    <el-dialog
+      title="数据导入"
+      :visible.sync="dialogVisible"
+      width="30%">
+      <input type="file" @change="updateFile" accept="application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="dialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="insertZones">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-import { createUser, queryUser, updateUser, delUser } from '@/api/user/user.js'
-import waves from '@/directive/waves' // waves directive
+import { accountOpeInfo,accountOpeCRUD } from '@/api/user/user.js'
 import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 import Tinymce from '@/components/Tinymce'
@@ -139,7 +125,6 @@ import axios from 'axios'
 export default {
   name: 'ComplexTable',
   components: { Tinymce, MDinput, Pagination },
-  directives: { waves },
   filters: {
     statusFilter(status) {
       const statusMap = {
@@ -155,16 +140,17 @@ export default {
   },
   data() {
     return {
+      pageSizes: [10, 20, 30, 50],
       tableKey: 0,
       list: null,
       total: 0,
       listLoading: true,
       postRules: {
-        user: [{ required: true, message: '请输入用户账号', trigger: 'blur' }],
-        name: [{ required: true, message: '请输入用户名称', trigger: 'blur' }],
-        password: [{ required: true, message: '请输入用户密码', trigger: 'blur' }],
-        phone: [{ required: true, message: '请输入联系方式', trigger: 'blur' }],
-        level: [{ required: true, message: '请选择权限等级', trigger: 'change' }],
+        device_code:[{ required: true, message: '请输入设备编号', trigger: 'blur' }],
+        channel_code:[{ required: true, message: '请输入线路编号', trigger: 'blur' }],
+        channel_name: [{ required: true, message: '请输入线路名称', trigger: 'blur' }],
+        name: [{ required: true, message: '请输入巡检员', trigger: 'blur' }],
+        phone: [{ required: true, message: '请输入巡检员手机号', trigger: 'blur' }],
       },
       showFlag: 0,
       pageType: {
@@ -175,23 +161,23 @@ export default {
       },
       queryForm: {
         page: 1,
-        limit: 15,
+        limit: 10,
+        keyword: '',
+        channel_name:'',
+        name:'',
       },
       postForm: {
-        name: '',
-        level: '',
-        user: '',
-        password: '',
-        phone: ''
+        device_code:'',
+        channel_code:'',
+        channel_name:'',
+        name:'',
+        phone:'',
+        id:'',
       },
-      levelList: [{
-        id: 1, name: '初级管理员'
-      }, {
-        id: 2, name: '高级管理员'
-      }, {
-        id: 3, name: '系统管理员'
-      }],
-      currentRow: {}
+      areaList: [],
+      currentRow: {},
+      dialogVisible: false,
+      fileparam: {}
     }
   },
   created() {
@@ -200,12 +186,12 @@ export default {
 
   computed: {
     mdcontent() {
-      let str = this.postForm.area_id == '' ? '请输入用户账号:' : '用户账号:'
+      let str = this.postForm.area_id == '' ? '请输入线路ID(至多4位):' : '线路ID:'
       return str
     },
     headName() {
-      let str = this.showFlag === this.pageType.add ? '新增管理员':
-        this.showFlag === this.pageType.edit ? '编辑管理员' : '管理员详情'
+      let str = this.showFlag === this.pageType.add ? '新增账号':
+        this.showFlag === this.pageType.edit ? '编辑账号' : '账号详情'
 
       return str
     }
@@ -214,7 +200,8 @@ export default {
     // 获取设备列表数据
     getList() {
       this.listLoading = true
-      queryUser(this.queryForm).then(res => {
+      // debugger
+      accountOpeInfo(this.queryForm).then(res => {
         if (res.retcode == 200) {
           this.list = res.result
           if (this.list && this.list.length > 0) {
@@ -230,6 +217,31 @@ export default {
 
     handleFilter() {
       this.getList()
+    },
+
+    handleShowImport() {
+      this.dialogVisible = true
+    },
+
+    updateFile(e) {
+        let file = e.target.files[0];
+        this.fileparam = new FormData(); //创建form对象
+        this.fileparam.append('excel_file',file);//通过append向form对象添加数据
+        console.log(this.fileparam.get('excel_file'));
+
+    },
+
+    insertZones() {
+      insertZones(this.fileparam).then(res => {
+        if (res.retcode == 200) {
+          this.$message({ type: 'success', message: '数据导入成功！' })
+          setTimeout(() => {
+            this.dialogVisible = false
+          }, 500);
+        } else {
+          this.$message({ type: 'warning', message: `数据导入失败！${res.status}` })
+        }
+      })
     },
 
     // 跳转至新增设备页面
@@ -269,7 +281,8 @@ export default {
       // 若验证通过则继续请求
       if (validTemp) {
         if (this.showFlag === this.pageType.add) {
-          createUser(this.postForm).then(res => {
+          this.postForm.ope='add'
+          accountOpeCRUD(this.postForm).then(res => {
             if (res.retcode === 200 || res.status === 'success') {
               this.$message({ type: 'success', message: '提交成功！'})
               setTimeout(() => {
@@ -279,7 +292,8 @@ export default {
             }
           })
         } else if (this.showFlag === this.pageType.edit) {
-          updateUser(this.postForm).then(res => {
+          this.postForm.ope='update'
+          accountOpeCRUD(this.postForm).then(res => {
             if (res.retcode === 200 || res.status === 'success') {
               this.$message({ type: 'success', message: '提交成功！'})
               setTimeout(() => {
@@ -299,6 +313,9 @@ export default {
       Object.keys(this.postForm).forEach(item => {
         this.postForm[item] = row[item]
       })
+    //   debugger
+    //   this.postForm.id=row.id
+    //   debugger
     },
 
     // 跳转至详情页面
@@ -311,13 +328,14 @@ export default {
 
     handleDelete(row) {
       let params = {}
-      params.user = row.user
-      this.$confirm('用户删除后将不可恢复，确认删除该用户？', '提示', {
+      params.id = row.id
+      this.$confirm('账号删除后将不可恢复，确认删除该？', '提示', {
         confirmButtonText: '删除',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        delUser(params).then(res => {
+        params.ope='delete'
+        accountOpeCRUD(params).then(res => {
           if (res.retcode === 200) {
             this.$message({ type: 'success', message: '删除成功！' })
             setTimeout(() => {
