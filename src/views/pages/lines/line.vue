@@ -2,7 +2,7 @@
   <div class="app-container">
     <div v-if="showFlag === pageType.list">
       <div class="filter-container">
-        <el-input v-model="queryForm.device_code" clearable placeholder="设备号" style="width: 300px;margin-right: 10px;" class="filter-item" @keyup.enter.native="handleFilter" /> 
+        <el-input v-model="queryForm.device_code" clearable placeholder="设备编号" style="width: 300px;margin-right: 10px;" class="filter-item" @keyup.enter.native="handleFilter" /> 
         <el-input v-model="queryForm.channel_name" clearable placeholder="线路名称" style="width: 300px;margin-right: 10px;" class="filter-item" @keyup.enter.native="handleFilter" /> 
         
         <el-button class="filter-item" style="margin-left: 10px;float:right;margin-right: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
@@ -27,19 +27,21 @@
       >
         <el-table-column label="序号" type="index" align="center" width="80">
         </el-table-column>
-        <el-table-column label="设备号" min-width="180px" align="center" prop="device_code">
-        </el-table-column>
-        <el-table-column label="添加时间" min-width="180px" align="center" prop="addtime">
-        </el-table-column>
-        <el-table-column label="线路编号" min-width="180px" align="center" prop="channel_code">
-        </el-table-column>
         <el-table-column label="线路名称" min-width="180px" align="center" prop="channel_name">
         </el-table-column>
-        <el-table-column label="线路长度" min-width="80px" align="center" prop="length">
+        <el-table-column label="设备编号" min-width="180px" align="center" prop="device_code">
+        </el-table-column>
+        
+        <el-table-column label="线路编号" min-width="180px" align="center" prop="channel_code">
+        </el-table-column>
+        
+        <el-table-column label="光缆长度" min-width="80px" align="center" prop="length">
         </el-table-column>
         <el-table-column label="巡检员" min-width="180px" align="center" prop="check_name">
         </el-table-column>
         <el-table-column label="巡检员手机号" min-width="180px" align="center" prop="check_phone">
+        </el-table-column>
+        <el-table-column label="添加时间" min-width="180px" align="center" prop="addtime">
         </el-table-column>
         <el-table-column fixed="right" :label="$t('table.actions')" align="center" width="220" class-name="small-padding fixed-width">
           <template slot-scope="{row,$index}">
@@ -81,8 +83,8 @@
               <div class="postInfo-container fit-padding" >
                 <el-row>
                   <el-col :span="9">
-                    <el-form-item label-width="120px" label="设备号:" class="postInfo-container-item" prop="device_code">
-                      <el-input placeholder="请输入设备号" v-model="postForm.device_code" style="min-width: 120px;" clearable :disabled="showFlag === pageType.detail"></el-input>
+                    <el-form-item label-width="120px" label="设备编号:" class="postInfo-container-item" prop="device_code">
+                      <el-input placeholder="请输入设备编号" v-model="postForm.device_code" style="min-width: 120px;" clearable :disabled="showFlag === pageType.detail"></el-input>
                     </el-form-item>
                   </el-col>
                   <el-col :span="9">

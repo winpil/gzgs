@@ -74,3 +74,19 @@ export function queryAlarmCount(query) {
     params: query
   })
 }
+export function alarmInfo(query) {
+  return request({
+      url: '/api/v1/alert_log/',
+      method: 'get',
+      params: query
+    })
+}
+export function alarmChuli(query) {
+  return request({
+      url: '/api/v1/alert_deal/',
+      method: 'post',
+      data: query
+    })
+}
+
+

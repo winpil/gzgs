@@ -45,7 +45,7 @@
         </el-table-column>
         <el-table-column label="线路名" width="200px" align="center" prop="line_name">
         </el-table-column>
-       <!-- <el-table-column label="设备号" width="200px" align="center" prop="device_id">
+       <!-- <el-table-column label="设备编号" width="200px" align="center" prop="device_id">
         </el-table-column> -->
         <!-- <el-table-column label="设备类型" width="100px" align="center" prop="device_type">
           <template slot-scope="{row}">
@@ -327,7 +327,7 @@ export default {
       postRules: {
         name: [{ required: true, message: '请输入名称代号', trigger: 'blur' }],
         area_id: [{ required: true, message: '请选择设备', trigger: 'change' }],
-        gt_id: [{ required: true, message: '请输入设备号', trigger: 'blur' }],
+        gt_id: [{ required: true, message: '请输入设备编号', trigger: 'blur' }],
         length: [{ required: true, message: '请输入设备长度', trigger: 'blur' }],
         longitude: [{ required: true, message: '请输入设备经度', trigger: 'blur' }],
         latitude: [{ required: true, message: '请输入设备纬度', trigger: 'blur' }],
@@ -504,7 +504,7 @@ export default {
 
     handleExport() {
       import('@/vendor/Export2Excel').then(excel => {
-        const tHeader = ['Id', '设备号', '设备类型', '发生时间', '发生位置', '事件状态', '非受控描述', '确认人姓名', '联系方式', '经度', '纬度']
+        const tHeader = ['Id', '设备编号', '设备类型', '发生时间', '发生位置', '事件状态', '非受控描述', '确认人姓名', '联系方式', '经度', '纬度']
         const filterVal = ['id', 'device_id', 'device_type', 'begin_time', 'position', 'status', 'text', 'name', 'phone', 'longitude', 'latitude']
         const list = this.list
         const data = this.formatJson(filterVal, list)

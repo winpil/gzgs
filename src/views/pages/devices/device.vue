@@ -2,7 +2,7 @@
   <div class="app-container">
     <div v-if="showFlag === pageType.list">
       <div class="filter-container">
-        <!-- <el-input v-model="queryForm.keyword" clearable placeholder="设备号/区域/设备代号" style="width: 300px;margin-right: 10px;" class="filter-item" @keyup.enter.native="handleFilter" />  -->
+        <!-- <el-input v-model="queryForm.keyword" clearable placeholder="设备编号/区域/设备代号" style="width: 300px;margin-right: 10px;" class="filter-item" @keyup.enter.native="handleFilter" />  -->
         <el-button class="filter-item" style="margin-left: 10px;float:right;margin-right: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
           {{ $t('table.add') }}
         </el-button>
@@ -25,35 +25,42 @@
       >
         <!-- <el-table-column label="ID" type="index" align="center" width="80">
         </el-table-column> -->
-        <el-table-column label="设备号" min-width="150px" align="center" prop="device_code">
+        <el-table-column label="设备编号" min-width="150px" align="center" prop="device_code">
         </el-table-column>
         <el-table-column label="设备名称" min-width="200px" align="center" prop="device_name">
         </el-table-column>
-        <el-table-column label="添加时间" min-width="180px" align="center" prop="addtime">
+        <el-table-column label="省" min-width="120px" align="center" prop="province">
         </el-table-column>
+        <el-table-column label="市" min-width="120px" align="center" prop="city">
+        </el-table-column>
+        <el-table-column label="区" min-width="120px" align="center" prop="country">
+        </el-table-column>
+        <el-table-column label="详细地址" min-width="80px" align="center" prop="address">
+        </el-table-column>
+        <el-table-column label="经度" min-width="180px" align="center" prop="longitude">
+        </el-table-column>
+        <el-table-column label="纬度" min-width="180px" align="center" prop="latitude">
+        </el-table-column>
+        <el-table-column label="CPU使用率" min-width="100px" align="center" prop="host_cpu">
+        </el-table-column>
+        <el-table-column label="内存使用率" min-width="100px" align="center" prop="host_mem">
+        </el-table-column>
+        
         <el-table-column label="时钟状态" min-width="80px" align="center" prop="host_clock">
         </el-table-column>
         <el-table-column label="风扇状态" min-width="80px" align="center" prop="host_fan">
         </el-table-column>
         <el-table-column label="电源状态" min-width="80px" align="center" prop="host_power">
         </el-table-column>
-        <el-table-column label="省" min-width="120px" align="center" prop="province">
-        </el-table-column>
-        <el-table-column label="市" min-width="120px" align="center" prop="city">
-        </el-table-column>
-        <el-table-column label="经度" min-width="180px" align="center" prop="longitude">
-        </el-table-column>
-        <el-table-column label="纬度" min-width="180px" align="center" prop="latitude">
-        </el-table-column>
-        <el-table-column label="设备ip地址" min-width="120px" align="center" prop="ip">
+        
+        <!-- <el-table-column label="设备ip地址" min-width="120px" align="center" prop="ip">
         </el-table-column>
         <el-table-column label="设备端口" min-width="80px" align="center" prop="port">
-        </el-table-column>
-        <el-table-column label="CPU使用率" min-width="100px" align="center" prop="host_cpu">
-        </el-table-column>
-        <el-table-column label="内存使用率" min-width="100px" align="center" prop="host_mem">
-        </el-table-column>
+        </el-table-column> -->
+        
         <el-table-column label="设备温度" min-width="80px" align="center" prop="host_temp">
+        </el-table-column>
+        <el-table-column label="添加时间" min-width="180px" align="center" prop="addtime">
         </el-table-column>
         <el-table-column fixed="right" :label="$t('table.actions')" align="center" width="220" class-name="small-padding fixed-width">
           <template slot-scope="{row,$index}">
@@ -95,8 +102,8 @@
               <div class="postInfo-container fit-padding" >
                 <el-row>
                   <el-col :span="9">
-                    <el-form-item label-width="90px" label="设备号:" class="postInfo-container-item" prop="device_code">
-                      <el-input placeholder="请输入设备号" v-model="postForm.device_code" style="min-width: 120px;" clearable :disabled="showFlag === pageType.detail"></el-input>
+                    <el-form-item label-width="90px" label="设备编号:" class="postInfo-container-item" prop="device_code">
+                      <el-input placeholder="请输入设备编号" v-model="postForm.device_code" style="min-width: 120px;" clearable :disabled="showFlag === pageType.detail"></el-input>
                     </el-form-item>
                   </el-col>
                   <el-col :span="9">
@@ -104,21 +111,7 @@
                       <el-input placeholder="请输入设备名称" v-model="postForm.device_name" style="min-width: 120px;" clearable :disabled="showFlag === pageType.detail"></el-input>
                     </el-form-item>
                   </el-col>
-                  <el-col v-if="showFlag === pageType.detail" :span="9">
-                    <el-form-item label-width="90px" label="时钟状态:" class="postInfo-container-item" prop="host_clock">
-                      <el-input placeholder="请输入时钟状态" v-model="postForm.host_clock" style="min-width: 120px;" clearable :disabled="showFlag === pageType.detail"></el-input>
-                    </el-form-item>
-                  </el-col>
-                  <el-col v-if="showFlag === pageType.detail" :span="9">
-                    <el-form-item label-width="90px" label="风扇状态:" class="postInfo-container-item" prop="host_fan">
-                      <el-input placeholder="请输入风扇状态" v-model="postForm.host_fan" style="min-width: 120px;" clearable :disabled="showFlag === pageType.detail"></el-input>
-                    </el-form-item>
-                  </el-col>
-                  <el-col v-if="showFlag === pageType.detail" :span="9">
-                    <el-form-item label-width="90px" label="电源状态:" class="postInfo-container-item" prop="host_power">
-                      <el-input placeholder="请输入电源状态" v-model="postForm.host_power" style="min-width: 120px;" clearable :disabled="showFlag === pageType.detail"></el-input>
-                    </el-form-item>
-                  </el-col>
+                  
                   <el-col :span="9">
                     <el-form-item label-width="90px" label="省:" class="postInfo-container-item" prop="province">
                       <el-input placeholder="请输入省" v-model="postForm.province" style="min-width: 120px;" clearable :disabled="showFlag === pageType.detail"></el-input>
@@ -167,6 +160,21 @@
                   <el-col v-if="showFlag === pageType.detail" :span="9">
                     <el-form-item label-width="90px" label="内存使用率:" class="postInfo-container-item" prop="host_mem">
                       <el-input placeholder="请输入内存使用率" v-model="postForm.host_mem" style="min-width: 120px;" clearable :disabled="showFlag === pageType.detail"></el-input>
+                    </el-form-item>
+                  </el-col>
+                  <el-col v-if="showFlag === pageType.detail" :span="9">
+                    <el-form-item label-width="90px" label="时钟状态:" class="postInfo-container-item" prop="host_clock">
+                      <el-input placeholder="请输入时钟状态" v-model="postForm.host_clock" style="min-width: 120px;" clearable :disabled="showFlag === pageType.detail"></el-input>
+                    </el-form-item>
+                  </el-col>
+                  <el-col v-if="showFlag === pageType.detail" :span="9">
+                    <el-form-item label-width="90px" label="风扇状态:" class="postInfo-container-item" prop="host_fan">
+                      <el-input placeholder="请输入风扇状态" v-model="postForm.host_fan" style="min-width: 120px;" clearable :disabled="showFlag === pageType.detail"></el-input>
+                    </el-form-item>
+                  </el-col>
+                  <el-col v-if="showFlag === pageType.detail" :span="9">
+                    <el-form-item label-width="90px" label="电源状态:" class="postInfo-container-item" prop="host_power">
+                      <el-input placeholder="请输入电源状态" v-model="postForm.host_power" style="min-width: 120px;" clearable :disabled="showFlag === pageType.detail"></el-input>
                     </el-form-item>
                   </el-col>
                   <el-col v-if="showFlag === pageType.detail" :span="9">
@@ -230,8 +238,8 @@ export default {
       listLoading: true,
       postRules: {
         // device_name: [{ required: true, message: '请输入设备名称', trigger: 'blur' }],
-        device_code: [{ required: true, message: '请输入设备号', trigger: 'blur' }],
-        // gt_id: [{ required: true, message: '请输入设备号', trigger: 'blur' }],
+        device_code: [{ required: true, message: '请输入设备编号', trigger: 'blur' }],
+        // gt_id: [{ required: true, message: '请输入设备编号', trigger: 'blur' }],
         // length: [{ required: true, message: '请输入设备长度', trigger: 'blur' }],
         // longitude: [{ required: true, message: '请输入设备经度', trigger: 'blur' }],
         // latitude: [{ required: true, message: '请输入设备纬度', trigger: 'blur' }],
@@ -281,7 +289,7 @@ export default {
 
   computed: {
     mdcontent() {
-      let str = this.postForm.gt_id == '' ? '请输入设备号:' : '设备号:'
+      let str = this.postForm.gt_id == '' ? '请输入设备编号:' : '设备编号:'
       return str
     },
     headName() {

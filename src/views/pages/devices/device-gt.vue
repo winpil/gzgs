@@ -2,7 +2,7 @@
   <div class="app-container">
     <div v-if="showFlag === pageType.list">
       <div class="filter-container">
-        <el-input clearable placeholder="设备号/区域/设备代号" style="width: 300px;margin-right: 10px;" class="filter-item" @keyup.enter.native="handleFilter" />
+        <el-input clearable placeholder="设备编号/区域/设备代号" style="width: 300px;margin-right: 10px;" class="filter-item" @keyup.enter.native="handleFilter" />
         <el-button class="filter-item" style="margin-left: 10px;float:right;margin-right: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
           {{ $t('table.add') }}
         </el-button>
@@ -25,7 +25,7 @@
       >
         <el-table-column label="ID" type="index" align="center" width="80">
         </el-table-column>
-        <el-table-column label="设备号" min-width="150px" align="center" prop="gt_id">
+        <el-table-column label="设备编号" min-width="150px" align="center" prop="gt_id">
         </el-table-column>
         <el-table-column label="名称代号" min-width="150px" align="center" prop="name">
         </el-table-column>
@@ -180,7 +180,7 @@ export default {
       postRules: {
         name: [{ required: true, message: '请输入名称代号', trigger: 'blur' }],
         area_id: [{ required: true, message: '请选择区域', trigger: 'change' }],
-        gt_id: [{ required: true, message: '请输入设备号', trigger: 'blur' }],
+        gt_id: [{ required: true, message: '请输入设备编号', trigger: 'blur' }],
         length: [{ required: true, message: '请输入设备长度', trigger: 'blur' }],
         longitude: [{ required: true, message: '请输入设备经度', trigger: 'blur' }],
         latitude: [{ required: true, message: '请输入设备纬度', trigger: 'blur' }],
@@ -217,7 +217,7 @@ export default {
 
   computed: {
     mdcontent() {
-      let str = this.postForm.gt_id == '' ? '请输入设备号:' : '设备号:'
+      let str = this.postForm.gt_id == '' ? '请输入设备编号:' : '设备编号:'
       return str
     },
     headName() {

@@ -2,7 +2,7 @@
   <div class="app-container">
     <div>
       <div class="filter-container" style="margin-bottom: 10px;">
-        <el-input v-model="queryForm.keyword" clearable placeholder="设备号/区域/设备代号" style="width: 200px;margin-right: 10px;margin-bottom: 1px;" class="filter-item" @keyup.enter.native="handleFilter" />
+        <el-input v-model="queryForm.keyword" clearable placeholder="设备编号/区域/设备代号" style="width: 200px;margin-right: 10px;margin-bottom: 1px;" class="filter-item" @keyup.enter.native="handleFilter" />
         <el-date-picker
             v-model="queryForm.dateTime"
             type="datetimerange"
@@ -35,7 +35,7 @@
             <span>{{ row.id }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="设备号" width="200px" align="center" prop="device_id">
+        <el-table-column label="设备编号" width="200px" align="center" prop="device_id">
         </el-table-column>
         <el-table-column label="设备类型" width="100px" align="center" prop="device_type">
         </el-table-column>
@@ -186,7 +186,7 @@ export default {
     handleExport() {
       this.downloadLoading = true
       import('@/vendor/Export2Excel').then(excel => {
-        const tHeader = ['Id', '设备号', '设备类型', '发生时间', '发生位置', '处理结果', '是否受控', '非受控描述', '是否确认', '确认人姓名', '联系方式', '经度', '纬度']
+        const tHeader = ['Id', '设备编号', '设备类型', '发生时间', '发生位置', '处理结果', '是否受控', '非受控描述', '是否确认', '确认人姓名', '联系方式', '经度', '纬度']
         const filterVal = ['id', 'device_id', 'device_type', 'begin_time', 'position', 'result', 'control', 'text', 'confirm', 'name', 'phone', 'longitude', 'latitude']
         const list = this.list
         const data = this.formatJson(filterVal, list)

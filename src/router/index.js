@@ -144,7 +144,7 @@ export const asyncRoutes = [
         path: 'log',
         component: () => import('@/views/pages/alarms/alarm-log.vue'),
         name: 'log',
-        meta: { title: '告警记录', icon: 'documentation' }
+        meta: { title: '告警日志', icon: 'documentation' }
       },
       {
         path: 'index',
