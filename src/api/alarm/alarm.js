@@ -81,6 +81,13 @@ export function alarmInfo(query) {
       params: query
     })
 }
+export function shakeInfo(query) {
+  return request({
+      url: '/api/v1/shake_info/',
+      method: 'get',
+      params: query
+    })
+}
 export function alarmChuli(query) {
   return request({
       url: '/api/v1/alert_deal/',

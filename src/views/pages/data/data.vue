@@ -1,24 +1,13 @@
 <template>
   <div class="app-container">
-    <div>
-      <div class="filter-container" style="margin-bottom: 10px;">
-        <el-input v-model="queryForm.keyword" clearable placeholder="设备编号/区域/设备代号" style="width: 200px;margin-right: 10px;margin-bottom: 1px;" class="filter-item" @keyup.enter.native="handleFilter" />
-        <el-date-picker
-            v-model="queryForm.dateTime"
-            type="datetimerange"
-            :picker-options="pickerOptions"
-            range-separator="至"
-            start-placeholder="开始日期"
-            end-placeholder="结束日期"
-            align="right"
-            style="margin-top: -10px;">
-        </el-date-picker>
-        <el-button v-waves class="filter-item" style="float: right;" type="primary" icon="el-icon-search" @click="handleFilter">
+    <div v-if="showFlag === pageType.list">
+      <div class="filter-container">
+        <el-input v-model="queryForm.device_code" clearable placeholder="设备编号" style="width: 300px;margin-right: 10px;" class="filter-item" @keyup.enter.native="handleFilter" /> 
+        <el-input v-model="queryForm.channel_name" clearable placeholder="线路名称" style="width: 300px;margin-right: 10px;" class="filter-item" @keyup.enter.native="handleFilter" /> 
+        
+         <el-button class="filter-item" style="float: right;" type="primary" icon="el-icon-search" @click="handleFilter">
           {{ $t('table.search') }}
-        </el-button>
-        <el-button :loading="downloadLoading" class="filter-item" style="float: right;margin-right: 10px;" type="primary" icon="el-icon-download" @click="handleExport">
-          导出
-        </el-button>
+        </el-button> 
       </div>
 
       <el-table
@@ -30,74 +19,44 @@
         highlight-current-row
         style="width: 100%;"
       >
-        <el-table-column label="ID" prop="id" align="center" width="80">
-          <template slot-scope="{row}">
-            <span>{{ row.id }}</span>
-          </template>
+        <el-table-column label="序号" type="index" align="center" width="80">
         </el-table-column>
-        <el-table-column label="设备编号" width="200px" align="center" prop="device_id">
+        <el-table-column label="告警id" align="center"  min-width="120" prop="alert_id">
         </el-table-column>
-        <el-table-column label="设备类型" width="100px" align="center" prop="device_type">
+        <el-table-column label="设备编号" min-width="180px" align="center" prop="device_code">
         </el-table-column>
-        <el-table-column label="发生时间" width="200px" align="center" prop="begin_time">
-          <template slot-scope="{row}">
-            <span>{{ row.begin_time.split('T')[0] + '  ' + row.begin_time.split('T')[1] }}</span>
-          </template>
+        <el-table-column label="线路名称" min-width="180px" align="center" prop="channel_name">
         </el-table-column>
-        <el-table-column label="发生位置" width="300px" align="center" prop="position">
+        <el-table-column label="开始时间" min-width="120px" align="center" prop="start_time">
         </el-table-column>
-        <el-table-column label="处理结果" width="200px" align="center" prop="result">
+        <el-table-column label="结束时间" min-width="120px" align="center" prop="end_time">
         </el-table-column>
-        <el-table-column label="是否受控" width="200px" align="center" prop="control">
+        <el-table-column label="告警位置" min-width="120px" align="center" prop="position">
         </el-table-column>
-        <el-table-column label="非受控描述" width="200px" align="center" prop="text">
-          <template slot-scope="{row}">
-            {{ row.text == 0 ? '无' : row.text }}
-          </template>
+        <el-table-column label="经度" min-width="120px" align="center" prop="longitude">
         </el-table-column>
-        <el-table-column label="是否确认" width="200px" align="center" prop="confirm">
-        </el-table-column>
-        <el-table-column label="确认人姓名" width="200px" align="center" prop="name">
-        </el-table-column>
-        <el-table-column label="联系方式" width="200px" align="center" prop="phone">
-        </el-table-column>
-        <el-table-column label="经度" width="200px" align="center" prop="longitude">
-          <template slot-scope="{row}">
-            <span>{{Number(row.longitude).toFixed(4)}}</span>
-          </template>
-        </el-table-column>
-        <el-table-column label="纬度" width="200px" align="center" prop="latitude">
-          <template slot-scope="{row}">
-            <span>{{Number(row.latitude).toFixed(4)}}</span>
-          </template>
-        </el-table-column>
-        <!-- <el-table-column fixed="right" :label="$t('table.actions')" align="center" width="120" class-name="small-padding fixed-width">
-          <template slot-scope="{row,$index}">
-            <el-button size="mini" type="danger" @click="handleDelete(row,$index)">
-              {{ $t('table.delete') }}
-            </el-button>
-          </template>
-        </el-table-column> -->
+        <el-table-column label="纬度" min-width="120px" align="center" prop="latitude">
+        </el-table-column>        
       </el-table>
 
-      <pagination v-show="total>0" :total="total" :page.sync="queryForm.page" :limit.sync="queryForm.limit" @pagination="getList" />
+      <pagination v-show="total>0" :total="total" :page-sizes="pageSizes" :page.sync="queryForm.page" :limit.sync="queryForm.limit" @pagination="getList" />
     </div>
+
   </div>
 </template>
 
 <script>
-import { queryData } from '@/api/data/data.js'
-import waves from '@/directive/waves' // waves directive
+import { alarmInfo,alarmChuli,shakeInfo } from '@/api/alarm/alarm.js'
 import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 import Tinymce from '@/components/Tinymce'
 import Upload from '@/components/Upload/SingleImage3'
 import MDinput from '@/components/MDinput'
+import axios from 'axios'
 
 export default {
   name: 'ComplexTable',
   components: { Tinymce, MDinput, Pagination },
-  directives: { waves },
   filters: {
     statusFilter(status) {
       const statusMap = {
@@ -113,69 +72,117 @@ export default {
   },
   data() {
     return {
+        chuliVisible:false,
+        pageSizes: [10, 20, 30, 50],
+        options: [{
+          value: '',
+          label: '全部'
+        }, {
+          value: '0',
+          label: '未处理'
+        },{
+          value: '1',
+          label: '误报'
+        }, {
+          value: '2',
+          label: '已处理'
+        }],
       tableKey: 0,
       list: null,
       total: 0,
       listLoading: true,
+      postRules: {
+        device_code:[{ required: true, message: '请输入设备编号', trigger: 'blur' }],
+        channel_code:[{ required: true, message: '请输入线路编号', trigger: 'blur' }],
+        channel_name: [{ required: true, message: '请输入线路名称', trigger: 'blur' }],
+        length: [{ required: true, message: '请输入线路长度', trigger: 'blur' }],
+        check_name: [{ required: true, message: '请输入巡检员', trigger: 'blur' }],
+        check_phone: [{ required: true, message: '请输入巡检员手机号', trigger: 'blur' }],
+      },
+      showFlag: 0,
+      pageType: {
+        list: 0,
+        add: 1,
+        edit: 2,
+        detail: 3
+      },
       queryForm: {
         page: 1,
         limit: 10,
         keyword: '',
-        dateTime: ''
+        channel_name:'',
+        device_code:'',
+        deal_result:'',
       },
-      downloadLoading: false,
+      currentAlarm:{},
+      alarmForm:{
+        alert_id:'',
+        deal_result:'',
+        deal_name:'',
+        deal_phone:'',
+      },
+      postForm: {
+        device_code:'',
+        channel_code:'',
+        channel_name:'',
+        length:'',
+        check_name:'',
+        check_phone:'',
+      },
+      areaList: [],
       currentRow: {},
-      pickerOptions: {
-        shortcuts: [{
-            text: '最近一周',
-            onClick(picker) {
-                const end = new Date();
-                const start = new Date();
-                start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
-                picker.$emit('pick', [start, end]);
-            }
-            }, {
-            text: '最近一个月',
-            onClick(picker) {
-                const end = new Date();
-                const start = new Date();
-                start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
-                picker.$emit('pick', [start, end]);
-            }
-            }, {
-            text: '最近三个月',
-            onClick(picker) {
-                const end = new Date();
-                const start = new Date();
-                start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
-                picker.$emit('pick', [start, end]);
-            }
-            }]
-        },
+      dialogVisible: false,
+      fileparam: {}
     }
   },
   created() {
     this.getList()
   },
 
+  computed: {
+    mdcontent() {
+      let str = this.postForm.area_id == '' ? '请输入线路ID(至多4位):' : '线路ID:'
+      return str
+    },
+    headName() {
+      let str = this.showFlag === this.pageType.add ? '新增线路':
+        this.showFlag === this.pageType.edit ? '编辑线路' : '线路详情'
+
+      return str
+    }
+  },
   methods: {
+      chuliLogin(){
+          alarmChuli(this.alarmForm).then(res => {
+            //   debugger
+            if (res.retcode == 200) {
+                this.$message({ type: 'success', message: '提交成功！'})
+                this.chuliVisible=false
+                this.getList()
+            }
+        })
+      },
+      handleChuLi(row){
+          this.alarmForm.alert_id=row.alert_id
+          this.currentAlarm=row
+          this.chuliVisible=true
+      },
     // 获取设备列表数据
     getList() {
       this.listLoading = true
-      let params = {}
-      params.page = this.queryForm.page
-      params.limit = this.queryForm.limit
-      queryData(params).then(res => {
-        if (res.retcode === 200) {
+      // debugger
+      shakeInfo(this.queryForm).then(res => {
+        //   debugger
+        if (res.retcode == 200) {
           this.list = res.result
           if (this.list && this.list.length > 0) {
-            this.total = this.list.length
+            this.total = res.total
           }
-          // Just to simulate the time of the request
-          setTimeout(() => {
-            this.listLoading = false
-          }, 1 * 1000)
         }
+        // Just to simulate the time of the request
+        setTimeout(() => {
+          this.listLoading = false
+        }, 1 * 1000)
       })
     },
 
@@ -183,41 +190,132 @@ export default {
       this.getList()
     },
 
-    handleExport() {
-      this.downloadLoading = true
-      import('@/vendor/Export2Excel').then(excel => {
-        const tHeader = ['Id', '设备编号', '设备类型', '发生时间', '发生位置', '处理结果', '是否受控', '非受控描述', '是否确认', '确认人姓名', '联系方式', '经度', '纬度']
-        const filterVal = ['id', 'device_id', 'device_type', 'begin_time', 'position', 'result', 'control', 'text', 'confirm', 'name', 'phone', 'longitude', 'latitude']
-        const list = this.list
-        const data = this.formatJson(filterVal, list)
-        excel.export_json_to_excel({
-          header: tHeader,
-          data,
-          filename: '振动数据-' + (new Date()).getFullYear() + '-' + (Number((new Date()).getMonth()) + 1) + '-' + (new Date()).getDate(),
-          autoWidth: true,
-          bookType: 'xlsx'
-        })
-        this.downloadLoading = false
+    handleShowImport() {
+      this.dialogVisible = true
+    },
+
+    updateFile(e) {
+        let file = e.target.files[0];
+        this.fileparam = new FormData(); //创建form对象
+        this.fileparam.append('excel_file',file);//通过append向form对象添加数据
+        console.log(this.fileparam.get('excel_file'));
+
+    },
+
+    insertZones() {
+      insertZones(this.fileparam).then(res => {
+        if (res.retcode == 200) {
+          this.$message({ type: 'success', message: '数据导入成功！' })
+          setTimeout(() => {
+            this.dialogVisible = false
+          }, 500);
+        } else {
+          this.$message({ type: 'warning', message: `数据导入失败！${res.status}` })
+        }
       })
     },
 
-    formatJson(filterVal, jsonData) {
-      return jsonData.map(v => filterVal.map(j => {
-        if (j === 'timestamp') {
-          return parseTime(v[j])
-        } else {
-          return v[j]
-        }
-      }))
+    // 跳转至新增设备页面
+    handleCreate() {
+      this.showFlag = this.pageType.add
+      this.currentRow = {}
+      this.handleReset()
     },
 
-    handleDelete() {
-      this.$confirm('数据删除后将不可恢复，确认删除该事件？', '提示', {
+    // 返回列表页面
+    handleReturn() {
+      this.showFlag = this.pageType.list
+    },
+
+    // 重置表单
+    handleReset() {
+      Object.keys(this.postForm).forEach((item) => {
+        this.postForm[item] = this.currentRow[item]
+      })
+      this.$nextTick(() => {
+        this.$refs.postForm.resetFields()
+      })
+    },
+
+    // 创建/修改设备表单提交
+    handleSubmit() {
+      let validTemp
+      this.$refs['postForm'].validate((valid) => {
+        if (valid) {
+          validTemp = true
+        } else {
+          console.log('error submit!!');
+          validTemp = false
+          return false;
+        }
+      });
+      // 若验证通过则继续请求
+      if (validTemp) {
+        if (this.showFlag === this.pageType.add) {
+          this.postForm.ope='add'
+          lineCRUD(this.postForm).then(res => {
+            if (res.retcode === 200 || res.status === 'success') {
+              this.$message({ type: 'success', message: '提交成功！'})
+              setTimeout(() => {
+                this.showFlag = this.pageType.list
+                this.getList()
+              }, 500)
+            }
+          })
+        } else if (this.showFlag === this.pageType.edit) {
+          this.postForm.ope='update'
+          lineCRUD(this.postForm).then(res => {
+            if (res.retcode === 200 || res.status === 'success') {
+              this.$message({ type: 'success', message: '提交成功！'})
+              setTimeout(() => {
+                this.showFlag = this.pageType.list
+                this.getList()
+              }, 500)
+            }
+          })
+        }
+      }
+    },
+
+    // 跳转至编辑页面
+    handleUpdate(row) {
+      this.showFlag = this.pageType.edit
+      this.currentRow = row
+      Object.keys(this.postForm).forEach(item => {
+        this.postForm[item] = row[item]
+      })
+    },
+
+    // 跳转至详情页面
+    handleDetail(row) {
+      this.showFlag = this.pageType.detail
+      Object.keys(this.postForm).forEach(item => {
+        this.postForm[item] = row[item]
+      })
+    },
+
+    handleDelete(row) {
+      let params = {}
+      params.device_code = row.device_code
+      params.channel_code = row.channel_code
+      this.$confirm('线路删除后将不可恢复，确认删除该线路？', '提示', {
         confirmButtonText: '删除',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        this.$message({ type: 'success', message: '删除成功！' })
+        params.ope='delete'
+        lineCRUD(params).then(res => {
+          if (res.retcode === 200) {
+            this.$message({ type: 'success', message: '删除成功！' })
+            setTimeout(() => {
+              this.getList()
+            }, 200);
+          } else {
+            this.$message({ type: 'warning', message: `删除失败！${res.status}` })
+          }
+        })
+      }).catch(err => {
+        console.log(err)
       })
     }
   }
@@ -271,15 +369,5 @@ export default {
 
   .fit-padding {
     padding-left: 10px;
-  }
-
-  .event-wrapper {
-    display: flex;
-    padding: 0 30px;
-    flex-wrap: wrap;
-
-    .flex-item {
-      flex: 0 0 300px;
-    }
   }
 </style>
