@@ -264,10 +264,10 @@ export default {
         phone_auth_code:'',
       },
       loginForm: {
-        account: 'admin',
-        password: 'gs-root',
+        account: '',
+        password: '',
         pCode:'',
-        phone:'18390143861',
+        phone:'',
         phone_auth_code:'',
       },
       loginRules: {
