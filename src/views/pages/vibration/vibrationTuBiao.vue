@@ -93,6 +93,7 @@ export default {
   },
   methods: {
     handleFilterYi(){
+      this.erOption=[]
       for(var i=0;i<this.allList.length;i++){
           let temp=this.allList[i].device_code
           if(temp==this.queryForm.device_code){
@@ -117,7 +118,7 @@ export default {
           }
           var xData=[]
           xData.push(0)
-          for(var i=1;i<=yMax;i++){
+          for(var i=1;i<=yData.length;i++){
             xData.push(i)
           }
           this.initChart(xData,yData)
@@ -125,6 +126,7 @@ export default {
       })
     },
     handleFilterEr(){
+      this.sanOption=[]
       for(var i=0;i<this.allList.length;i++){
           let temp=this.allList[i].device_code
           if(temp==this.queryForm.device_code){

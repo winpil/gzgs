@@ -429,6 +429,11 @@ export default {
     setInterval(() => {
       this.gettTime()
     }, 1000)
+    setInterval(() => {
+     if(this.device_code.length > 0 && this.channel_code.length > 0){
+      this.getRealTableData()
+     }
+    }, 1000*60)
     /* setInterval(() => {
       this.getDeviceInfo()//获取设备状态
       this.builBlink()//亮灯
@@ -738,7 +743,7 @@ export default {
             }
             var xData=[]
             xData.push(0)
-            for(var i=1;i<=yMax;i++){
+            for(var i=1;i<=yData.length;i++){
               xData.push(i)
             }
             this.initChart(xData,yData)
