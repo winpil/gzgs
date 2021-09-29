@@ -75,7 +75,15 @@
                   </el-col>
                   <el-col :span="9">
                     <el-form-item label-width="120px" label="角色:" class="postInfo-container-item" prop="role">
-                      <el-input placeholder="请输入角色" v-model="postForm.role" style="min-width: 120px;" clearable :disabled="showFlag === pageType.detail"></el-input>
+                      <!-- <el-input placeholder="请输入角色" v-model="postForm.role" style="min-width: 120px;" clearable :disabled="showFlag === pageType.detail"></el-input> -->
+                      <el-select v-model="postForm.role" placeholder="请选择角色" @change="handleFilter">
+                        <el-option
+                        v-for="item in roles"
+                        :key="item.name"
+                        :label="item.name"
+                        :value="item.name">
+                        </el-option>
+                    </el-select>
                     </el-form-item>
                   </el-col>
                   <el-col :span="9">
@@ -142,7 +150,7 @@
 </template>
 
 <script>
-import { accountOpeInfo,accountOpeCRUD } from '@/api/user/user.js'
+import { accountOpeInfo,accountOpeCRUD,roleDataInfo } from '@/api/user/user.js'
 import { authCode } from '@/api/login/user.js'
 import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
@@ -169,6 +177,7 @@ export default {
   },
   data() {
     return {
+      roles:[],
       passwordType:'password',
       yzmDjsMsg:'',
       pageSizes: [10, 20, 30, 50],
@@ -218,6 +227,11 @@ export default {
     }
   },
   created() {
+    roleDataInfo({'page':1,'limit':100}).then(res => {
+        if (res.retcode == 200) {
+          this.roles = res.result
+        }
+      })
     this.getList()
   },
 
@@ -416,7 +430,7 @@ export default {
             this.$refs.phone.focus();
             return;
           }else{
-            let data={purpose:1,phone:this.postForm.phone};
+            let data={purpose:0,phone:this.postForm.phone};
             this.tackBtn(data);   //验证码倒数60秒
           }    
     },

@@ -416,7 +416,7 @@ export default {
               this.$refs.pcode.focus();
               return ;
             }
-            let data={purpose:1,phone:that[checkForm].phone};
+            let data={purpose:(checkForm=='loginForm'?1:3),phone:that[checkForm].phone};
             this.tackBtn(data);   //验证码倒数60秒
           }
         })        

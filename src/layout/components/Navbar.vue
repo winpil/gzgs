@@ -41,7 +41,7 @@
       </el-dropdown>
     </div>
     
-    <el-dialog :before-close="forgetPasswordClose" width="600px" title="忘记密码" :close-on-click-modal="false" :visible.sync="forgetPasswordVisible">
+    <el-dialog :before-close="forgetPasswordClose" width="600px" title="修改密码" :close-on-click-modal="false" :visible.sync="forgetPasswordVisible">
       <el-form ref="forgetPasswordForm" :model="forgetPasswordForm" :rules="forgetPasswordRules" >
         <el-form-item prop="account">
           <span class="svg-container">
@@ -266,7 +266,7 @@ export default {
               this.$refs.pcode.focus();
               return ;
             }
-            let data={purpose:1,phone:that[checkForm].phone};
+            let data={purpose:3,phone:that[checkForm].phone};
             this.tackBtn(data);   //验证码倒数60秒
           }
         })        
