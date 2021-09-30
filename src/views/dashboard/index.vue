@@ -592,8 +592,14 @@ export default {
               {
                 type: 'category',
                 axisTick: { show: false },
-                data: xData
-              }
+                data: xData,
+                splitLine:{
+                  show:true,
+                  lineStyle:{
+                    width: 2
+                  }
+                }
+              }  
             ],
             yAxis: [
               {
