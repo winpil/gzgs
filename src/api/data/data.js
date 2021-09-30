@@ -29,3 +29,18 @@ export function queryDataTuBiaoOption(query) {
       params: query
     })
 }
+export function queryZhiNengFenYeTuBiao(query) {
+  return request({
+      url: '/api/v1/alert_level/',
+      method: 'get',
+      params: query
+    })
+}
+export function getTimeInfo(query) {
+  // debugger
+  return request({
+    url: '/api/v1/get_time/',
+    method: 'get',
+    params: query
+  })
+}

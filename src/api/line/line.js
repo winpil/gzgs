@@ -62,6 +62,14 @@ export function lineInfo(query) {
     params: query
   })
 }
+export function sysCheckInfo(query) {
+  // debugger
+  return request({
+    url: '/api/v1/sys_check/',
+    method: 'get',
+    params: query
+  })
+}
 
 export function lineCRUD(query) {
   return request({

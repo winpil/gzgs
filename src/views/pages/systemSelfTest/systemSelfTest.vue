@@ -6,16 +6,64 @@
         <div v-show="isShow">
             <el-progress :percentage="percentageVal" :format="format"></el-progress>
         </div>
-        
+        <div v-show="is_show_info" style="margin-top:30px">
+          <el-form ref="checkInfo" :model="checkInfo" label-width="150px">         
+            <el-form-item label="CPU使用率"  :style="itemStyle">
+                <el-input :disabled="readOnly" v-model="checkInfo.host_cpu"></el-input>
+            </el-form-item>
+            <div class="clear"></div>
+            <el-form-item label="内存使用率" :style="itemStyle" >
+                <el-input :disabled="readOnly" v-model="checkInfo.host_mem"></el-input>
+            </el-form-item>
+            <div class="clear"></div>
+            <el-form-item label="时钟状态" :style="itemStyle" >
+                <el-input :disabled="readOnly" v-model="checkInfo.host_clock"></el-input>
+            </el-form-item>
+            <div class="clear"></div>
+            <el-form-item label="风扇状态" :style="itemStyle" >
+                <el-input :disabled="readOnly" v-model="checkInfo.host_fan"></el-input>
+            </el-form-item>
+            <div class="clear"></div>
+            <el-form-item label="电源状态" :style="itemStyle" >
+                <el-input :disabled="readOnly" v-model="checkInfo.host_power"></el-input>
+            </el-form-item>
+            <div class="clear"></div>
+            <el-form-item label="网络状态" :style="itemStyle" >
+                <el-input :disabled="readOnly" v-model="checkInfo.host_internet"></el-input>
+            </el-form-item>
+            <div class="clear"></div>
+            <el-form-item label="激光器状态" :style="itemStyle" >
+                <el-input :disabled="readOnly" v-model="checkInfo.host_laser"></el-input>
+            </el-form-item>
+            <div class="clear"></div>
+            <el-form-item label="光信号状态" :style="itemStyle" >
+                <el-input :disabled="readOnly" v-model="checkInfo.host_signal"></el-input>
+            </el-form-item>
+            <div class="clear"></div>
+            <el-form-item label="断纤状态" :style="itemStyle" >
+                <el-input :disabled="readOnly" v-model="checkInfo.host_fiber"></el-input>
+            </el-form-item>
+            <div class="clear"></div>
+            <el-form-item label="设备温度" :style="itemStyle" >
+                <el-input :disabled="readOnly" v-model="checkInfo.host_temp"></el-input>
+            </el-form-item>
+          </el-form>  
+        </div>
     </div>
 </template>
 
 <script>
+import { sysCheckInfo } from '@/api/line/line.js'
+
 export default {
     data() {
         return {
+            itemStyle:'width: 33%;',
+            readOnly:true,
+            is_show_info:false,
             isShow:false,
             percentageVal:0,
+            checkInfo:{}
         }
     },
     methods: {
@@ -24,6 +72,11 @@ export default {
         },
         startZiJian(){
             // debugger;
+            sysCheckInfo({}).then(res => {
+              if (res.retcode == 200) {
+                this.checkInfo=res.result
+              }
+            })
             if(this.isShow){
                 return ;
             }
@@ -39,6 +92,7 @@ export default {
                             message: '自检完成',
                             type: 'success'
                         });
+                        that.is_show_info=true
                     },200)
                 }
             },90);

@@ -50,12 +50,16 @@
                 <div class="content-detail">
                 	<span>处理结果：</span>
                   <input type="radio" v-model="dealResult" value="2" name="_dealResult">
-				  <label for="dealResult2">正</label>
-				  <input type="radio" style="margin-left: 20px;" v-model="dealResult" value="1" name="_dealResult">
-				  <label for="dealResult1">误</label>
-				  <input type="radio" style="margin-left: 20px;" v-model="dealResult" value="0" name="_dealResult">
-				  <label for="dealResult0">未</label>
-				</div>
+                  <label for="dealResult2">正</label>
+                  <input type="radio" style="margin-left: 20px;" v-model="dealResult" value="1" name="_dealResult">
+                  <label for="dealResult1">误</label>
+                  <input type="radio" style="margin-left: 20px;" v-model="dealResult" value="0" name="_dealResult">
+                  <label for="dealResult0">未</label>
+                </div>
+                <div class="content-detail">
+                	<span>处理备注：</span>
+                  <el-input v-model="deal_remarks" value="2" name="deal_remarks"></el-input>
+                </div>
 				<div class="content-detail">
 					<el-button style="float: left;margin-left: 10px;" @click="saveDealResult()">确定</el-button>
 					<el-button style="float: left;margin-left: 10px;" @click.capture="showWindow = false">放弃</el-button>
@@ -66,8 +70,12 @@
           </div>
           <div :style="{'position': 'absolute', 'z-index': '12','left': '10px', 'top': '10px'}">
 			<a :class="addChannelClass(item.channel_code)" v-for="item in channelList" :ref="'channel-' + item.channel_code" @click="changeChannel(item)">
+                <span class="channelCountClass">{{item.count}}</span>
                 {{item.channel_name}}
             </a>
+          </div>
+          <div :style="{'position': 'absolute', 'z-index': '12','right': '10px', 'top': '10px'}">
+            <el-button @click="zhiNengFenYe()"  >智能分类页</el-button>
           </div>
           <!-- <div v-show="showBlink">
               <img :src="blinkImg" :style="{'position': 'absolute', 'z-index': '12','right': '0px', 'top': '0px'}"/>
@@ -184,7 +192,7 @@
               </el-table-column>
               <el-table-column
                 prop="shake_count"
-                label="报警次数"
+                label="振动次数"
                 width="77"
                 align="center">
               </el-table-column>
@@ -220,12 +228,36 @@
       </div>
     </div>    
 
-    <el-dialog  width="1100px" title="振动波形展示" :close-on-click-modal="false" :visible.sync="chuliVisible">
+    <el-dialog  width="800px" title="振动波形展示" :close-on-click-modal="false" :visible.sync="chuliVisible">
       <div :id="id" :class="className" :style="{height:height,width:width}" >
 
         </div>
       <div slot="footer" class="dialog-footer">
         <el-button @click.native.prevent="chuliVisible=false" >关 闭</el-button>
+      </div>
+    </el-dialog>
+    <el-dialog  width="1000px" height="800px" title="智能分类页展示" :close-on-click-modal="false" :visible.sync="zhiNengFenYeVisible">
+      <div id="zhiNengFenYeId" :style="{height:'500px',width:'650px',float:'left'}" >
+
+        </div>
+        <div style="float:right;width:300px">
+          <el-table
+            :data="zhiNengFenYeTableData"
+            style="width: 100%">
+            <el-table-column
+              prop="dengji"
+              label="告警类型序号"
+              width="120">
+            </el-table-column>
+            <el-table-column
+              prop="leixing"
+              label="告警类型"
+              width="180">
+            </el-table-column>
+          </el-table>
+        </div>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click.native.prevent="zhiNengFenYeVisible=false" >关 闭</el-button>
       </div>
     </el-dialog>
 
@@ -246,7 +278,7 @@
 </template>
 
 <script>
-import { queryDataTuBiaoMap } from '@/api/data/data.js'
+import { queryDataTuBiaoMap,getTimeInfo,queryZhiNengFenYeTuBiao } from '@/api/data/data.js'
 import { queryArea } from '@/api/area/area.js'
 import { queryAlarm,queryRealTimeAlarm,alertWhite,clearAlarm,queryAlarmCount } from '@/api/alarm/alarm.js'
 import { queryLineDetail } from '@/api/line/line.js'
@@ -254,7 +286,8 @@ import { deviceInfo,lineChange,alertDeal} from '@/api/device/device.js'
 import echarts from 'echarts'
 import { queryAreaGps, queryDeviceGps, getAreaInfo, getMapCenter, getDeviceInfo, queryZoneInfo, getAlarmFields } from '@/api/dashboard/dashboard.js'
 import Modal from './modal.vue'
-const NORMAL_COLOR = '#0c1f53'
+//const NORMAL_COLOR = '#0c1f53'
+const NORMAL_COLOR = '#0000FF'
 const SPECIAL_COLOR = "black"
 export default {
   name: 'Dashboard',
@@ -269,11 +302,11 @@ export default {
     },
     width: {
       type: String,
-      default: '1000px'
+      default: '700px'
     },
     height: {
       type: String,
-      default: '600px'
+      default: '500px'
     }
   },
   data() {    
@@ -323,6 +356,13 @@ export default {
         // var style_map=['normal','light','dark','redalert','googlelite','grassgreen','midnight','pink','darkgreen','bluish','grayscale','hardedge'];
         //分别风格是：默认地图样式，清新蓝风格，黑夜风格，红色警戒风格，精简风格，自然绿风格，午夜蓝风格，浪漫粉风格，青春绿风格，清新蓝绿风格，高端灰风格，强边界风格
       },
+
+      //sgj start
+      alarm_count:{},
+      deal_remarks:'',
+      zhiNengFenYeVisible:false,
+      //sgj end
+
       chart1: '',
       chart2: '',
       chart3: '',
@@ -344,6 +384,40 @@ export default {
       deviceList:[],
       channelList:[],
       dealResult:0,	
+      zhiNengFenYeTableData:[{
+        dengji: '1',
+        leixing: '大型车辆经过',
+      },{
+        dengji: '2',
+        leixing: '远处小型机械施工',
+      },{
+        dengji: '3',
+        leixing: '远处中型机械施工',
+      },{
+        dengji: '4',
+        leixing: '远处大型机械施工',
+      },{
+        dengji: '5',
+        leixing: '附近破坏',
+      },{
+        dengji: '6',
+        leixing: '附近持续破坏',
+      },{
+        dengji: '7',
+        leixing: '附近靠近破坏',
+      },{
+        dengji: '8',
+        leixing: '周边破坏',
+      },{
+        dengji: '9',
+        leixing: '周边轻入侵破坏',
+      },{
+        dengji: '10',
+        leixing: '周边重入侵破坏',
+      },{
+        dengji: '11',
+        leixing: '周边严重破坏',
+      }],
       tableData: [{
             date: '2016-05-02',
             name: '王小虎',
@@ -465,6 +539,107 @@ export default {
     }
   },
   methods: {
+    zhiNengFenYe(){
+      this.zhiNengFenYeVisible=true
+      queryZhiNengFenYeTuBiao({'device_code':this.device_code}).then(res => {
+        if (res.retcode == 200) {
+          debugger
+          let myResult=res.result
+          let xData=[]
+          let yData={'xj':[],'huaj':[],'al':[],'huij':[]}
+          for(var i=0;i<myResult.length;i++){            
+            let lineDatas=myResult[i].data
+            for(var j=0;j<lineDatas.length;j++){
+              if(i==0){
+                xData.push(lineDatas[j].alarm_type)
+              }
+              if(myResult[i].channel_name=='新局'){
+                yData.xj.push(lineDatas[j].alarm_count)
+              }else if(myResult[i].channel_name=='华景'){
+                yData.huaj.push(lineDatas[j].alarm_count)
+              }else if(myResult[i].channel_name=='奥林'){
+                yData.al.push(lineDatas[j].alarm_count)
+              }else if(myResult[i].channel_name=='汇景'){
+                yData.huij.push(lineDatas[j].alarm_count)
+              }
+            }
+          }
+          this.initChartZhiNeng(xData,yData)
+        }
+      })
+    },
+    initChartZhiNeng(xData,yData){
+      let chartzhiNeng = echarts.init(document.getElementById("zhiNengFenYeId"))
+        chartzhiNeng.setOption({
+            tooltip: {
+              trigger: 'axis',
+              axisPointer: {
+                type: 'shadow'
+              }
+            },
+            dataZoom : [
+              {
+                type: 'slider',
+                show: true,
+                start: 0,
+                end: 20,
+              }
+            ],
+            legend: {
+              data: ['新局', '华景', '奥林', '汇景']
+            },
+            xAxis: [
+              {
+                type: 'category',
+                axisTick: { show: false },
+                data: xData
+              }
+            ],
+            yAxis: [
+              {
+                type: 'value'
+              }
+            ],
+            series: [
+              {
+                name: '新局',
+                type: 'bar',
+                color: 'blue',
+                emphasis: {
+                  focus: 'series'
+                },
+                data: yData.xj
+              },
+              {
+                name: '华景',
+                type: 'bar',
+              color:'green',
+                emphasis: {
+                  focus: 'series'
+                },
+                data: yData.huaj
+              },
+              {
+                name: '奥林',
+                type: 'bar',
+              color:'yellow',
+                emphasis: {
+                  focus: 'series'
+                },
+                data: yData.al
+              },
+              {
+                name: '汇景',
+                type: 'bar',
+              color:'violet',
+                emphasis: {
+                  focus: 'series'
+                },
+                data: yData.huij
+              }
+            ]
+          })
+    },
     initChart1() {
       this.chart1 = echarts.init(this.$refs.chart1)
       this.chart1.setOption({
@@ -722,17 +897,18 @@ export default {
     	  if(this.dealResult == 1 || this.dealResult == 2){
     		  this.showDealResult = true;
         	  this.dealResultForm.alert_id = this.currentAlarm.id
-        	  this.dealResultForm.deal_result = this.dealResult
+            this.dealResultForm.deal_result = this.dealResult
+            this.dealResultForm.deal_remarks = this.deal_remarks
     	  }else{
     		  this.$message({ type: 'warning', message: '未处理的故障不用提交' })
     	  }
     	  
       },
       seeWarnData(){
-        debugger
+        // debugger
         this.chuliVisible=true
         queryDataTuBiaoMap({'alert_id':this.currentAlarm.id}).then(res => {
-          debugger
+          // debugger
           if (res.retcode == 200) {
             var yData=res.result
             var yMax=0
@@ -927,9 +1103,19 @@ export default {
       })
     },
     getRealTableData() {
-      let params = {}
+      let params = {'device_code':this.device_code}
+      let that=this
       queryRealTimeAlarm(params).then(res => {
         if (res.retcode === 200) {
+          that.alarm_count=res.alarm_count
+          for(var i=0;i<that.alarm_count.length;i++){
+            for(var j=0;j<that.channelList.length;j++){
+              if(that.alarm_count[i].device_code==that.device_code && that.alarm_count[i].channel_code==that.channelList[j].channel_code){
+                that.channelList[j].count=that.alarm_count[i].count
+                break
+              }
+            }
+          }
           this.tableData = res.result
           this.alarmPoints = [];
           res.result.forEach(it => {
@@ -1105,9 +1291,15 @@ export default {
       })
     },
     gettTime() {
-      let time = new Date()
-      let timestr = time.toLocaleString()
-      this.time = timestr
+      // let time = new Date()
+      // let timestr = time.toLocaleString()
+      // this.time = timestr
+      getTimeInfo({}).then(res => {
+        // debugger
+        if (res.retcode == 200) {
+          this.time = res.result
+        }
+      })
     },
 
     handleShowDecInfo(id) {
@@ -1218,7 +1410,8 @@ export default {
     lineIn(it,i) {
       //let tempArr = str.split('--')
       //this.lines[tempArr[0]].fields[tempArr[1]].lineColor = '#e6a700'
-      this.lines2[i].lineColor = '#e6a700'
+      // this.lines2[i].lineColor = '#e6a700'
+      this.lines2[i].lineColor = '#008000'
     },
     lineOut(it,i) {
       //let tempArr = str.split('--')
@@ -1481,6 +1674,13 @@ export default {
 </script>
 
 <style scoped lang='less'>
+  .channelCountClass{
+    color: red;
+    position: absolute;
+    left: 23px;
+    top: -8px;
+    font-weight: bold;
+  }
   .f-width {
     width: 100%;
   }
@@ -1797,7 +1997,8 @@ export default {
 	vertical-align:middle;	
 	color:#fff;
 	margin-left:5px;
-	font-size:8px;
+  font-size:8px;
+  position: sticky;
 }
 .devicePoint2{
 	display:inline-table;
@@ -1810,6 +2011,7 @@ export default {
 	vertical-align:middle;	
 	color:#fff;
 	margin-left:5px;
-	font-size:8px;
+  font-size:8px;
+  position: sticky;
 }
 </style>

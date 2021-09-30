@@ -37,6 +37,14 @@
         
         <el-table-column label="光缆长度" min-width="80px" align="center" prop="length">
         </el-table-column>
+
+        <el-table-column label="是否有效" align="center" width="80px">
+          <template slot-scope="{row,$index}">
+            <span v-if="row.is_show">是</span>
+            <span v-else>否</span>
+          </template>
+        </el-table-column>
+
         <el-table-column label="巡检员" min-width="180px" align="center" prop="check_name">
         </el-table-column>
         <el-table-column label="巡检员手机号" min-width="180px" align="center" prop="check_phone">
@@ -95,6 +103,14 @@
                   <el-col :span="9">
                     <el-form-item label-width="120px" label="线路名称:" class="postInfo-container-item" prop="channel_name">
                       <el-input placeholder="请输入线路名称" v-model="postForm.channel_name" style="min-width: 120px;" clearable :disabled="showFlag === pageType.detail"></el-input>
+                    </el-form-item>
+                  </el-col>
+                  <el-col :span="9">
+                    <el-form-item label-width="120px" label="是否有效:" class="postInfo-container-item" prop="is_show">
+                      <el-select v-model="postForm.is_show" placeholder="请选择是否有效">
+                          <el-option label="是" value=true></el-option>
+                          <el-option label="否" value=false></el-option>
+                      </el-select>
                     </el-form-item>
                   </el-col>
                   <el-col :span="9">
@@ -192,6 +208,7 @@ export default {
         length:'',
         check_name:'',
         check_phone:'',
+        is_show:true,
       },
       areaList: [],
       currentRow: {},
@@ -297,6 +314,11 @@ export default {
           return false;
         }
       });
+      if(this.postForm.is_show=='true'){
+        this.postForm.is_show=true
+      }else{
+        this.postForm.is_show=false
+      }
       // 若验证通过则继续请求
       if (validTemp) {
         if (this.showFlag === this.pageType.add) {

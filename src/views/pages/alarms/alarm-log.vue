@@ -66,6 +66,8 @@
         </el-table-column>
         <el-table-column label="处理人" min-width="100px" align="center" prop="deal_name">
         </el-table-column>
+        <el-table-column label="处理备注" min-width="190px" align="center" prop="deal_remarks">
+        </el-table-column>
         <el-table-column label="处理时间" min-width="100px" align="center" prop="deal_time">
         </el-table-column>
         
@@ -87,6 +89,9 @@
         </el-form-item>
         <el-form-item label="处理人手机">
             <el-input v-model="alarmForm.deal_phone"></el-input>
+        </el-form-item>
+        <el-form-item label="备注">
+            <el-input v-model="alarmForm.deal_remarks"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -183,6 +188,7 @@ export default {
         deal_result:'',
         deal_name:'',
         deal_phone:'',
+        deal_remarks:''
       },
       postForm: {
         device_code:'',
