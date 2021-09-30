@@ -551,7 +551,7 @@ export default {
             let lineDatas=myResult[i].data
             for(var j=0;j<lineDatas.length;j++){
               if(i==0){
-                xData.push(lineDatas[j].alarm_type)
+                xData.push(lineDatas[j].alarm_level)
               }
               if(myResult[i].channel_name=='新局'){
                 yData.xj.push(lineDatas[j].alarm_count)
@@ -577,14 +577,14 @@ export default {
                 type: 'shadow'
               }
             },
-            dataZoom : [
-              {
-                type: 'slider',
-                show: true,
-                start: 0,
-                end: 20,
-              }
-            ],
+            // dataZoom : [
+            //   {
+            //     type: 'slider',
+            //     show: true,
+            //     start: 0,
+            //     end: 20,
+            //   }
+            // ],
             legend: {
               data: ['新局', '华景', '奥林', '汇景']
             },
