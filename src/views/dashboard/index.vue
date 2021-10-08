@@ -284,7 +284,7 @@ import { queryDataTuBiaoMap,getTimeInfo,queryZhiNengFenYeTuBiao } from '@/api/da
 import { queryArea } from '@/api/area/area.js'
 import { queryAlarm,queryRealTimeAlarm,alertWhite,clearAlarm,queryAlarmCount } from '@/api/alarm/alarm.js'
 import { queryLineDetail } from '@/api/line/line.js'
-import { deviceInfo,lineChange,alertDeal} from '@/api/device/device.js'
+import { deviceInfo,lineChange,lineChangeTwo,alertDeal} from '@/api/device/device.js'
 import echarts from 'echarts'
 import { queryAreaGps, queryDeviceGps, getAreaInfo, getMapCenter, getDeviceInfo, queryZoneInfo, getAlarmFields } from '@/api/dashboard/dashboard.js'
 import Modal from './modal.vue'
@@ -851,41 +851,56 @@ export default {
        },
       //显示线路
       showChannel() {
-    	   let params = {}
+         let params = {}
+         let that=this
     	   params.device_code = this.device_code;
-    	   params.channel_code = this.channel_code;
-    	   lineChange(params).then(res => {
+    	  //  params.channel_code = this.channel_code;
+    	   lineChangeTwo(params).then(res => {
    	 		  if (res.retcode === 200 && res.result && res.result.length > 0) {
    	 			  console.log(res);
    	 			  this.lines2 = []
-   	 			  let tempObj = {}
-   	 			  tempObj.points = []
-   	 			  this.linePoint = []
-	   	 		  res.result[0].nodes.forEach(node => {
-	   	 			if(this.linePoint.length == 0){//起点只要一个
-	   	 	          let startPoint = {};
-	   	 	          startPoint.lng = node.longitude
-	   	 	          startPoint.lat = node.latitude
-	   	 	          startPoint.filedId = res.result[0].channel_code
-	   	 	          startPoint.type = "start"
-	   	 	          startPoint.id = res.result[0].channel_code + "start"
-	   	 	          startPoint.icon = this.selfImgBaseUrl+"RELhIs.png"
-	   	 	          this.linePoint.push(startPoint);
-	   	 	        }
-	   	 			let nodeObj = {}
+   	 			  // let tempObj = {}
+   	 			  // tempObj.points = []
+            this.linePoint = []
+            // debugger  
+	   	 		  res.result[0].fields.forEach(lineTemp => {
+	   	 			// if(this.linePoint.length == 0){//起点只要一个
+	   	 	    //       let startPoint = {};
+	   	 	    //       startPoint.lng = node.longitude
+	   	 	    //       startPoint.lat = node.latitude
+	   	 	    //       startPoint.filedId = res.result[0].channel_code
+	   	 	    //       startPoint.type = "start"
+	   	 	    //       startPoint.id = res.result[0].channel_code + "start"
+	   	 	    //       startPoint.icon = this.selfImgBaseUrl+"RELhIs.png"
+	   	 	    //       this.linePoint.push(startPoint);
+              //     }
+              let myPoints=[]
+              for(var pointIndex=0;pointIndex<lineTemp.nodes.length;pointIndex++){
+                let node=lineTemp.nodes[pointIndex]
+                let nodeObj = {}
 		   	        nodeObj.lng = node.longitude
 		   	        nodeObj.lat = node.latitude
-		   	        nodeObj.order = node.order
-		   	        tempObj.points.push(nodeObj)
+                nodeObj.order = node.order
+                myPoints.push(nodeObj) 
+              }
+              let tempObj = {}
+              tempObj.points=myPoints
+	   	        tempObj.channel_code = lineTemp.channel_code
+              tempObj.name = lineTemp.person_name
+              tempObj.head = lineTemp.person_name
+              tempObj.phone = lineTemp.phone
+              tempObj.device = lineTemp.device_code
+              tempObj.lineColor = (that.channel_code==lineTemp.channel_code?'#42b983':NORMAL_COLOR)
+	   	        that.lines2.push(tempObj)
+
+	   	 			// let nodeObj = {}
+		   	    //     nodeObj.lng = node.longitude
+		   	    //     nodeObj.lat = node.latitude
+		   	    //     nodeObj.order = node.order
+		   	    //     tempObj.points.push(nodeObj)
 	   	          })
-	   	          tempObj.channel_code = res.result[0].channel_code
-		        tempObj.name = res.result[0].person_name
-		        tempObj.head = res.result[0].person_name
-		        tempObj.phone = res.result[0].phone
-		        tempObj.device = res.result[0].device_code
-		        tempObj.lineColor = NORMAL_COLOR
-	   	          this.lines2.push(tempObj)
-   	 	      }
+              }
+              // debugger
   	 	   })
       },
       alarmClick(row, event, column) {
@@ -1420,12 +1435,12 @@ export default {
       //let tempArr = str.split('--')
       //this.lines[tempArr[0]].fields[tempArr[1]].lineColor = '#e6a700'
       // this.lines2[i].lineColor = '#e6a700'
-      this.lines2[i].lineColor = '#42b983'
+      // this.lines2[i].lineColor = '#42b983'
     },
     lineOut(it,i) {
       //let tempArr = str.split('--')
       //this.lines[tempArr[0]].fields[tempArr[1]].lineColor = '#23cefd'
-      this.lines2[i].lineColor = NORMAL_COLOR
+      // this.lines2[i].lineColor = NORMAL_COLOR
     },
     showLineInfo(it) {
       if(it.type != "start"){

@@ -194,6 +194,14 @@ export function lineChange(query) {
       params: query
     })
 }
+//获取线路信息
+export function lineChangeTwo(query) {
+  return request({
+      url: '/api/v1/area_gps_list/',
+      method: 'get',
+      params: query
+    })
+}
 //更新告警状态
 export function alertDeal(query) {
   return request({
