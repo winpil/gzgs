@@ -237,6 +237,7 @@
       </div> -->
     </el-dialog>
     <el-dialog  width="1000px" height="800px" title="智能分类页展示" :close-on-click-modal="false" :visible.sync="zhiNengFenYeVisible">
+      
       <div id="zhiNengFenYeId" :style="{height:'400px',width:'650px',float:'left'}" >
 
         </div>
@@ -256,9 +257,10 @@
             </el-table-column>
           </el-table>
         </div>
-      <div slot="footer" class="dialog-footer">
+        <div style="height:500px;width:1px;">&nbsp;</div>
+      <!-- <div slot="footer" class="dialog-footer">
         <el-button @click.native.prevent="zhiNengFenYeVisible=false" >关 闭</el-button>
-      </div>
+      </div> -->
     </el-dialog>
 
     <!-- 地区信息窗口开始 -->
@@ -543,7 +545,7 @@ export default {
       this.zhiNengFenYeVisible=true
       queryZhiNengFenYeTuBiao({'device_code':this.device_code}).then(res => {
         if (res.retcode == 200) {
-          debugger
+          // debugger
           let myResult=res.result
           let xData=[]
           let yData={'xj':[],'huaj':[],'al':[],'huij':[]}

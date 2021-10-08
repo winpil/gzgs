@@ -63,7 +63,21 @@ export default {
             is_show_info:false,
             isShow:false,
             percentageVal:0,
-            checkInfo:{}
+            checkInfo:{
+                host_cpu:'',
+                host_mem:'',
+                host_clock:'',
+                host_fan:'',
+                host_power:'',
+                host_internet:'',
+                host_laser:'',
+                host_signal:'',
+                host_fiber:'',
+                host_temp:'',
+            },
+            checkInfoTemp:{
+              
+            }
         }
     },
     methods: {
@@ -74,28 +88,48 @@ export default {
             // debugger;
             sysCheckInfo({}).then(res => {
               if (res.retcode == 200) {
-                this.checkInfo=res.result
+                this.checkInfoTemp=res.result
               }
             })
             if(this.isShow){
                 return ;
             }
-            this.percentageVal=1;
+            this.percentageVal=0;
             this.isShow=true;
             let that=this;
+            that.is_show_info=true
             var t2 = window.setInterval(function() {               
-                that.percentageVal+=3;
+                that.percentageVal+=20;
+                // debugger
+                if(that.percentageVal>=20){
+                  that.checkInfo.host_cpu=that.checkInfoTemp.host_cpu
+                  that.checkInfo.host_mem=that.checkInfoTemp.host_mem
+                }
+                if(that.percentageVal>=40){
+                  that.checkInfo.host_clock=that.checkInfoTemp.host_clock
+                  that.checkInfo.host_fan=that.checkInfoTemp.host_fan
+                }
+                if(that.percentageVal>=60){
+                  that.checkInfo.host_power=that.checkInfoTemp.host_power
+                  that.checkInfo.host_internet=that.checkInfoTemp.host_internet
+                }
+                if(that.percentageVal>=80){
+                  that.checkInfo.host_laser=that.checkInfoTemp.host_laser
+                  that.checkInfo.host_signal=that.checkInfoTemp.host_signal
+                }
+                
                 if(that.percentageVal>=100){
                     window.clearInterval(t2);
-                    var t1 = window.setTimeout(function() {
+                    //var t1 = window.setTimeout(function() {
                         that.$message({
                             message: '自检完成',
                             type: 'success'
                         });
-                        that.is_show_info=true
-                    },200)
+                        // that.is_show_info=true
+                        that.checkInfo=that.checkInfoTemp
+                    //},200)
                 }
-            },90);
+            },1000);
             
             
         }
