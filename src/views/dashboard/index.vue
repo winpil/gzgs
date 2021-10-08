@@ -289,7 +289,7 @@ import echarts from 'echarts'
 import { queryAreaGps, queryDeviceGps, getAreaInfo, getMapCenter, getDeviceInfo, queryZoneInfo, getAlarmFields } from '@/api/dashboard/dashboard.js'
 import Modal from './modal.vue'
 //const NORMAL_COLOR = '#0c1f53'
-const NORMAL_COLOR = '#0000FF'
+const NORMAL_COLOR = '#46a6ff'
 const SPECIAL_COLOR = "black"
 export default {
   name: 'Dashboard',
@@ -1420,7 +1420,7 @@ export default {
       //let tempArr = str.split('--')
       //this.lines[tempArr[0]].fields[tempArr[1]].lineColor = '#e6a700'
       // this.lines2[i].lineColor = '#e6a700'
-      this.lines2[i].lineColor = '#008000'
+      this.lines2[i].lineColor = '#42b983'
     },
     lineOut(it,i) {
       //let tempArr = str.split('--')
