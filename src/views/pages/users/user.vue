@@ -397,25 +397,29 @@ export default {
       })
     },
     tackBtn(phone){       //验证码倒数60秒
-    debugger
-      authCode(phone).then(res => {
-        debugger
-        console.log(res);
-      });
-      debugger
-      let time = 60;
-      let that=this;
-      this.timer = setInterval(() => {
-          if(time == 0){
-              clearInterval(that.timer);
-              this.yzmDjsMsg = '获取验证码';
-              this.disabled = false;
-          }else{
-              this.disabled = true;
-              this.yzmDjsMsg = time + '秒后重试';
-              time--;
-          }
-      }, 1000);
+		let that=this;
+		authCode(phone).then(res => {
+			debugger
+			if(res.data.retcode!=200){
+			  that.disabled = false;
+			  that.$message.error(res.data.error);
+			  return 
+			}else{
+			  let time = 60;
+			  that.timer = setInterval(() => {
+			  if(time == 0){
+				  clearInterval(that.timer);
+				  that.yzmDjsMsg = '获取验证码';
+				  that.disabled = false;
+			  }else{
+				  that.disabled = true;
+				  that.yzmDjsMsg = time + '秒后重试';
+				  time--;
+			  }
+		  }, 1000);
+			}
+			console.log(res);
+		});   
     },
     getCode(checkForm){
         if(this.disabled){

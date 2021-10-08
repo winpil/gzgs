@@ -314,11 +314,11 @@ export default {
           return false;
         }
       });
-      if(this.postForm.is_show=='true'){
-        this.postForm.is_show=true
-      }else{
-        this.postForm.is_show=false
-      }
+      // if(this.postForm.is_show=='true'){
+      //   this.postForm.is_show=true
+      // }else{
+      //   this.postForm.is_show=false
+      // }
       // 若验证通过则继续请求
       if (validTemp) {
         if (this.showFlag === this.pageType.add) {
