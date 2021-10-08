@@ -228,16 +228,16 @@
       </div>
     </div>    
 
-    <el-dialog  width="800px" title="振动波形展示" :close-on-click-modal="false" :visible.sync="chuliVisible">
+    <el-dialog class="zdbxClass"  width="800px" title="振动波形展示" :close-on-click-modal="false" :visible.sync="chuliVisible">
       <div :id="id" :class="className" :style="{height:height,width:width}" >
 
         </div>
-      <div slot="footer" class="dialog-footer">
+      <!-- <div slot="footer" class="dialog-footer">
         <el-button @click.native.prevent="chuliVisible=false" >关 闭</el-button>
-      </div>
+      </div> -->
     </el-dialog>
     <el-dialog  width="1000px" height="800px" title="智能分类页展示" :close-on-click-modal="false" :visible.sync="zhiNengFenYeVisible">
-      <div id="zhiNengFenYeId" :style="{height:'500px',width:'650px',float:'left'}" >
+      <div id="zhiNengFenYeId" :style="{height:'400px',width:'650px',float:'left'}" >
 
         </div>
         <div style="float:right;width:300px">
@@ -306,7 +306,7 @@ export default {
     },
     height: {
       type: String,
-      default: '500px'
+      default: '400px'
     }
   },
   data() {    
@@ -1323,6 +1323,7 @@ export default {
       })
     },
     showAlarmInfo(it) {
+      this.deal_remarks=''
       this.currentAlarm = it
       this.dealResult = it.deal_result_code
       this.infoType = 2
@@ -1935,6 +1936,13 @@ export default {
     .gs-info-window-area {
       top: 70px;
     }
+}
+.zdbxClass{
+  .el-dialog{
+    .el-dialog__body{
+      padding: 0px !important;
+    }
+  }
 }
 .switch-all{
   right: 40px;

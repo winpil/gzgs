@@ -108,8 +108,8 @@
                   <el-col :span="9">
                     <el-form-item label-width="120px" label="是否有效:" class="postInfo-container-item" prop="is_show">
                       <el-select v-model="postForm.is_show" placeholder="请选择是否有效">
-                          <el-option label="是" value=true></el-option>
-                          <el-option label="否" value=false></el-option>
+                          <el-option label="是" :value=true></el-option>
+                          <el-option label="否" :value=false></el-option>
                       </el-select>
                     </el-form-item>
                   </el-col>
