@@ -1665,22 +1665,50 @@ export default {
       this.showBlink = !this.showBlink
     },
     cleanAlarm() {
-      let params = {}
-      let alarmIds = []
-      this.alarmPoints.forEach(it => {
-        alarmIds.push(it.id)
-      }) 
-      params.alarm_ids = alarmIds
-      clearAlarm(params).then(res => {
-        if (res.retcode === 200) {
-          this.$message({ type: 'success', message: '清空告警成功！' })
-          if(this.realTime){
-            this.getRealTableData();
-          }else{
-            this.getTableData();
+      let that=this
+
+      this.$confirm('是否确认清空告警？', '提示', {
+        confirmButtonText: '确认',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        let params = {}
+        let alarmIds = []
+        that.alarmPoints.forEach(it => {
+          alarmIds.push(it.id)
+        }) 
+        params.alarm_ids = alarmIds
+        clearAlarm(params).then(res => {
+          if (res.retcode === 200) {
+            that.$message({ type: 'success', message: '清空告警成功！' })
+            if(that.realTime){
+              that.getRealTableData();
+            }else{
+              that.getTableData();
+            }
           }
-        }
+        })
+      }).catch(err => {
+        console.log(err)
       })
+
+
+      // let params = {}
+      // let alarmIds = []
+      // this.alarmPoints.forEach(it => {
+      //   alarmIds.push(it.id)
+      // }) 
+      // params.alarm_ids = alarmIds
+      // clearAlarm(params).then(res => {
+      //   if (res.retcode === 200) {
+      //     this.$message({ type: 'success', message: '清空告警成功！' })
+      //     if(this.realTime){
+      //       this.getRealTableData();
+      //     }else{
+      //       this.getTableData();
+      //     }
+      //   }
+      // })
     },
     getAlarmCount(){
       let params = {}

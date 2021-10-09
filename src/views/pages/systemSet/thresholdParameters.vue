@@ -15,7 +15,7 @@
             <div class="clear"></div>
         </el-form>    
         <div class="clear"></div>
-        <div style="margin-left:150px">
+        <!-- <div style="margin-left:150px">
             <el-button v-show="readOnly" type="primary" style="width:150px;margin-bottom:30px;" @click="readOnly=false">
                 修 改
             </el-button>
@@ -25,7 +25,7 @@
             <el-button v-show="!readOnly" style="width:150px;margin-bottom:30px;" @click="readOnly=true">
                 放 弃
             </el-button>
-        </div>
+        </div> -->
     </div>
 </template>
 
