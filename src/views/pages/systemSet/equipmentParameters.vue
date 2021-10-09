@@ -1,10 +1,10 @@
 <template>
     <div class="app-container">
         <el-form ref="form" :model="form" label-width="150px">         
-            <el-form-item label="id序号"  :style="itemStyle">
+            <!-- <el-form-item label="id序号"  :style="itemStyle">
                 <el-input :disabled="readOnly" v-model="form.id" ></el-input>
             </el-form-item>
-            <div class="clear"></div>   
+            <div class="clear"></div>    -->
             <el-form-item label="FFT转换系数"  :style="itemStyle">
                 <el-input :disabled="readOnly" v-model="form.fft_change" ></el-input>
             </el-form-item>
