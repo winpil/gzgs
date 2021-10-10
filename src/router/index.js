@@ -236,6 +236,12 @@ export const asyncRoutes = [
         component: () => import('@/views/pages/systemSelfTest/systemSelfTest.vue'),
         name: 'systemSelfTest',
         meta: { title: '系统自检', icon: 'el-icon-refresh' }
+      },
+      {
+        path: 'backups',
+        component: () => import('@/views/pages/systemSet/backups.vue'),
+        name: 'backups',
+        meta: { title: '备份', icon: 'el-icon-s-order' }
       }
     ]
   },

@@ -132,3 +132,19 @@ export function alarmChuli(query) {
 }
 
 
+export function sysExportData(query) {
+  return request({
+      url: '/api/v1/export_data/',
+      method: 'post',
+      responseType:'blob',
+      data: query
+    })
+}
+
+export function sysDelData(query) {
+  return request({
+      url: '/api/v1/del_data/',
+      method: 'post',
+      data: query
+    })
+}

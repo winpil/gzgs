@@ -8,6 +8,9 @@
         </div>
         <div v-show="is_show_info" style="margin-top:30px">
           <el-form ref="checkInfo" :model="checkInfo" label-width="150px">         
+            <el-form-item label="自检时间"  :style="itemStyle">
+                <el-input :disabled="readOnly" v-model="checkInfo.check_time"></el-input>
+            </el-form-item>
             <el-form-item label="CPU使用率"  :style="itemStyle">
                 <el-input :disabled="readOnly" v-model="checkInfo.host_cpu"></el-input>
             </el-form-item>
@@ -64,6 +67,7 @@ export default {
             isShow:false,
             percentageVal:0,
             checkInfo:{
+                check_time:'',
                 host_cpu:'',
                 host_mem:'',
                 host_clock:'',
@@ -102,6 +106,7 @@ export default {
                 that.percentageVal+=20;
                 // debugger
                 if(that.percentageVal>=20){
+                  that.checkInfo.check_time=that.checkInfoTemp.check_time
                   that.checkInfo.host_cpu=that.checkInfoTemp.host_cpu
                   that.checkInfo.host_mem=that.checkInfoTemp.host_mem
                 }
