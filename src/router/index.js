@@ -223,13 +223,13 @@ export const asyncRoutes = [
         path: 'equipmentParameters',
         component: () => import('@/views/pages/systemSet/equipmentParameters.vue'),
         name: 'equipmentParameters',
-        meta: { title: '工作参数设置', icon: 'el-icon-coin' }
+        meta: { title: '工作参数', icon: 'el-icon-coin' }
       },
       {
         path: 'thresholdParameters',
         component: () => import('@/views/pages/systemSet/thresholdParameters.vue'),
         name: 'thresholdParameters',
-        meta: { title: '告警阈值设置', icon: 'el-icon-odometer' }
+        meta: { title: '告警阈值', icon: 'el-icon-odometer' }
       },
       {
         path: 'index',
