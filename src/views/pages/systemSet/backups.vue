@@ -69,7 +69,18 @@ export default {
         daochu(){
             console.log(this.value1)
             let param={'start_time':this.value1[0],'end_time':this.value1[1]}
-            sysExportData(param)
+            sysExportData(param).then(res => {
+                const filename = res.headers["content-disposition"];
+                const blob = new Blob([res]);
+                var downloadElement = document.createElement("a");
+                var href = window.URL.createObjectURL(blob);
+                downloadElement.href = href;
+                downloadElement.download = decodeURIComponent(filename.split("filename=")[1]);
+                document.body.appendChild(downloadElement);
+                downloadElement.click();
+                document.body.removeChild(downloadElement);
+                window.URL.revokeObjectURL(href);   
+            });   
         },
         shanchu(){
             console.log(this.value2)

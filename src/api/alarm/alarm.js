@@ -1,4 +1,6 @@
 import request from '@/utils/request'
+import axios from 'axios'
+import { getToken } from '@/utils/auth'
 
 // 获取告警事件列表
 export function queryAlarm(query) {
@@ -133,12 +135,22 @@ export function alarmChuli(query) {
 
 
 export function sysExportData(query) {
-  return request({
-      url: '/api/v1/export_data/',
-      method: 'post',
-      responseType:'blob',
-      data: query
-    })
+  // return request({
+  //     url: '/api/v1/export_data/',
+  //     method: 'get',
+  //     responseType:'blob',
+  //     params: query
+  //   })
+  return axios({
+    method: "get",
+    url: '/api/v1/export_data/',
+    headers: {
+        'Content-Type': 'text/plain;charset=UTF-8',
+        'token': getToken()
+    },
+    responseType:'blob',
+    params: query,
+  });
 }
 
 export function sysDelData(query) {
