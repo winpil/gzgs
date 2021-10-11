@@ -71,7 +71,7 @@ export default {
             let param={'start_time':this.value1[0],'end_time':this.value1[1]}
             sysExportData(param).then(res => {
                 const filename = res.headers["content-disposition"];
-                const blob = new Blob([res]);
+                const blob = new Blob([res.data]);
                 var downloadElement = document.createElement("a");
                 var href = window.URL.createObjectURL(blob);
                 downloadElement.href = href;
