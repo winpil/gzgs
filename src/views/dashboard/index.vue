@@ -1667,7 +1667,7 @@ export default {
     cleanAlarm() {
       let that=this
 
-      this.$confirm('是否确认清空告警？', '提示', {
+      this.$confirm('所有告警将设置成已处理，是否确认？', '提示', {
         confirmButtonText: '确认',
         cancelButtonText: '取消',
         type: 'warning'
