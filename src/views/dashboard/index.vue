@@ -41,6 +41,8 @@
               </div>
               <div class="line-info-content" v-if="infoType == 2">
                 <div class="content-detail"><span>位置：</span> <span>{{currentAlarm.address}}</span></div>
+                <div class="content-detail"><span>经度：</span> <span>{{currentAlarm.lng}}</span></div>
+                <div class="content-detail"><span>纬度：</span> <span>{{currentAlarm.lat}}</span></div>
                 <div class="content-detail"><span>距离：</span> <span>{{currentAlarm.position}}</span></div>
                 <div class="content-detail"><span>振动开始时间：</span> <span>{{currentAlarm.startTime}}</span></div>
                 <div class="content-detail"><span>振动结束时间：</span> <span>{{currentAlarm.endTime}}</span></div>
@@ -63,7 +65,7 @@
 				<div class="content-detail">
 					<el-button style="float: left;margin-left: 10px;" @click="saveDealResult()">确定</el-button>
 					<el-button style="float: left;margin-left: 10px;" @click.capture="showWindow = false">放弃</el-button>
-					<el-button style="float: left;margin-left: 10px;" @click="seeWarnData" >查看数据</el-button>
+					<el-button style="float: left;margin-left: 10px;" @click="seeWarnData" >波形展示</el-button>
 				</div>
                 <!-- <div class="content-detail"><el-button style="float: right;margin-right: 10px;"  @click="addToWhiteList(currentAlarm.id)">加入白名单</el-button></div> -->
               </div>
@@ -1112,6 +1114,8 @@ export default {
               alarmPoint.shake_count = it.shake_count
               alarmPoint.fieldId = it.channel_code
               alarmPoint.address = it.address
+              // alarmPoint.longitude = it.longitude
+              // alarmPoint.latitude = it.latitude
               if(it.alarm_level == "严重告警"){
                 alarmPoint.icon = this.selfImgBaseUrl+"RFTa9g.png"
               }else if(it.alarm_level == "中级告警"){

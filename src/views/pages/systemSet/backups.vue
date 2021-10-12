@@ -2,6 +2,13 @@
     <div class="app-container">
         <div class="filter-container">
             <el-button style="margin-right:100px" class="filter-item" type="primary" icon="el-icon-search" @click="daochu">数据导出</el-button>
+            <span style="margin-right: 100px;">
+                <span style="margin-right: 10px;color:#76777a">是否带上振动数据</span>
+                <el-select v-model="is_get_shake" placeholder="是否带上振动数据">
+                    <el-option label="是" :value=true></el-option>
+                    <el-option label="否" :value=false></el-option>
+                </el-select>
+            </span>
             <el-date-picker
                 v-model="value1"
                 value-format="yyyy-MM-dd HH:mm:ss"
@@ -62,13 +69,14 @@ export default {
                 }]
             },
             value1:'',
+            is_get_shake:false,
             value2:''
         }
     },
     methods:{
         daochu(){
             console.log(this.value1)
-            let param={'start_time':this.value1[0],'end_time':this.value1[1]}
+            let param={'start_time':this.value1[0],'end_time':this.value1[1],'is_get_shake':this.is_get_shake}
             sysExportData(param).then(res => {
                 const filename = res.headers["content-disposition"];
                 const blob = new Blob([res.data]);

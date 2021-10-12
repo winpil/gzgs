@@ -167,12 +167,12 @@ export const asyncRoutes = [
         name: 'data',
         meta: { title: '振动数据查询', icon: 'table' }
       },
-      {
-        path: 'vibrationTuBiao',
-        component: () => import('@/views/pages/vibration/vibrationTuBiao.vue'),
-        name: 'vibrationTuBiao',
-        meta: { title: '振动波形展示', icon: 'el-icon-film' }
-      }
+      // {
+      //   path: 'vibrationTuBiao',
+      //   component: () => import('@/views/pages/vibration/vibrationTuBiao.vue'),
+      //   name: 'vibrationTuBiao',
+      //   meta: { title: '振动波形展示', icon: 'el-icon-film' }
+      // }
       
     ]
   },

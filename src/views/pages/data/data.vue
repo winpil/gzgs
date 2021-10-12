@@ -4,7 +4,16 @@
       <div class="filter-container">
         <el-input v-model="queryForm.device_code" clearable placeholder="设备编号" style="width: 300px;margin-right: 10px;" class="filter-item" @keyup.enter.native="handleFilter" /> 
         <el-input v-model="queryForm.channel_name" clearable placeholder="线路名称" style="width: 300px;margin-right: 10px;" class="filter-item" @keyup.enter.native="handleFilter" /> 
-        
+        <el-date-picker
+            v-model="value1"
+            value-format="yyyy-MM-dd HH:mm:ss"
+            type="datetimerange"
+            :picker-options="pickerOptions"
+            range-separator="至"
+            start-placeholder="开始日期"
+            end-placeholder="结束日期"
+            align="right">
+        </el-date-picker>
          <el-button class="filter-item" style="float: right;" type="primary" icon="el-icon-search" @click="handleFilter">
           {{ $t('table.search') }}
         </el-button> 
@@ -36,12 +45,24 @@
         <el-table-column label="经度" min-width="120px" align="center" prop="longitude">
         </el-table-column>
         <el-table-column label="纬度" min-width="120px" align="center" prop="latitude">
-        </el-table-column>        
+        </el-table-column>
+        <el-table-column fixed="right" label="操作" align="center" width="120" class-name="small-padding fixed-width">
+          <template slot-scope="{row,$index}">
+            <!-- v-loading.fullscreen.lock="fullscreenLoading" -->
+            <el-button  type="primary" size="mini" @click="boxingzhanshi(row)">
+              波形展示
+            </el-button>
+          </template>
+        </el-table-column>
       </el-table>
 
       <pagination v-show="total>0" :total="total" :page-sizes="pageSizes" :page.sync="queryForm.page" :limit.sync="queryForm.limit" @pagination="getList" />
     </div>
+    <el-dialog class="zdbxClass"  width="1040px" title="振动波形展示" :close-on-click-modal="false" :visible.sync="chuliVisible">
+      <div :id="id" :class="className" :style="{height:height,width:width}" >
 
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -53,6 +74,8 @@ import Tinymce from '@/components/Tinymce'
 import Upload from '@/components/Upload/SingleImage3'
 import MDinput from '@/components/MDinput'
 import axios from 'axios'
+import echarts from 'echarts'
+import { queryDataTuBiao,queryDataTuBiaoOption,queryDataTuBiaoMap } from '@/api/data/data.js'
 
 export default {
   name: 'ComplexTable',
@@ -70,8 +93,57 @@ export default {
       return calendarTypeKeyValue[type]
     }
   },
+  props: {
+    className: {
+      type: String,
+      default: 'chart'
+    },
+    id: {
+      type: String,
+      default: 'id'
+    },
+    width: {
+      type: String,
+      default: '1000px'
+    },
+    height: {
+      type: String,
+      default: '400px'
+    }
+  },
   data() {
     return {
+      fullscreenLoading:false,
+      myLoading:{},
+      chuliVisible:false,
+        pickerOptions: {
+            shortcuts: [{
+                text: '最近一周',
+                onClick(picker) {
+                const end = new Date();
+                const start = new Date();
+                start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+                picker.$emit('pick', [start, end]);
+                }
+            }, {
+                text: '最近一个月',
+                onClick(picker) {
+                const end = new Date();
+                const start = new Date();
+                start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+                picker.$emit('pick', [start, end]);
+                }
+            }, {
+                text: '最近三个月',
+                onClick(picker) {
+                const end = new Date();
+                const start = new Date();
+                start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
+                picker.$emit('pick', [start, end]);
+                }
+            }]
+        },
+        value1:'',
         chuliVisible:false,
         pageSizes: [10, 20, 30, 50],
         options: [{
@@ -152,6 +224,56 @@ export default {
     }
   },
   methods: {
+      boxingzhanshi(item){
+        this.fullscreenLoading=true
+        // this.chuliVisible=true
+        // debugger
+        this.myLoading=this.$loading({
+          lock: true,
+          text: 'Loading',
+          spinner: 'el-icon-loading',
+          background: 'rgba(0, 0, 0, 0.7)'
+        });
+        queryDataTuBiaoMap({'alert_id':item.alert_id}).then(res => {
+          // debugger
+          if (res.retcode == 200) {
+            var yData=res.result
+            var yMax=0
+            for(var i=0;i<yData.length;i++){
+              if(yMax<yData[i]){
+                yMax=yData[i]
+              }
+            }
+            var xData=[]
+            xData.push(0)
+            for(var i=1;i<=yData.length;i++){
+              xData.push(i)
+            }
+            this.chuliVisible=true
+            this.fullscreenLoading=false
+            this.myLoading.close()
+            this.initChart(xData,yData)
+          }
+        })
+      },
+      initChart(xData,yData) {
+        this.chart = echarts.init(document.getElementById(this.id))
+        this.chart.setOption({
+          xAxis: {
+            type: 'category',
+            data: xData
+          },
+          yAxis: {
+            type: 'value'
+          },
+          series: [
+            {
+              data: yData,
+              type: 'line'
+            }
+          ]
+        })
+      },
       chuliLogin(){
           alarmChuli(this.alarmForm).then(res => {
             //   debugger
@@ -170,6 +292,11 @@ export default {
     // 获取设备列表数据
     getList() {
       this.listLoading = true
+      // debugger
+      if(this.value1!=null && this.value1.length==2){
+        this.queryForm.start_time=this.value1[0]
+        this.queryForm.end_time=this.value1[1]
+      }
       // debugger
       shakeInfo(this.queryForm).then(res => {
         //   debugger
@@ -327,7 +454,13 @@ export default {
     min-width: 800px;
     overflow: auto;
   }
-
+.zdbxClass{
+  .el-dialog{
+    .el-dialog__body{
+      padding: 0px !important;
+    }
+  }
+}
   .form-container {
     margin-left: 40px;
     margin-right: 10px;
