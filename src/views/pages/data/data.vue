@@ -30,11 +30,11 @@
       >
         <el-table-column label="序号" type="index" align="center" width="80">
         </el-table-column>
-        <el-table-column label="告警id" align="center"  min-width="120" prop="alert_id">
+        <el-table-column label="告警id" align="center"  min-width="140" prop="alert_id">
         </el-table-column>
         <el-table-column label="设备编号" min-width="180px" align="center" prop="device_code">
         </el-table-column>
-        <el-table-column label="线路名称" min-width="180px" align="center" prop="channel_name">
+        <el-table-column label="线路名称" min-width="140px" align="center" prop="channel_name">
         </el-table-column>
         <el-table-column label="开始时间" min-width="120px" align="center" prop="start_time">
         </el-table-column>
@@ -296,6 +296,9 @@ export default {
       if(this.value1!=null && this.value1.length==2){
         this.queryForm.start_time=this.value1[0]
         this.queryForm.end_time=this.value1[1]
+      }else{
+        this.queryForm.start_time=''
+        this.queryForm.end_time=''
       }
       // debugger
       shakeInfo(this.queryForm).then(res => {
