@@ -2,14 +2,21 @@
   <div class="app-container">
     <div v-if="showFlag === pageType.list">
       <div class="filter-container">
-        <el-input v-model="queryForm.name" clearable placeholder="名称" style="width: 300px;margin-right: 10px;" class="filter-item" @keyup.enter.native="handleFilter" /> 
-        
+        <el-input v-model="queryForm.device_code" clearable placeholder="设备编号" style="width: 300px;margin-right: 10px;" class="filter-item" @keyup.enter.native="handleFilter" /> 
+        <el-input v-model="queryForm.channel_name" clearable placeholder="线路名称" style="width: 300px;margin-right: 10px;" class="filter-item" @keyup.enter.native="handleFilter" /> 
+        <el-select clearable style="position: absolute;" v-model="queryForm.is_on_the_ground" placeholder="请选择是否在地上">
+          <el-option label="在地下" value="0"></el-option>
+          <el-option label="在地上" value="1"></el-option>
+        </el-select> 
         <el-button class="filter-item" style="margin-left: 10px;float:right;margin-right: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
           {{ $t('table.add') }}
         </el-button>
          <el-button class="filter-item" style="float: right;" type="primary" icon="el-icon-search" @click="handleFilter">
           {{ $t('table.search') }}
         </el-button> 
+        <!-- <el-button class="filter-item" style="margin-left: 10px;float:right;" type="primary" icon="el-icon-edit" @click="handleShowImport">
+          数据导入
+        </el-button> -->
       </div>
 
       <el-table
@@ -21,18 +28,44 @@
         highlight-current-row
         style="width: 100%;"
       >
-        <el-table-column label="角色名称" min-width="120px" align="center" prop="name">
+        <el-table-column label="序号" min-width="80px" align="center" prop="id">
         </el-table-column>
-        <el-table-column label="权限列表" align="center" width="880px" >
+        <el-table-column label="设备编号" min-width="180px" align="center" prop="device_code">
+        </el-table-column>
+        <el-table-column label="线路编号" min-width="120px" align="center" prop="channel_code">
+        </el-table-column>
+        <el-table-column label="线路名称" min-width="180px" align="center" prop="channel_name">
+        </el-table-column>
+        <el-table-column label="传感器编号" min-width="120px" align="center" prop="sensor_number">
+        </el-table-column>
+         <el-table-column label="经度" min-width="120px" align="center" prop="longitude">
+        </el-table-column>
+        <el-table-column label="纬度" min-width="120px" align="center" prop="latitude">
+        </el-table-column>
+        <el-table-column label="地址" min-width="120px" align="center" prop="address">
+        </el-table-column>
+        <el-table-column label="距离" min-width="180px" align="center" prop="lencount">
+        </el-table-column>
+        <el-table-column label="强度阈值" min-width="80px" align="center" prop="strong_level">
+        </el-table-column>
+        <!-- <el-table-column label="是否在地上" min-width="110px" align="center" prop="is_on_the_ground">
+        </el-table-column> -->
+
+        <el-table-column label="是否在地上" align="center" width="110px">
           <template slot-scope="{row,$index}">
-            <span style="margin-right:20px" v-for="item in row.menu_info">{{item.title}}</span>
+            <span v-if="row.is_on_the_ground=='0'">在地下</span>
+            <span v-if="row.is_on_the_ground=='1'">在地上</span>
           </template>
         </el-table-column>
+
         <el-table-column fixed="right" :label="$t('table.actions')" align="center" width="220" class-name="small-padding fixed-width">
           <template slot-scope="{row,$index}">
             <el-button type="primary" size="mini" @click="handleUpdate(row)">
               {{ $t('table.edit') }}
             </el-button>
+            <!-- <el-button type="primary" size="mini" @click="handleDetail(row)">
+              详情
+            </el-button> -->
             <el-button size="mini" type="danger" @click="handleDelete(row,$index)">
               {{ $t('table.delete') }}
             </el-button>
@@ -40,7 +73,7 @@
         </el-table-column>
       </el-table>
 
-      <pagination :page-sizes="pageSizes" v-show="total>0" :total="total" :page.sync="queryForm.page" :limit.sync="queryForm.limit" @pagination="getList" />
+      <pagination v-show="total>0" :total="total" :page.sync="queryForm.page" :limit.sync="queryForm.limit" @pagination="getList" />
     </div>
 
     <div v-else-if="showFlag === pageType.add || showFlag === pageType.edit || showFlag === pageType.detail">
@@ -65,26 +98,58 @@
               <div class="postInfo-container fit-padding" >
                 <el-row>
                   <el-col :span="9">
-                    <el-form-item label-width="120px" label="角色名称:" class="postInfo-container-item" prop="name">
-                      <el-input placeholder="请输入角色名称" v-model="postForm.name" style="min-width: 120px;" clearable :disabled="showFlag === pageType.detail"></el-input>
+                    <el-form-item label-width="120px" label="设备编号:" class="postInfo-container-item" prop="device_code">
+                      <el-input placeholder="请输入设备编号" v-model="postForm.device_code" style="min-width: 120px;" clearable :disabled="showFlag === pageType.detail || showFlag === this.pageType.edit"></el-input>
                     </el-form-item>
                   </el-col>
                   <el-col :span="9">
-                  </el-col>    
-                  <el-col :span="9">
-                    <el-form-item label-width="120px" label="权限列表:" class="postInfo-container-item" prop="auth_list">
-                        <el-tree
-                            :data="dataTree"
-                            show-checkbox
-                            :check-strictly="true" 
-                            ref="dataTreeRef"
-                            node-key="id"
-                             @check="checkeTree"
-                            :default-checked-keys="checkedMenu"
-                            :props="defaultProps">
-                        </el-tree>                        
+                    <el-form-item label-width="120px" label="线路编号:" class="postInfo-container-item" prop="channel_code">
+                      <el-input placeholder="请输入线路编号" v-model="postForm.channel_code" style="min-width: 120px;" clearable :disabled="showFlag === pageType.detail || showFlag === this.pageType.edit"></el-input>
                     </el-form-item>
-                   
+                  </el-col>
+                  <el-col :span="9">
+                    <el-form-item label-width="120px" label="线路名称:" class="postInfo-container-item" prop="channel_name">
+                      <el-input placeholder="请输入线路名称" v-model="postForm.channel_name" style="min-width: 120px;" clearable :disabled="showFlag === pageType.detail || showFlag === this.pageType.edit"></el-input>
+                    </el-form-item>
+                  </el-col>
+                  <el-col :span="9" v-show="showFlag === pageType.detail || showFlag === this.pageType.edit">
+                    <el-form-item label-width="120px" label="传感器编号:" class="postInfo-container-item" prop="sensor_number">
+                      <el-input placeholder="请输入传感器编号" v-model="postForm.sensor_number" style="min-width: 120px;" clearable :disabled="showFlag === pageType.detail || showFlag === this.pageType.edit"></el-input>
+                    </el-form-item>
+                  </el-col>
+                  <el-col :span="9">
+                    <el-form-item label-width="120px" label="经度:" class="postInfo-container-item" prop="longitude">
+                      <el-input placeholder="请输入经度" v-model="postForm.longitude" style="min-width: 120px;" clearable :disabled="showFlag === pageType.detail"></el-input>
+                    </el-form-item>
+                  </el-col>
+                  <el-col :span="9">
+                    <el-form-item label-width="120px" label="纬度:" class="postInfo-container-item" prop="latitude">
+                      <el-input placeholder="请输入纬度" v-model="postForm.latitude" style="min-width: 120px;" clearable :disabled="showFlag === pageType.detail"></el-input>
+                    </el-form-item>
+                  </el-col>
+                  <el-col :span="9">
+                    <el-form-item label-width="120px" label="地址:" class="postInfo-container-item" prop="address">
+                      <el-input placeholder="请输入地址" v-model="postForm.address" style="min-width: 120px;" clearable :disabled="showFlag === pageType.detail"></el-input>
+                    </el-form-item>
+                  </el-col>
+                  <el-col :span="9">
+                    <el-form-item label-width="120px" label="距离:" class="postInfo-container-item" prop="lencount">
+                      <el-input oninput ="value=value.replace(/[^0-9.]/g,'')" placeholder="请输入距离" v-model="postForm.lencount" style="min-width: 120px;" clearable :disabled="showFlag === pageType.detail"></el-input>
+                    </el-form-item>
+                  </el-col>
+                  <el-col :span="9">
+                    <el-form-item label-width="120px" label="强度阈值:" class="postInfo-container-item" prop="strong_level">
+                      <el-input placeholder="请输入强度阈值" v-model="postForm.strong_level" style="min-width: 120px;" clearable :disabled="showFlag === pageType.detail"></el-input>
+                    </el-form-item>
+                  </el-col>
+
+                  <el-col :span="9">
+                    <el-form-item label-width="120px" label="是否在地上:" class="postInfo-container-item" prop="is_on_the_ground">
+                      <el-select v-model="postForm.is_on_the_ground" placeholder="请选择是否在地上">
+                          <el-option label="在地下" value="0"></el-option>
+                          <el-option label="在地上" value="1"></el-option>
+                      </el-select>
+                    </el-form-item>
                   </el-col>
                 </el-row> 
               </div>
@@ -107,7 +172,7 @@
 </template>
 
 <script>
-import { roleDataInfo,roleDataCRUD } from '@/api/user/user.js'
+import { nodeDataInfo,nodeDataCRUD,createLine, queryLine, updateLine, delLine, insertZones } from '@/api/line/line.js'
 import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 import Tinymce from '@/components/Tinymce'
@@ -133,93 +198,18 @@ export default {
   },
   data() {
     return {
-        defaultProps: {
-            label: 'label'
-        },
-      dataTree:[{
-            'id':1,
-            'label':'数据可视化'
-          },{
-            'id':2,
-            'label':'设备管理'
-          },{
-            'id':3,
-            'label':'线路管理',
-            'children':[{
-                'id':21,
-                'label':'线路信息',
-            },{
-                'id':22,
-                'label':'节点信息',
-            }]
-          },{
-            'id':4,
-            'label':'告警日志',
-            'children':[{
-                'id':5,
-                'label':'告警记录',
-            },{
-                'id':6,
-                'label':'告警事件处理',
-            },{
-                'id':23,
-                'label':'布防撤防',
-            }]
-          },{
-            'id':7,
-            'label':'振动数据查询',
-            // 'children':[{
-            //     'id':8,
-            //     'label':'振动数据查询',
-            // }
-            // ,{
-            //     'id':9,
-            //     'label':'振动波形展示',
-            // }
-            // ]
-          },{
-            'id':10,
-            'label':'人员管理',
-            'children':[{
-                'id':11,
-                'label':'巡检人员设置',
-            },{
-                'id':12,
-                'label':'角色管理',
-            },{
-                'id':13,
-                'label':'账号管理',
-            },{
-                'id':14,
-                'label':'操作日志管理',
-            }]
-          },{
-            'id':15,
-            'label':'系统设置',
-            'children':[{
-                'id':16,
-                'label':'工作参数',
-            },{
-                'id':17,
-                'label':'告警阈值',
-            },{
-                'id':20,
-                'label':'告警短信规则',
-            },{
-                'id':18,
-                'label':'系统自检',
-            },{
-                'id':19,
-                'label':'备份',
-            }]
-          }],
-      pageSizes: [10, 20, 30, 50],
       tableKey: 0,
       list: null,
       total: 0,
       listLoading: true,
       postRules: {
-        name: [{ required: true, message: '请输入角色名称', trigger: 'blur' }],
+        device_code:[{ required: true, message: '请输入设备编号', trigger: 'blur' }],
+        channel_code:[{ required: true, message: '请输入线路编号', trigger: 'blur' }],
+        channel_name: [{ required: true, message: '请输入线路名称', trigger: 'blur' }],
+        longitude: [{ required: true, message: '请输入经度', trigger: 'blur' }],
+        latitude: [{ required: true, message: '请输入纬度', trigger: 'blur' }],
+        lencount: [{ required: true, message: '请输入距离', trigger: 'blur' }],
+        address: [{ required: true, message: '请输入地址', trigger: 'blur' }],
       },
       showFlag: 0,
       pageType: {
@@ -232,16 +222,27 @@ export default {
         page: 1,
         limit: 10,
         keyword: '',
-        name:'',
         channel_name:'',
         device_code:'',
+        is_on_the_ground:'',
       },
       postForm: {
-        name:'',
+        device_code:'',
+        channel_code:'',
+        channel_name:'',
+        length:'',
+        check_name:'',
+        check_phone:'',
+        is_show:true,
+        is_on_the_ground:'',
+        longitude:'',
+        latitude:'',
+        address:'',
+        strong_level:'',
+        lencount:'',
         id:'',
-        auth_list:'',
+        sensor_number:''
       },
-      checkedMenu:[],
       areaList: [],
       currentRow: {},
       dialogVisible: false,
@@ -258,50 +259,22 @@ export default {
       return str
     },
     headName() {
-      let str = this.showFlag === this.pageType.add ? '新增角色':
-        this.showFlag === this.pageType.edit ? '编辑角色' : '角色详情'
+      let str = this.showFlag === this.pageType.add ? '新增节点':
+        this.showFlag === this.pageType.edit ? '编辑节点' : '节点详情'
 
       return str
     }
   },
   methods: {
-    checkeTree (data) {
-      let thisNode = this.$refs.dataTreeRef.getNode(data.id) // 获取当前节点
-      var keys = this.$refs.dataTreeRef.getCheckedKeys() // 获取已勾选节点的key值
-        debugger
-      if (thisNode.checked) { // 当前节点若被选中
-        for (let i = thisNode.level; i > 1; i--) { // 判断是否有父级节点
-          if (!thisNode.parent.checked) { // 父级节点未被选中，则将父节点替换成当前节点，往上继续查询，并将此节点key存入keys数组
-            thisNode = thisNode.parent
-            keys.push(thisNode.data.id)
-          }
-        }
-        let childNodes=thisNode.childNodes
-        for(var j=0;j<childNodes.length;j++){
-            keys.push(childNodes[j].data.id)
-        }
-      }else{
-            let childNodes=thisNode.childNodes
-            for(var j=0;j<childNodes.length;j++){
-                for(var k=0;k<keys.length;k++){
-                    if(keys[k]==childNodes[j].data.id){
-                        keys.splice(k,1);
-                    }
-                }
-            }
-      }
- 
-      this.$refs.dataTreeRef.setCheckedKeys(keys) // 将所有keys数组的节点全选中
-    },
     // 获取设备列表数据
     getList() {
       this.listLoading = true
       // debugger
-      roleDataInfo(this.queryForm).then(res => {
+      nodeDataInfo(this.queryForm).then(res => {
         if (res.retcode == 200) {
           this.list = res.result
           if (this.list && this.list.length > 0) {
-            this.total = this.list.length
+            this.total = res.total
           }
         }
         // Just to simulate the time of the request
@@ -312,7 +285,7 @@ export default {
     },
 
     handleFilter() {
-	this.queryForm.page=1
+      this.queryForm.page=1
       this.getList()
     },
 
@@ -365,17 +338,6 @@ export default {
 
     // 创建/修改设备表单提交
     handleSubmit() {
-        debugger
-        let tempList=this.$refs.dataTreeRef.getCheckedNodes()
-        // return 
-        var auth_list_temp=""
-        for(var i=0;i<tempList.length;i++){
-            if(i>0){
-                auth_list_temp+=","
-            }
-            auth_list_temp+=tempList[i].id
-        }
-        this.postForm.auth_list=auth_list_temp
       let validTemp
       this.$refs['postForm'].validate((valid) => {
         if (valid) {
@@ -386,11 +348,16 @@ export default {
           return false;
         }
       });
+      // if(this.postForm.is_show=='true'){
+      //   this.postForm.is_show=true
+      // }else{
+      //   this.postForm.is_show=false
+      // }
       // 若验证通过则继续请求
       if (validTemp) {
         if (this.showFlag === this.pageType.add) {
           this.postForm.ope='add'
-          roleDataCRUD(this.postForm).then(res => {
+          nodeDataCRUD(this.postForm).then(res => {
             if (res.retcode === 200 || res.status === 'success') {
               this.$message({ type: 'success', message: '提交成功！'})
               setTimeout(() => {
@@ -401,7 +368,7 @@ export default {
           })
         } else if (this.showFlag === this.pageType.edit) {
           this.postForm.ope='update'
-          roleDataCRUD(this.postForm).then(res => {
+          nodeDataCRUD(this.postForm).then(res => {
             if (res.retcode === 200 || res.status === 'success') {
               this.$message({ type: 'success', message: '提交成功！'})
               setTimeout(() => {
@@ -416,20 +383,13 @@ export default {
 
     // 跳转至编辑页面
     handleUpdate(row) {
-        debugger
-        this.checkedMenu=[]
-        let menu_info=row.menu_info
-        for(var i=0;i<menu_info.length;i++){
-            this.checkedMenu.push(menu_info[i].id)
-        }
+      // debugger
       this.showFlag = this.pageType.edit
       this.currentRow = row
       Object.keys(this.postForm).forEach(item => {
         this.postForm[item] = row[item]
       })
-    //   debugger
-    //   this.postForm.id=row.id
-    //   debugger
+      this.postForm.is_on_the_ground=row.is_on_the_ground?'1':'0'
     },
 
     // 跳转至详情页面
@@ -443,13 +403,13 @@ export default {
     handleDelete(row) {
       let params = {}
       params.id = row.id
-      this.$confirm('角色删除后将不可恢复，确认删除该？', '提示', {
+      this.$confirm('节点删除后将不可恢复，确认删除该节点？', '提示', {
         confirmButtonText: '删除',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
         params.ope='delete'
-        roleDataCRUD(params).then(res => {
+        nodeDataCRUD(params).then(res => {
           if (res.retcode === 200) {
             this.$message({ type: 'success', message: '删除成功！' })
             setTimeout(() => {

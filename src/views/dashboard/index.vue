@@ -24,6 +24,8 @@
                   <span v-if="infoType == 0">断纤信息</span>  
                   <span v-if="infoType == 1">线路名称：{{channel_name}}</span>
                   <span v-if="infoType == 2">告警信息</span>  
+                  <span v-if="infoType == 2 && currentAlarm.defense_status==0">已撤防</span>
+                  <el-button style="position: absolute;right: 3px;top: 3px;padding: 6px 10px;" v-if="infoType == 2 && currentAlarm.defense_status=='1'" @click="chefangFun">撤防</el-button>
                 </span>
               </div>
               <div class="line-info-content" v-if="infoType == 0">
@@ -238,6 +240,35 @@
         <el-button @click.native.prevent="chuliVisible=false" >关 闭</el-button>
       </div> -->
     </el-dialog>
+    <el-dialog class="chefangDialog"  width="600px" title="撤防" :close-on-click-modal="false" :visible.sync="chefangVisible">
+      <el-form ref="chefangFunForm" :model="chefangFunForm"  >
+          <el-form-item label-width="120px" label="区间前(米):"  prop="before_pos">
+            <el-input placeholder="请输入区间前(米)" v-model="chefangFunForm.before_pos" style="background: #FFFFFF;" class="chefangInputClass" clearable ></el-input>
+          </el-form-item>
+          <el-form-item label-width="120px" label="区间后(米):"  prop="after_pos">
+            <el-input placeholder="请输入区间后(米)" v-model="chefangFunForm.after_pos" style="background: #FFFFFF;" clearable ></el-input>
+          </el-form-item>
+          <el-form-item label-width="120px" label="开始结束时间:" class="postInfo-container-item" prop="value1" >
+            <el-date-picker
+                v-model="chefangFunForm.value1"
+                value-format="yyyy-MM-dd HH:mm:ss"
+                type="datetimerange"
+                :picker-options="pickerOptions"
+                range-separator="至"
+                start-placeholder="开始时间"
+                end-placeholder="结束时间"
+                align="right">
+            </el-date-picker>
+          </el-form-item>
+          <el-form-item label-width="120px" label="备注:"  prop="remarks">
+            <el-input placeholder="备注" v-model="chefangFunForm.remarks" style="background: #FFFFFF;" clearable ></el-input>
+          </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click.native.prevent="chefangFunClose" >取 消</el-button>
+        <el-button type="primary" @click.native.prevent="chefangFunLogin" >提 交</el-button>
+      </div>
+    </el-dialog>
     <el-dialog  width="1000px" height="800px" title="智能分类页展示" :close-on-click-modal="false" :visible.sync="zhiNengFenYeVisible">
       
       <div id="zhiNengFenYeId" :style="{height:'400px',width:'650px',float:'left'}" >
@@ -285,7 +316,7 @@
 import { queryDataTuBiaoMap,getTimeInfo,queryZhiNengFenYeTuBiao } from '@/api/data/data.js'
 import { queryArea } from '@/api/area/area.js'
 import { queryAlarm,queryRealTimeAlarm,alertWhite,clearAlarm,queryAlarmCount } from '@/api/alarm/alarm.js'
-import { queryLineDetail } from '@/api/line/line.js'
+import { queryLineDetail,cancelDefenseCRUD } from '@/api/line/line.js'
 import { deviceInfo,lineChange,lineChangeTwo,alertDeal} from '@/api/device/device.js'
 import echarts from 'echarts'
 import { queryAreaGps, queryDeviceGps, getAreaInfo, getMapCenter, getDeviceInfo, queryZoneInfo, getAlarmFields } from '@/api/dashboard/dashboard.js'
@@ -315,6 +346,43 @@ export default {
   },
   data() {    
     return {
+      pickerOptions: {
+            shortcuts: [{
+                text: '最近一周',
+                onClick(picker) {
+                const end = new Date();
+                const start = new Date();
+                start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+                picker.$emit('pick', [start, end]);
+                }
+            }, {
+                text: '最近一个月',
+                onClick(picker) {
+                const end = new Date();
+                const start = new Date();
+                start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+                picker.$emit('pick', [start, end]);
+                }
+            }, {
+                text: '最近三个月',
+                onClick(picker) {
+                const end = new Date();
+                const start = new Date();
+                start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
+                picker.$emit('pick', [start, end]);
+                }
+            }]
+        },
+      chefangFunForm:{
+        before_pos:'',
+        after_pos:'',
+        start_time:'',
+        end_time:'',
+        remarks:'',
+        defense_status:'',
+        alert_id:'',
+        value1:'',
+      },
       chuliVisible:false,
       fullscreen: false,
       value1: '',
@@ -365,6 +433,7 @@ export default {
       alarm_count:{},
       deal_remarks:'',
       zhiNengFenYeVisible:false,
+      chefangVisible:false,
       //sgj end
 
       chart1: '',
@@ -543,6 +612,44 @@ export default {
     }
   },
   methods: {
+    chefangFunLogin(){
+      if(this.chefangFunForm.value1!=null && this.chefangFunForm.value1.length==2){
+        this.chefangFunForm.start_time=this.chefangFunForm.value1[0]
+        this.chefangFunForm.end_time=this.chefangFunForm.value1[1]
+      }else{
+        this.$message({ type: 'warning', message: '请选择开始结束时间' })
+        return 
+      }
+      if(!this.chefangFunForm.before_pos){
+        this.$message({ type: 'warning', message: '请输入区间前(米)' })
+        return 
+      }
+      if(!this.chefangFunForm.after_pos){
+        this.$message({ type: 'warning', message: '请输入区间后(米)' })
+        return 
+      }
+      this.chefangFunForm.alert_id=this.currentAlarm.id
+      // debugger
+      this.chefangFunForm.ope='add'
+      cancelDefenseCRUD(this.chefangFunForm).then(res => {
+        if (res.retcode === 200 || res.status === 'success') {
+          this.$message({ type: 'success', message: '提交成功！'})
+          setTimeout(() => {
+            this.chefangVisible=false
+            this.currentAlarm.defense_status='0'
+          }, 500)
+        }
+      })
+    },
+    chefangFunClose(){
+      this.chefangVisible=false
+    },
+    chefangFun(){
+      this.$nextTick(() => {
+        this.$refs.chefangFunForm.resetFields()
+      })
+      this.chefangVisible=true
+    },
     zhiNengFenYe(){
       this.zhiNengFenYeVisible=true
       queryZhiNengFenYeTuBiao({'device_code':this.device_code}).then(res => {
@@ -906,6 +1013,7 @@ export default {
   	 	   })
       },
       alarmClick(row, event, column) {
+        // debugger
     	  console.log(row, event, column)
     	  this.showAlarmInfo(row)
       },
@@ -1094,9 +1202,11 @@ export default {
       params.begin_time = this.currentStartDate;
       params.end_time = this.currentEndDate;
       params.area_id = this.defaultAreaId;
+      // debugger
       queryAlarm(params).then(res => {
         if (res.retcode === 200 && res.result && res.result.length > 0) {
           this.tableData = [];
+          // debugger
           this.alarmPoints = [];
           res.result.forEach(it => {
             if(it.channel == this.currentLine || this.currentLine == "全部"){
@@ -1133,6 +1243,7 @@ export default {
       let params = {'device_code':this.device_code}
       let that=this
       queryRealTimeAlarm(params).then(res => {
+        // debugger
         if (res.retcode === 200) {
           that.alarm_count=res.alarm_count
           for(var i=0;i<that.alarm_count.length;i++){
@@ -1159,7 +1270,9 @@ export default {
 	            alarmPoint.alarmType = it.alarm_type
 	            alarmPoint.shake_count = it.shake_count
 	            alarmPoint.fieldId = it.channel_code
-	            alarmPoint.address = it.address
+              alarmPoint.address = it.address
+              // debugger
+              alarmPoint.defense_status=it.defense_status
 	            alarmPoint.deal_result_code = it.deal_result_code
 	            alarmPoint.deal_result = it.deal_result
 	            if(it.alarm_level == "严重告警"){
@@ -1344,6 +1457,7 @@ export default {
       })
     },
     showAlarmInfo(it) {
+      // debugger
       this.deal_remarks=''
       this.currentAlarm = it
       this.dealResult = it.deal_result_code
@@ -1730,6 +1844,31 @@ export default {
 </script>
 
 <style scoped lang='less'>
+  .chefangDialog{
+    .el-dialog{
+      .el-dialog__body{
+        .el-form{
+          .el-form-item{
+            .el-form-item__content{
+              .el-input{
+                input{
+                  background: rgb(255, 255, 255);
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  .chefangInputClass{
+    .el-input__inner{
+      background: rgb(255, 255, 255) !important;
+    }
+  }
+  .chefangInputClass>.el-input__inner{
+      background: rgb(255, 255, 255) !important;
+  }
   .channelCountClass{
     color: red;
     position: absolute;
