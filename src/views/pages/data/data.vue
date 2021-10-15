@@ -317,6 +317,7 @@ export default {
     },
 
     handleFilter() {
+	this.queryForm.page=1
       this.getList()
     },
 

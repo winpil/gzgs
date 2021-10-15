@@ -125,20 +125,25 @@ export const asyncRoutes = [
   {
     path: '/lines',
     component: Layout,
-    meta:{ roles: [2,3]},
+    meta:{ title: '线路管理', icon: 'example'},
     children: [
       {
         path: '/index',
         component: () => import('@/views/pages/lines/line.vue'),
         name: 'lines',
-        meta: { title: 'line', icon: 'example' , roles: [2,3] }
+        meta: { title: '线路信息', icon: 'el-icon-remove-outline' }
+      },{
+        path: '/node',
+        component: () => import('@/views/pages/lines/node.vue'),
+        name: 'node',
+        meta: { title: '节点信息', icon: 'el-icon-s-promotion'}
       }
     ]
   },
   {
     path: '/alarms',
     component: Layout,
-    meta: { title: '告警日志', icon: 'bug' ,roles: [2,3]},
+    meta: { title: '告警日志', icon: 'bug' },
     children: [
       {
         path: 'log',
@@ -150,9 +155,14 @@ export const asyncRoutes = [
         path: 'index',
         component: () => import('@/views/pages/alarms/alarm.vue'),
         name: 'alarm',
-        meta: { title: '告警事件处理', icon: 'form' , roles: [2,3] }
+        meta: { title: '告警事件处理', icon: 'form'  }
       },
-      
+      {
+        path: 'deploymentAndWithdrawal',
+        component: () => import('@/views/pages/alarms/deploymentAndWithdrawal.vue'),
+        name: 'deploymentAndWithdrawal',
+        meta: { title: '布防撤防', icon: 'el-icon-s-flag'  }
+      },
     ],
   },
 
@@ -230,6 +240,12 @@ export const asyncRoutes = [
         component: () => import('@/views/pages/systemSet/thresholdParameters.vue'),
         name: 'thresholdParameters',
         meta: { title: '告警阈值', icon: 'el-icon-odometer' }
+      },
+      {
+        path: 'thresholdNoteRule',
+        component: () => import('@/views/pages/systemSet/thresholdNoteRule.vue'),
+        name: 'thresholdNoteRule',
+        meta: { title: '告警短信规则', icon: 'el-icon-s-marketing' }
       },
       {
         path: 'index',

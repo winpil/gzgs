@@ -78,3 +78,42 @@ export function lineCRUD(query) {
     data: query
   })
 }
+
+export function cancelDefenseInfo(query) {
+  return request({
+    url: '/api/v1/cancel_defense/',
+    method: 'get',
+    params: query
+  })
+}
+export function getNodeInfo(query) {
+  return request({
+    url: '/api/v1/get_node/',
+    method: 'get',
+    params: query
+  })
+}
+
+export function cancelDefenseCRUD(query) {
+  return request({
+    url: '/api/v1/cancel_defense/',
+    method: 'post',
+    data: query
+  })
+}
+
+export function nodeDataInfo(query) {
+  // debugger
+  return request({
+    url: '/api/v1/node_data/',
+    method: 'get',
+    params: query
+  })
+}
+export function nodeDataCRUD(query) {
+  return request({
+    url: '/api/v1/node_data/',
+    method: 'post',
+    data: query
+  })
+}

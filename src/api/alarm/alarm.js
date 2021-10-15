@@ -97,6 +97,22 @@ export function alertParamCRUD(query) {
       data: query
     })
 }
+
+export function alertSmsInfo(query) {
+  return request({
+      url: '/api/v1/alert_sms/',
+      method: 'get',
+      params: query
+    })
+}
+export function alertSmsCRUD(query) {
+  return request({
+      url: '/api/v1/alert_sms/',
+      method: 'post',
+      data: query
+    })
+}
+
 export function workParamInfo(query) {
   return request({
       url: '/api/v1/work_param/',
