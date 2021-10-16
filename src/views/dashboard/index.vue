@@ -24,7 +24,7 @@
                   <span v-if="infoType == 0">断纤信息</span>  
                   <span v-if="infoType == 1">线路名称：{{channel_name}}</span>
                   <span v-if="infoType == 2">告警信息</span>  
-                  <span v-if="infoType == 2 && currentAlarm.defense_status==0">已撤防</span>
+                  <span style="position: absolute;right: 10px;" v-if="infoType == 2 && currentAlarm.defense_status==0">已撤防</span>
                   <el-button style="position: absolute;right: 3px;top: 3px;padding: 6px 10px;" v-if="infoType == 2 && currentAlarm.defense_status=='1'" @click="chefangFun">撤防</el-button>
                 </span>
               </div>
@@ -1226,6 +1226,7 @@ export default {
               alarmPoint.address = it.address
               // alarmPoint.longitude = it.longitude
               // alarmPoint.latitude = it.latitude
+              debugger
               if(it.alarm_level == "严重告警"){
                 alarmPoint.icon = this.selfImgBaseUrl+"RFTa9g.png"
               }else if(it.alarm_level == "中级告警"){
@@ -1271,29 +1272,39 @@ export default {
 	            alarmPoint.shake_count = it.shake_count
 	            alarmPoint.fieldId = it.channel_code
               alarmPoint.address = it.address
-              // debugger
               alarmPoint.defense_status=it.defense_status
 	            alarmPoint.deal_result_code = it.deal_result_code
 	            alarmPoint.deal_result = it.deal_result
-	            if(it.alarm_level == "严重告警"){
-	              if(it.is_now_shake){
-	                alarmPoint.icon = this.selfImgBaseUrl+"RELfaj.gif"
-	              }else{
-	                alarmPoint.icon = this.selfImgBaseUrl+"RFTa9g.png"
-	              }
-	            }else if(it.alarm_level == "中级告警"){
-	              if(it.is_now_shake){
-	                alarmPoint.icon = this.selfImgBaseUrl+"RELWZQ.gif"
-	              }else{
-	                alarmPoint.icon = this.selfImgBaseUrl+"RFTwcj.png"
-	              }
-	            }else{
-	              if(it.is_now_shake){
-	                alarmPoint.icon = this.selfImgBaseUrl+"REL2qg.gif";
-	              }else{
-	                alarmPoint.icon = this.selfImgBaseUrl+"RFTd3Q.png";
-	              }
-	            }
+              // debugger
+	            // if(it.alarm_level == "严重告警"){
+	            //   if(it.is_now_shake){
+	            //     alarmPoint.icon = this.selfImgBaseUrl+"RELfaj.gif"
+	            //   }else{
+	            //     alarmPoint.icon = this.selfImgBaseUrl+"RFTa9g.png"
+	            //   }
+	            // }else if(it.alarm_level == "中级告警"){
+	            //   if(it.is_now_shake){
+	            //     alarmPoint.icon = this.selfImgBaseUrl+"RELWZQ.gif"
+	            //   }else{
+	            //     alarmPoint.icon = this.selfImgBaseUrl+"RFTwcj.png"
+	            //   }
+	            // }else{
+	            //   if(it.is_now_shake){
+	            //     alarmPoint.icon = this.selfImgBaseUrl+"REL2qg.gif";
+	            //   }else{
+	            //     alarmPoint.icon = this.selfImgBaseUrl+"RFTd3Q.png";
+	            //   }
+              // }
+              // if(it.defense_status=='0'){
+                //默认用换色
+                alarmPoint.icon = this.selfImgBaseUrl+"RFTd3Q.png";
+              // }
+              if(it.alarm_level == "强告警"){
+                alarmPoint.icon = this.selfImgBaseUrl+"RFTa9g.png"
+              }else if(it.alarm_level == "中告警" || it.alarm_level == "弱告警"){
+                alarmPoint.icon = this.selfImgBaseUrl+"RFTwcj.png"
+              }
+              console.log(it.alarm_level)
 	            this.alarmPoints.push(alarmPoint);
 	          }
           })
