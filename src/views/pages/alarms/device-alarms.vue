@@ -70,12 +70,6 @@
 
     <el-dialog  width="600px" title="修改设备状态告警" :close-on-click-modal="false" :visible.sync="chuliVisible">
       <el-form label-width="120px" ref="alarmForm" :model="alarmForm" :rules="postRules" >
-      	<el-form-item label="处理结果" prop="deal_result">
-            <el-select v-model="alarmForm.deal_result" placeholder="请选择处理结果">
-                <el-option label="已处理" value="1"></el-option>
-                <el-option label="未处理" value="0"></el-option>
-            </el-select>
-        </el-form-item>
         <el-form-item label="处理人" prop="deal_name">
             <el-input v-model="alarmForm.deal_name"></el-input>
         </el-form-item>
@@ -229,10 +223,10 @@ export default {
       },
       handleChuLi(row){
           this.alarmForm.id=row.id
-          this.alarmForm.deal_result=row.deal_result
-          this.alarmForm.deal_name=row.deal_name
-          this.alarmForm.deal_phone=row.deal_phone
-          this.alarmForm.deal_remarks=row.deal_remarks
+          this.alarmForm.deal_result = 1
+          this.alarmForm.deal_name = row.deal_name
+          this.alarmForm.deal_phone = row.deal_phone
+          this.alarmForm.deal_remarks = row.deal_remarks
           this.chuliVisible=true
       },
     // 获取设备列表数据
