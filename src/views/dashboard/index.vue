@@ -81,9 +81,9 @@
           <div :style="{'position': 'absolute', 'z-index': '12','right': '10px', 'top': '10px'}">
             <el-button @click="zhiNengFenYe()"  >智能分类页</el-button>
           </div>
-          <!-- <div v-show="showBlink">
-              <img :src="blinkImg" :style="{'position': 'absolute', 'z-index': '12','right': '0px', 'top': '0px'}"/>
-          </div> -->
+          <div>
+              <img :src="blinkImg" @click.capture="showDeviceMsg = true" :style="{'position': 'absolute', 'z-index': '12','right': '110px', 'top': '0px'}"/>
+          </div>
           <!-- 线路信息窗口结束 -->
           <img src="../../assets/img/map.png" class="f-width f-height abs" style="left: 0; top: 0;z-index: 2;" alt="">
           <baidu-map :mapStyle="mapStyle" :mapClick="false" :scroll-wheel-zoom="true" :center="center" :zoom="zoom" @ready="handler" class="bm-view">
@@ -217,7 +217,15 @@
           </el-form>
         </Modal>
         <Modal :show="showDeviceMsg" :title="deviceMsgTitle" @hideModal="hideDeviceMsg" @submit="hideDeviceMsg">
-          <p style="color:#fff">{{deviceErrorMsg}}</p>
+          <p style="color:#fff">设备名称：{{device_data.device_name}}</p>
+          <p style="color:#fff">设备编号：{{device_data.device_code}}</p>
+          <p style="color:#fff">时钟状态：{{device_data.host_clock}}</p>
+          <p style="color:#fff">风扇状态：{{device_data.host_fan}}</p>
+          <p style="color:#fff">电源状态：{{device_data.host_power}}</p>
+          <p style="color:#fff">网络状态：{{device_data.host_internet}}</p>
+          <p style="color:#fff">激光器状态：{{device_data.host_laser}}</p>
+          <p style="color:#fff">光信号状态：{{device_data.host_signal}}</p>
+          <p style="color:#fff">光纤状态：{{device_data.host_fiber}}</p>
         </Modal>
         <Modal :show="showDealResult" :title="dealResultTitle" @hideModal="hideDealResult" @submit="submitShowDeal">
           <el-form ref="dealResultForm" :model="dealResultForm">
@@ -443,7 +451,7 @@ export default {
       modalTitle: '加入白名单',
       showModal: false,
       deviceName:"",
-      deviceMsgTitle:"设备故障",
+      deviceMsgTitle:"设备状态",
       dealResultTitle:"告警信息处理",
       showDeviceMsg: false,
       isDeviceError: false,
@@ -452,6 +460,7 @@ export default {
       deviceErrorChannels : [],
       alarmCountList: [],
       device_code:"",
+      device_data:{},
       channel_code:"",
       channel_name:"",
       deviceList:[],
@@ -581,10 +590,9 @@ export default {
       this.getRealTableData()
      }
     }, 1000*60)
-    /* setInterval(() => {
+    setInterval(() => {
       this.getDeviceInfo()//获取设备状态
-      this.builBlink()//亮灯
-    }, 1000) */
+    }, 1000)
     //设备故障时十分钟提醒一次
     /* setInterval(() => {
       if(this.isDeviceError){
@@ -1350,41 +1358,21 @@ export default {
       })
     },
     getDeviceInfo() {
-     deviceInfo().then(res => {
-        if (res.retcode === 200) {
-          this.deviceErrorMsg = "";
-          let flag = true
-          let rs = res.result[0]//只有一个设备
-          this.deviceName = rs.device_name
-          rs.channels.forEach(it => {
-            if(it.fiber_info != "正常"){
-              flag = false
-              this.deviceErrorMsg += it.id+"号光纤"+it.fiber_info+"&"
-            }
-          })
-          let deviceStatus = rs.device_run_status[0];
-          if(flag && deviceStatus.is_online && deviceStatus.is_device_online && deviceStatus.device_status ){
-            this.blinkImg = require("../../assets/img/greenLight.png")
-            this.showDeviceMsg = false;
-            this.isDeviceError = false;
-          }else{
-            this.blinkImg = require("../../assets/img/redLigth.png")
-            if(!this.isDeviceError){
-              this.showDeviceMsg = true;
-            }
-            this.isDeviceError = true;
-            if(!deviceStatus.is_online){
-              this.deviceErrorMsg += "数据处理程序故障&"
-            }
-            if(!deviceStatus.is_device_online){
-              this.deviceErrorMsg += "断网&"
-            }
-            if(!deviceStatus.device_status){
-              this.deviceErrorMsg += "设备故障"
-            }
-          }
-        }
-      })
+    	let params = {}
+        params._q_ = this.device_code;
+    	  deviceInfo(params).then(res => {
+   		  if (res.retcode === 200 && res.result && res.result.length > 0) {
+   			 this.device_data = res.result[0];
+   			if(this.device_data.host_clock == "正常" && this.device_data.host_fan == "正常" && this.device_data.host_power == "正常" 
+   					&& this.device_data.host_internet  == "正常" && this.device_data.host_laser == "正常" 
+   					&& this.device_data.host_signal == "正常" && this.device_data.host_fiber == "正常"){
+   	           this.blinkImg = require("../../assets/img/greenLight.png")
+   	         }else{
+   	           this.blinkImg = require("../../assets/img/redLigth.png")
+   	         }
+   	        }
+   	      })
+    	 
     },
     getAlarmFields() {
       getAlarmFields().then(res => {

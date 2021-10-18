@@ -176,3 +176,18 @@ export function sysDelData(query) {
       data: query
     })
 }
+
+export function deviceStatus(query) {
+  return request({
+      url: '/api/v1/device_status/',
+      method: 'get',
+      params: query
+    })
+}
+export function deviceStatusChuli(query) {
+	  return request({
+	      url: '/api/v1/device_status/',
+	      method: 'post',
+	      data: query
+	    })
+	}

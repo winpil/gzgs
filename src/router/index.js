@@ -163,6 +163,12 @@ export const asyncRoutes = [
         name: 'deploymentAndWithdrawal',
         meta: { title: '布防撤防', icon: 'el-icon-s-flag'  }
       },
+      {
+          path: 'deviceAlarms',
+          component: () => import('@/views/pages/alarms/device-alarms.vue'),
+          name: 'alarm',
+          meta: { title: '设备告警状态', icon: 'el-icon-s-marketing'  }
+        },
     ],
   },
 
