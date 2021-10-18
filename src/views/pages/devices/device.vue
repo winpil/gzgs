@@ -103,7 +103,7 @@
                 <el-row>
                   <el-col :span="9">
                     <el-form-item label-width="90px" label="设备编号:" class="postInfo-container-item" prop="device_code">
-                      <el-input placeholder="请输入设备编号" v-model="postForm.device_code" style="min-width: 120px;" clearable :disabled="showFlag === pageType.detail"></el-input>
+                      <el-input placeholder="请输入设备编号" v-model="postForm.device_code" style="min-width: 120px;" clearable :disabled="showFlag === pageType.detail || showFlag === this.pageType.edit"></el-input>
                     </el-form-item>
                   </el-col>
                   <el-col :span="9">
