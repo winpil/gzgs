@@ -246,7 +246,7 @@
             <el-input placeholder="请输入区间前(米)" v-model="chefangFunForm.before_pos" style="background: #FFFFFF;" class="chefangInputClass" clearable ></el-input>
           </el-form-item>
           <el-form-item label-width="120px" label="区间后(米):"  prop="after_pos">
-            <el-input placeholder="请输入区间后(米)" v-model="chefangFunForm.after_pos" style="background: #FFFFFF;" clearable ></el-input>
+            <el-input placeholder="请输入区间后(米)" v-model="chefangFunForm.after_pos" style="background: #FFFFFF;" class="chefangInputClass" clearable ></el-input>
           </el-form-item>
           <el-form-item label-width="120px" label="开始结束时间:" class="postInfo-container-item" prop="value1" >
             <el-date-picker
@@ -261,7 +261,7 @@
             </el-date-picker>
           </el-form-item>
           <el-form-item label-width="120px" label="备注:"  prop="remarks">
-            <el-input placeholder="备注" v-model="chefangFunForm.remarks" style="background: #FFFFFF;" clearable ></el-input>
+            <el-input placeholder="备注" v-model="chefangFunForm.remarks" style="background: #FFFFFF;" class="chefangInputClass" clearable ></el-input>
           </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -637,6 +637,7 @@ export default {
           setTimeout(() => {
             this.chefangVisible=false
             this.currentAlarm.defense_status='0'
+            this.getRealTableData()
           }, 500)
         }
       })
@@ -1304,6 +1305,9 @@ export default {
               }else if(it.alarm_level == "中告警" || it.alarm_level == "弱告警"){
                 alarmPoint.icon = this.selfImgBaseUrl+"RFTwcj.png"
               }
+              if(it.alarm_level!="强告警" && it.defense_status=='0'){
+                alarmPoint.icon = this.selfImgBaseUrl+"RFTd3Q.png"
+              }
               console.log(it.alarm_level)
 	            this.alarmPoints.push(alarmPoint);
 	          }
@@ -1855,31 +1859,7 @@ export default {
 </script>
 
 <style scoped lang='less'>
-  .chefangDialog{
-    .el-dialog{
-      .el-dialog__body{
-        .el-form{
-          .el-form-item{
-            .el-form-item__content{
-              .el-input{
-                input{
-                  background: rgb(255, 255, 255);
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-  .chefangInputClass{
-    .el-input__inner{
-      background: rgb(255, 255, 255) !important;
-    }
-  }
-  .chefangInputClass>.el-input__inner{
-      background: rgb(255, 255, 255) !important;
-  }
+  
   .channelCountClass{
     color: red;
     position: absolute;
@@ -2227,4 +2207,10 @@ export default {
   font-size:8px;
   position: sticky;
 }
+
+</style>
+<style lang="scss" >
+  .chefangInputClass>.el-input__inner {
+    background-color: rgb(255, 255, 255);    //橙色
+  }
 </style>

@@ -54,6 +54,8 @@
         </el-table-column>
         <el-table-column label="地址" min-width="120px" align="center" prop="address">
         </el-table-column>
+        <el-table-column label="距离" min-width="120px" align="center" prop="lencount">
+        </el-table-column>
         <el-table-column label="区间前(米)" min-width="120px" align="center" prop="before_pos">
         </el-table-column>
         <el-table-column label="区间后(米)" min-width="120px" align="center" prop="after_pos">
@@ -165,9 +167,10 @@
                     </el-form-item>
                   </el-col>
                   <el-col :span="9">
-                    &nbsp;
+                      <el-form-item label-width="120px" label="距离:" class="postInfo-container-item" prop="lencount">
+                        <el-input placeholder="" v-model="postForm.lencount" style="min-width: 120px;" clearable :disabled=true></el-input>
+                      </el-form-item>
                   </el-col>
-
                   <el-col :span="9">
                     <el-form-item label-width="120px" label="区间前(米):" class="postInfo-container-item" prop="before_pos">
                       <el-input placeholder="请输入区间前(米)" v-model="postForm.before_pos" style="min-width: 120px;" clearable :disabled="showFlag === pageType.detail"></el-input>
@@ -341,6 +344,7 @@ export default {
         is_valid:'1',
         start_time:'',
         end_time:'',
+        lencount:'',
         id:'',
       },
       areaList: [],
@@ -372,6 +376,7 @@ export default {
           this.postForm.longitude=this.jiedianList[i].longitude
           this.postForm.latitude=this.jiedianList[i].latitude
           this.postForm.address=this.jiedianList[i].address
+          this.postForm.lencount=this.jiedianList[i].lencount
           break;
         }
       }
@@ -384,7 +389,7 @@ export default {
           if (res.retcode == 200) {
             // debugger
             this.jiedianList = res.result
-            this.postForm.channel_name=res.channel_name
+            this.postForm.channel_name=res.channel_name            
           }
         })
       }

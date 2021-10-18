@@ -47,6 +47,13 @@
         </el-table-column>
         <el-table-column label="告警等级" min-width="100px" align="center" prop="alarm_level">
         </el-table-column>
+        <el-table-column label="防御状态" align="center" width="80" >
+          <template slot-scope="{row,$index}">
+            <span v-if="row.defense_status=='0'">撤防</span>
+             <span v-if="row.defense_status=='1'">布防</span>
+            </el-button>
+          </template>
+        </el-table-column>
         <el-table-column label="处理结果" align="center" width="120" >
           <template slot-scope="{row,$index}">
             <el-button v-if="row.deal_result=='未处理'" type="primary" size="mini" @click="handleChuLi(row)">

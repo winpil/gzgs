@@ -53,6 +53,13 @@
         </el-table-column>
         <el-table-column label="置信度" min-width="100px" align="center" prop="confidence">
         </el-table-column>
+        <el-table-column label="防御状态" align="center" width="80" >
+          <template slot-scope="{row,$index}">
+            <span v-if="row.defense_status=='0'">撤防</span>
+             <span v-if="row.defense_status=='1'">布防</span>
+            </el-button>
+          </template>
+        </el-table-column>
         <!-- <el-table-column label="处理结果" min-width="100px" align="center" prop="deal_result">
         </el-table-column> -->
         <el-table-column label="处理结果" align="center" width="120" >
