@@ -435,7 +435,8 @@ export default {
             this.$refs.phone.focus();
             return;
           }else{
-            let data={purpose:0,phone:this.postForm.phone};
+            let purposeVal=this.showFlag==this.pageType.add?0:3
+            let data={purpose:purposeVal,phone:this.postForm.phone};
             this.tackBtn(data);   //验证码倒数60秒
           }    
     },
