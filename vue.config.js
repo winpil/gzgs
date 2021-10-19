@@ -58,6 +58,10 @@ module.exports = {
   chainWebpack(config) {
     // it can improve the speed of the first screen, it is recommended to turn on preload
     // it can improve the speed of the first screen, it is recommended to turn on preload
+   config.optimization.minimizer[0].options.terserOptions.compress.warnings = false
+   config.optimization.minimizer[0].options.terserOptions.compress.drop_console = false
+   config.optimization.minimizer[0].options.terserOptions.compress.drop_debugger = false
+   config.optimization.minimizer[0].options.terserOptions.compress.pure_funcs = ['console.log']
     config.plugin('preload').tap(() => [
       {
         rel: 'preload',
