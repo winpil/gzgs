@@ -277,7 +277,7 @@
         <el-button type="primary" @click.native.prevent="chefangFunLogin" >提 交</el-button>
       </div>
     </el-dialog>
-    <el-dialog  width="1000px" height="800px" title="智能分类页展示" :close-on-click-modal="false" :visible.sync="zhiNengFenYeVisible">
+    <el-dialog  width="1000px" height="800px" title="智能分类展示" :close-on-click-modal="false" :visible.sync="zhiNengFenYeVisible">
       
       <div id="zhiNengFenYeId" :style="{height:'400px',width:'650px',float:'left'}" >
 
@@ -466,40 +466,7 @@ export default {
       deviceList:[],
       channelList:[],
       dealResult:0,	
-      zhiNengFenYeTableData:[{
-        dengji: '1',
-        leixing: '大型车辆经过',
-      },{
-        dengji: '2',
-        leixing: '远处小型机械施工',
-      },{
-        dengji: '3',
-        leixing: '远处中型机械施工',
-      },{
-        dengji: '4',
-        leixing: '远处大型机械施工',
-      },{
-        dengji: '5',
-        leixing: '附近破坏',
-      },{
-        dengji: '6',
-        leixing: '附近持续破坏',
-      },{
-        dengji: '7',
-        leixing: '附近靠近破坏',
-      },{
-        dengji: '8',
-        leixing: '周边破坏',
-      },{
-        dengji: '9',
-        leixing: '周边轻入侵破坏',
-      },{
-        dengji: '10',
-        leixing: '周边重入侵破坏',
-      },{
-        dengji: '11',
-        leixing: '周边严重破坏',
-      }],
+      zhiNengFenYeTableData:[],
       tableData: [{
             date: '2016-05-02',
             name: '王小虎',
@@ -663,32 +630,33 @@ export default {
       this.zhiNengFenYeVisible=true
       queryZhiNengFenYeTuBiao({'device_code':this.device_code}).then(res => {
         if (res.retcode == 200) {
-          // debugger
-          let myResult=res.result
+        	this.zhiNengFenYeTableData = [];
           let xData=[]
-          let yData={'xj':[],'huaj':[],'al':[],'huij':[]}
-          for(var i=0;i<myResult.length;i++){            
-            let lineDatas=myResult[i].data
-            for(var j=0;j<lineDatas.length;j++){
-              if(i==0){
-                xData.push(lineDatas[j].alarm_level)
-              }
-              if(myResult[i].channel_name=='新局'){
-                yData.xj.push(lineDatas[j].alarm_count)
-              }else if(myResult[i].channel_name=='华景'){
-                yData.huaj.push(lineDatas[j].alarm_count)
-              }else if(myResult[i].channel_name=='奥林'){
-                yData.al.push(lineDatas[j].alarm_count)
-              }else if(myResult[i].channel_name=='汇景'){
-                yData.huij.push(lineDatas[j].alarm_count)
-              }
-            }
-          }
-          this.initChartZhiNeng(xData,yData)
+          let _legend = {};
+          _legend.data = [];
+          let _series = [];
+          res.alarm_types.forEach(it => {
+      		this.zhiNengFenYeTableData.push({"dengji":it.id,"leixing":it.name});
+      		xData.push(it.id);
+      	 })
+      	 res.result.forEach(it =>{
+      		 let serie = {}
+      		 serie.name = it.channel_name
+      		serie.type = 'bar'
+      		serie.color = it.channel_color
+      		serie.emphasis = {'focus' : 'series'}
+      		serie.data = []
+      		it.data.forEach(d =>{
+      			serie.data.push(d.alarm_count);
+      		})
+      		_legend.data.push(it.channel_name);
+      		_series.push(serie);
+      	 })
+          this.initChartZhiNeng(xData,_legend,_series)
         }
       })
     },
-    initChartZhiNeng(xData,yData){
+    initChartZhiNeng(xData,_legend,_series){
       let chartzhiNeng = echarts.init(document.getElementById("zhiNengFenYeId"))
         chartzhiNeng.setOption({
             tooltip: {
@@ -705,9 +673,7 @@ export default {
             //     end: 20,
             //   }
             // ],
-            legend: {
-              data: ['新局', '华景', '奥林', '汇景']
-            },
+            legend: _legend,
             xAxis: [
               {
                 type: 'category',
@@ -726,44 +692,7 @@ export default {
                 type: 'value'
               }
             ],
-            series: [
-              {
-                name: '新局',
-                type: 'bar',
-                color: 'blue',
-                emphasis: {
-                  focus: 'series'
-                },
-                data: yData.xj
-              },
-              {
-                name: '华景',
-                type: 'bar',
-              color:'green',
-                emphasis: {
-                  focus: 'series'
-                },
-                data: yData.huaj
-              },
-              {
-                name: '奥林',
-                type: 'bar',
-              color:'yellow',
-                emphasis: {
-                  focus: 'series'
-                },
-                data: yData.al
-              },
-              {
-                name: '汇景',
-                type: 'bar',
-              color:'violet',
-                emphasis: {
-                  focus: 'series'
-                },
-                data: yData.huij
-              }
-            ]
+            series: _series
           })
     },
     initChart1() {
