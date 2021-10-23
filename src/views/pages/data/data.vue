@@ -36,6 +36,8 @@
         </el-table-column>
         <el-table-column label="线路名称" min-width="140px" align="center" prop="channel_name">
         </el-table-column>
+        <el-table-column label="告警强度" min-width="80px" align="center" prop="strong">
+        </el-table-column>
         <el-table-column label="开始时间" min-width="120px" align="center" prop="start_time">
         </el-table-column>
         <el-table-column label="结束时间" min-width="120px" align="center" prop="end_time">

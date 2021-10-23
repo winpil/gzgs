@@ -31,25 +31,27 @@
       >
         <el-table-column label="告警id" align="center"  min-width="120" prop="alert_id">
         </el-table-column>
-        <el-table-column label="设备编号" min-width="180px" align="center" prop="device_code">
+        <el-table-column label="设备编号" min-width="150px" align="center" prop="device_code">
         </el-table-column>
-        <el-table-column label="线路编号" min-width="180px" align="center" prop="channel_code">
+        <el-table-column label="线路编号" min-width="50px" align="center" prop="channel_code">
         </el-table-column>
-        <el-table-column label="线路名称" min-width="180px" align="center" prop="channel_name">
+        <el-table-column label="线路名称" min-width="120px" align="center" prop="channel_name">
         </el-table-column>
         <el-table-column label="开始时间" min-width="120px" align="center" prop="start_time">
         </el-table-column>
         <el-table-column label="结束时间" min-width="120px" align="center" prop="end_time">
         </el-table-column>
-        <el-table-column label="告警位置" min-width="120px" align="center" prop="position">
+        <el-table-column label="告警位置" min-width="100px" align="center" prop="position">
         </el-table-column>
-        <el-table-column label="经度" min-width="120px" align="center" prop="longitude">
+        <el-table-column label="经度" min-width="100px" align="center" prop="longitude">
         </el-table-column>
-        <el-table-column label="纬度" min-width="120px" align="center" prop="latitude">
+        <el-table-column label="纬度" min-width="100px" align="center" prop="latitude">
         </el-table-column>
         <el-table-column label="告警类型" min-width="100px" align="center" prop="alarm_type">
         </el-table-column>
         <el-table-column label="告警等级" min-width="100px" align="center" prop="alarm_level">
+        </el-table-column>
+        <el-table-column label="告警强度" min-width="80px" align="center" prop="strong">
         </el-table-column>
         <el-table-column label="置信度" min-width="100px" align="center" prop="confidence">
         </el-table-column>

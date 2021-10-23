@@ -47,6 +47,8 @@
         </el-table-column>
         <el-table-column label="告警等级" min-width="100px" align="center" prop="alarm_level">
         </el-table-column>
+        <el-table-column label="告警强度" min-width="80px" align="center" prop="strong">
+        </el-table-column>
         <el-table-column label="防御状态" align="center" width="80" >
           <template slot-scope="{row,$index}">
             <span v-if="row.defense_status=='0'">撤防</span>

@@ -54,11 +54,11 @@
                 <div class="content-detail">
                 	<span>处理结果：</span>
                   <input type="radio" v-model="dealResult" value="2" name="_dealResult">
-                  <label for="dealResult2">正</label>
+                  <label for="dealResult2">已处理</label>
                   <input type="radio" style="margin-left: 20px;" v-model="dealResult" value="1" name="_dealResult">
-                  <label for="dealResult1">误</label>
+                  <label for="dealResult1">误报</label>
                   <input type="radio" style="margin-left: 20px;" v-model="dealResult" value="0" name="_dealResult">
-                  <label for="dealResult0">未</label>
+                  <label for="dealResult0">未处理</label>
                 </div>
                 <div class="content-detail">
                 	<span>处理备注：</span>
@@ -75,7 +75,7 @@
           <div :style="{'position': 'absolute', 'z-index': '12','left': '10px', 'top': '10px'}">
 			<a :class="addChannelClass(item.channel_code)" v-for="item in channelList" :ref="'channel-' + item.channel_code" @click="changeChannel(item)">
                 <span class="channelCountClass">{{item.count}}</span>
-                {{item.channel_name}}
+                {{item.channel_short_name}}
             </a>
           </div>
           <div :style="{'position': 'absolute', 'z-index': '12','right': '10px', 'top': '10px'}">
@@ -88,9 +88,10 @@
           <img src="../../assets/img/map.png" class="f-width f-height abs" style="left: 0; top: 0;z-index: 2;" alt="">
           <baidu-map :mapStyle="mapStyle" :mapClick="false" :scroll-wheel-zoom="true" :center="center" :zoom="zoom" @ready="handler" class="bm-view">
             <!-- 自定义点 -->
-            <bm-marker :position="item" :dragging="false" v-for="(item) in linePoint" :key="'linePoint' + item.id" :icon="{url: item.icon, size: {width: 35, height: 35}}" @click="showLineInfo(item)"></bm-marker>
+            <bm-marker :position="item" :dragging="false" v-for="(item) in startPoints" :icon="{url: item.icon, size: {width: 35, height: 35}}"></bm-marker>
             <bm-marker :position="item" :dragging="false" v-for="(item) in alarmPoints" :key="'alarmPoint'+ item.id" :icon="{url: item.icon, size: {width: 35, height: 35}}" @click="showAlarmInfo(item)"></bm-marker>
             <bm-marker :position="item" :dragging="false" v-for="(item) in deviceErrorChannels" :key="item.deviceCode + item.id" :icon="{url: item.icon, size: {width: 35, height: 35}}" @click="showErrorChannelsInfo(item)">></bm-marker>
+            <bm-label v-for="(item) in endPoints" :content="item.channel_code" :position="item" :labelStyle="{border:'0',color: '#fff', fontSize : '16px','border-radius':'30px','background-color':'#0f4a71','width':'25px','height':'25px','line-height':'25px','text-align':'center','vertical-align':'middle'}" />
              <!-- <bm-marker :position="item" :dragging="false" v-for="(item, index) in linePoint" :key="index" :icon="{url: item.icon, size: {width: 35, height: 35}}" @click="handleShowDecInfo(item.id)"></bm-marker>-->
             <!-- <bm-marker :position="item" :dragging="true" v-for="(item, index) in polylinePath" :key="index" :icon="{url: 'https://s1.ax1x.com/2020/08/03/aUAul9.gif', size: {width: 35, height: 35}}"></bm-marker> -->
             <!-- 折线控件 -->
@@ -402,6 +403,7 @@ export default {
       lines: [],
       lines2: [],
       linePoint:[],
+      startPoints:[],
       alarmlines: [],
       lineColor: [],
       showWindow: false,
@@ -467,6 +469,7 @@ export default {
       channelList:[],
       dealResult:0,	
       zhiNengFenYeTableData:[],
+      endPoints:[],
       tableData: [{
             date: '2016-05-02',
             name: '王小虎',
@@ -676,6 +679,7 @@ export default {
             legend: _legend,
             xAxis: [
               {
+            	name:'时间',
                 type: 'category',
                 axisTick: { show: false },
                 data: xData,
@@ -689,6 +693,7 @@ export default {
             ],
             yAxis: [
               {
+            	name:'强度',
                 type: 'value'
               }
             ],
@@ -872,6 +877,12 @@ export default {
    	      		this.deviceList.push({"device_code":it.device_code,"device_name":it.device_name})
    	          })
    	          this.getChannelList();
+   	      	  let startPoint = {};
+ 			  startPoint.lng = this.center.lng
+	          startPoint.lat = this.center.lat
+	          startPoint.type = "start"
+	          startPoint.icon = this.selfImgBaseUrl+"RELhIs.png"
+	          this.startPoints.push(startPoint);
    	        }
    	      })
       },
@@ -886,10 +897,10 @@ export default {
  			 this.channel_code = res.result[0].channels[0].channel_code
  			 this.channel_name = res.result[0].channels[0].channel_name
  	          res.result[0].channels.forEach(it => {
- 	        	  	if(it.channel_name.length > 2){
- 	        	  		it.channel_name = it.channel_name.substr(0,2)
+ 	        	  	if(it.channel_short_name.length > 2){
+ 	        	  		it.channel_short_name = it.channel_short_name.substr(0,2)
  	        	  	}
- 	   	      		this.channelList.push({"channel_code":it.channel_code,"channel_name":it.channel_name})
+ 	   	      		this.channelList.push({"channel_code":it.channel_code,"channel_name":it.channel_name,"channel_short_name":it.channel_short_name})
    	          })
    	          this.showChannel();
  	        }
@@ -908,19 +919,20 @@ export default {
    	 			  this.lines2 = []
    	 			  // let tempObj = {}
    	 			  // tempObj.points = []
-            this.linePoint = []
+            	this.linePoint = []
+   	 			this.endPoints=[]
             // debugger  
 	   	 		  res.result[0].fields.forEach(lineTemp => {
-	   	 			// if(this.linePoint.length == 0){//起点只要一个
-	   	 	    //       let startPoint = {};
-	   	 	    //       startPoint.lng = node.longitude
-	   	 	    //       startPoint.lat = node.latitude
-	   	 	    //       startPoint.filedId = res.result[0].channel_code
-	   	 	    //       startPoint.type = "start"
-	   	 	    //       startPoint.id = res.result[0].channel_code + "start"
-	   	 	    //       startPoint.icon = this.selfImgBaseUrl+"RELhIs.png"
-	   	 	    //       this.linePoint.push(startPoint);
-              //     }
+	   	 			 /* if(this.linePoint.length == 0){//起点只要一个
+	   	 	           let startPoint = {};
+	   	 	           startPoint.lng = node.longitude
+	   	 	           startPoint.lat = node.latitude
+	   	 	           startPoint.filedId = res.result[0].channel_code
+	   	 	           startPoint.type = "start"
+	   	 	           startPoint.id = res.result[0].channel_code + "start"
+	   	 	           startPoint.icon = this.selfImgBaseUrl+"RELhIs.png"
+	   	 	           this.linePoint.push(startPoint);
+                   } */
               let myPoints=[]
               for(var pointIndex=0;pointIndex<lineTemp.nodes.length;pointIndex++){
                 let node=lineTemp.nodes[pointIndex]
@@ -929,17 +941,22 @@ export default {
 		   	        nodeObj.lat = node.latitude
                 nodeObj.order = node.order
                 myPoints.push(nodeObj) 
+              //终点
+				if(pointIndex == lineTemp.nodes.length-1){
+					this.endPoints.push({"channel_code":lineTemp.channel_code,"lng":node.longitude,"lat":node.latitude});
+				}
               }
+                   
               let tempObj = {}
               tempObj.points=myPoints
-	   	        tempObj.channel_code = lineTemp.channel_code
+	   	       tempObj.channel_code = lineTemp.channel_code
               tempObj.name = lineTemp.person_name
               tempObj.head = lineTemp.person_name
               tempObj.phone = lineTemp.phone
               tempObj.device = lineTemp.device_code
               tempObj.lineColor = (that.channel_code==lineTemp.channel_code?'#42b983':NORMAL_COLOR)
 	   	        that.lines2.push(tempObj)
-
+				
 	   	 			// let nodeObj = {}
 		   	    //     nodeObj.lng = node.longitude
 		   	    //     nodeObj.lat = node.latitude
@@ -1164,7 +1181,6 @@ export default {
               alarmPoint.address = it.address
               // alarmPoint.longitude = it.longitude
               // alarmPoint.latitude = it.latitude
-              debugger
               if(it.alarm_level == "严重告警"){
                 alarmPoint.icon = this.selfImgBaseUrl+"RFTa9g.png"
               }else if(it.alarm_level == "中级告警"){
@@ -1234,18 +1250,29 @@ export default {
 	            //   }
               // }
               // if(it.defense_status=='0'){
-                //默认用换色
+                //默认用黄色
                 alarmPoint.icon = this.selfImgBaseUrl+"RFTd3Q.png";
               // }
               if(it.alarm_level == "强告警"){
-                alarmPoint.icon = this.selfImgBaseUrl+"RFTa9g.png"
-              }else if(it.alarm_level == "中告警" || it.alarm_level == "弱告警"){
-                alarmPoint.icon = this.selfImgBaseUrl+"RFTwcj.png"
+            	  if(it.defense_status=='0'){
+            		  alarmPoint.icon = this.selfImgBaseUrl+"cf1.png"
+            	  }else{
+            		  alarmPoint.icon = this.selfImgBaseUrl+"RFTa9g.png"
+            	  }
+                
+              }else if(it.alarm_level == "中告警"){
+            	  if(it.defense_status=='0'){
+            		  alarmPoint.icon = this.selfImgBaseUrl+"cf2.png"
+            	  }else{
+                	alarmPoint.icon = this.selfImgBaseUrl+"RFTwcj.png"
+            	  }
+              }else if(it.alarm_level == "弱告警"){
+            	  if(it.defense_status=='0'){
+            		  alarmPoint.icon = this.selfImgBaseUrl+"cf3.png"
+            	  }else{
+                	alarmPoint.icon = this.selfImgBaseUrl+"RFTd3Q.png"
+            	  }
               }
-              if(it.alarm_level!="强告警" && it.defense_status=='0'){
-                alarmPoint.icon = this.selfImgBaseUrl+"RFTd3Q.png"
-              }
-              console.log(it.alarm_level)
 	            this.alarmPoints.push(alarmPoint);
 	          }
           })
@@ -1437,6 +1464,12 @@ export default {
         console.log(val);
         this.device_code = val;
         this.getChannelList();
+        let startPoint = {};
+		startPoint.lng = this.center.lng
+        startPoint.lat = this.center.lat
+        startPoint.type = "start"
+        startPoint.icon = this.selfImgBaseUrl+"RELhIs.png"
+        this.startPoints.push(startPoint);
       },
       changeChannel(val){
         console.log(val);
@@ -1497,6 +1530,10 @@ export default {
         this.currentLineInfo = it
         this.infoType = 1
         this.showWindow = true
+        this.channel_code = it.channel_code
+        this.channel_name = it.channel_name
+        this.getRealTableData();
+     	this.showChannel();
         this.$forceUpdate()
       }
     },
