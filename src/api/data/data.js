@@ -44,3 +44,10 @@ export function getTimeInfo(query) {
     params: query
   })
 }
+export function alarmTrend(query) {
+  return request({
+      url: '/api/v1/alarm_trend/',
+      method: 'get',
+      params: query
+    })
+}

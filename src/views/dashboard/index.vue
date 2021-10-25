@@ -65,9 +65,10 @@
                   <el-input v-model="deal_remarks" value="2" name="deal_remarks"></el-input>
                 </div>
 				<div class="content-detail">
-					<el-button style="float: left;margin-left: 10px;" @click="saveDealResult()">确定</el-button>
-					<el-button style="float: left;margin-left: 10px;" @click.capture="showWindow = false">放弃</el-button>
-					<el-button style="float: left;margin-left: 10px;" @click="seeWarnData" >波形展示</el-button>
+					<el-button style="float: left;" @click="saveDealResult()">确定</el-button>
+					<el-button style="float: left;margin-left: 5px;" @click.capture="showWindow = false">放弃</el-button>
+					<el-button style="float: left;margin-left: 5px;" @click="seeWarnData" >振动波形</el-button>
+					<el-button style="float: left;margin-left: 5px;" @click="showAlarmTrend" >振动趋势</el-button>
 				</div>
                 <!-- <div class="content-detail"><el-button style="float: right;margin-right: 10px;"  @click="addToWhiteList(currentAlarm.id)">加入白名单</el-button></div> -->
               </div>
@@ -241,13 +242,15 @@
       </div>
     </div>    
 
-    <el-dialog class="zdbxClass"  width="800px" title="振动波形展示" :close-on-click-modal="false" :visible.sync="chuliVisible">
+    <el-dialog class="zdbxClass"  width="800px" :title="echartTitle" :close-on-click-modal="false" :visible.sync="chuliVisible">
       <div :id="id" :class="className" :style="{height:height,width:width}" >
 
         </div>
-      <!-- <div slot="footer" class="dialog-footer">
-        <el-button @click.native.prevent="chuliVisible=false" >关 闭</el-button>
-      </div> -->
+    </el-dialog>
+    <el-dialog class="zdbxClass"  width="800px" :title="echartTitle" :close-on-click-modal="false" :visible.sync="chuliVisible2">
+      <div id="alarmTrendView" :class="className" :style="{height:height,width:width}" >
+
+        </div>
     </el-dialog>
     <el-dialog class="chefangDialog"  width="600px" title="撤防" :close-on-click-modal="false" :visible.sync="chefangVisible">
       <el-form ref="chefangFunForm" :model="chefangFunForm"  >
@@ -322,7 +325,7 @@
 </template>
 
 <script>
-import { queryDataTuBiaoMap,getTimeInfo,queryZhiNengFenYeTuBiao } from '@/api/data/data.js'
+import { queryDataTuBiaoMap,getTimeInfo,queryZhiNengFenYeTuBiao,alarmTrend } from '@/api/data/data.js'
 import { queryArea } from '@/api/area/area.js'
 import { queryAlarm,queryRealTimeAlarm,alertWhite,clearAlarm,queryAlarmCount } from '@/api/alarm/alarm.js'
 import { queryLineDetail,cancelDefenseCRUD } from '@/api/line/line.js'
@@ -393,6 +396,7 @@ export default {
         value1:'',
       },
       chuliVisible:false,
+      chuliVisible2:false,
       fullscreen: false,
       value1: '',
       time: '',
@@ -470,6 +474,7 @@ export default {
       dealResult:0,	
       zhiNengFenYeTableData:[],
       endPoints:[],
+      echartTitle:"",
       tableData: [{
             date: '2016-05-02',
             name: '王小虎',
@@ -679,7 +684,7 @@ export default {
             legend: _legend,
             xAxis: [
               {
-            	name:'时间',
+            	name:'类型',
                 type: 'category',
                 axisTick: { show: false },
                 data: xData,
@@ -693,7 +698,7 @@ export default {
             ],
             yAxis: [
               {
-            	name:'强度',
+            	name:'次数',
                 type: 'value'
               }
             ],
@@ -993,7 +998,7 @@ export default {
     	  
       },
       seeWarnData(){
-        // debugger
+        this.echartTitle = '振动波形'
         this.chuliVisible=true
         queryDataTuBiaoMap({'alert_id':this.currentAlarm.id}).then(res => {
           // debugger
@@ -1014,6 +1019,15 @@ export default {
           }
         })
       },
+      showAlarmTrend(){
+    	  this.echartTitle = '振动趋势'
+          this.chuliVisible2=true
+          alarmTrend({'alert_id':this.currentAlarm.id}).then(res => {
+            if (res.retcode == 200) {
+              this.initAlarmTrendChart(res.x,res.y)
+            }
+          })
+        },
       initChart(xData,yData) {
         this.chart = echarts.init(document.getElementById(this.id))
         this.chart.setOption({
@@ -1032,6 +1046,26 @@ export default {
           ]
         })
       },
+      initAlarmTrendChart(xData,yData) {
+          this.chart = echarts.init(document.getElementById('alarmTrendView'))
+          this.chart.setOption({
+            xAxis: {
+              name: '时间',
+              type: 'category',
+              data: xData
+            },
+            yAxis: {
+              name: '强度',
+              type: 'value'
+            },
+            series: [
+              {
+                data: yData,
+                type: 'line'
+              }
+            ]
+          })
+        },
     // 获取地区数据
     getAreaList() {
       let params = {}
