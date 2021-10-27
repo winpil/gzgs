@@ -22,7 +22,7 @@
               <div class="line-info-title">
                 <span class="title-detail">
                   <span v-if="infoType == 0">断纤信息</span>  
-                  <span v-if="infoType == 1">线路名称：{{channel_name}}</span>
+                  <span v-if="infoType == 1">线路名称：{{currentLineInfo.channel_name}}</span>
                   <span v-if="infoType == 2">告警信息</span>  
                   <span style="position: absolute;right: 10px;" v-if="infoType == 2 && currentAlarm.defense_status==0">已撤防</span>
                   <el-button style="position: absolute;right: 3px;top: 3px;padding: 6px 10px;" v-if="infoType == 2 && currentAlarm.defense_status=='1'" @click="chefangFun">撤防</el-button>
@@ -955,6 +955,7 @@ export default {
               let tempObj = {}
               tempObj.points=myPoints
 	   	       tempObj.channel_code = lineTemp.channel_code
+	   	    tempObj.channel_name = lineTemp.field_name
               tempObj.name = lineTemp.person_name
               tempObj.head = lineTemp.person_name
               tempObj.phone = lineTemp.phone
