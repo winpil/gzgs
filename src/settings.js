@@ -1,5 +1,5 @@
 module.exports = {
-  title: '预警平台网管系统',
+  title: '电力通信光缆及通道的防外力破坏预警软件',
 
   /**
    * @type {boolean} true | false

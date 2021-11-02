@@ -5,9 +5,12 @@
         <img v-if="logo" :src="logo" class="sidebar-logo">
         <h1 v-else class="sidebar-title">{{ title }} </h1>
       </router-link>
-      <router-link v-else key="expand" class="sidebar-logo-link" to="/">
+      <router-link v-else key="expand" class="sidebar-logo-link" to="/" style="margin-left:10px;" align="left">
         <img v-if="logo" :src="logo" class="sidebar-logo">
-        <h1 class="sidebar-title">{{ title }} </h1>
+        <span class="sidebar-title" style="font-size:13px;"> 
+        	<p style="line-height:10px">电力通信光缆及通道的</p>
+        	<p style="line-height:10px">防外力破坏预警软件</p>
+        </span>
       </router-link>
     </transition>
   </div>
@@ -24,7 +27,7 @@ export default {
   },
   data() {
     return {
-      title: '预警平台网管系统',
+      title: '电力通信光缆及通道的防外力破坏预警软件',
       logo: this.selfImgBaseUrl+'69a1c46c-eb1c-4b46-8bd4-e9e686ef5251.png'
     }
   }

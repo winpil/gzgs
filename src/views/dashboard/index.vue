@@ -5,7 +5,7 @@
       <img src="../../assets/img/topleft.png" class="top-left-wrapper" alt="">
       <div class="top-mid-wrapper">
         <img src="../../assets/img/topmid.png" class="f-width f-width">
-        <span class="title-content f-width abs">预警平台网管系统</span>
+        <span class="title-content f-width abs" style="font-size:20px">电力通信光缆及通道的防外力破坏预警软件</span>
       </div>
       <img src="../../assets/img/topright.png" class="top-right-img abs">
       <span style="position: absolute;z-index: 9;color: #23cefd;right: 3%;top: 10%;">{{time}}</span>
@@ -79,11 +79,11 @@
                 {{item.channel_short_name}}
             </a>
           </div>
-          <div :style="{'position': 'absolute', 'z-index': '12','right': '10px', 'top': '10px'}">
+          <div :style="{'position': 'absolute', 'z-index': '12','right': '15px', 'top': '10px'}">
             <el-button @click="zhiNengFenYe()"  >智能分类页</el-button>
           </div>
           <div>
-              <img :src="blinkImg" @click.capture="showDeviceMsg = true" :style="{'position': 'absolute', 'z-index': '12','right': '110px', 'top': '0px'}"/>
+              <img :src="blinkImg" @click.capture="showDeviceMsg = true" :style="{'position': 'absolute', 'z-index': '12','right': '115px', 'top': '0px'}"/>
           </div>
           <!-- 线路信息窗口结束 -->
           <img src="../../assets/img/map.png" class="f-width f-height abs" style="left: 0; top: 0;z-index: 2;" alt="">
