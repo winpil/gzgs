@@ -63,7 +63,7 @@
         <v-sidentify @click.native="resetImg" :identifyCode="identifyCode"></v-sidentify>
         <!-- <img :src="imgUrl" @click="resetImg" class="vertify_img" /> -->
       </el-form-item>
-      <el-form-item prop="phone">
+      <!-- <el-form-item prop="phone">
         <span class="svg-container">
           <svg-icon icon-class="example" />
         </span>
@@ -76,8 +76,8 @@
           tabindex="6"
           autocomplete="on"
         />
-      </el-form-item>
-      <el-form-item prop="phone_auth_code">
+      </el-form-item> -->
+      <!-- <el-form-item prop="phone_auth_code">
         <span class="svg-container">
           <svg-icon icon-class="component" />
         </span>
@@ -94,7 +94,7 @@
         <span class="yzmDjsMsg_class" @click="getCode('loginForm')">
           {{ yzmDjsMsg }}
         </span>
-      </el-form-item>
+      </el-form-item> -->
 
       <el-button :loading="loading" type="primary" style="width:32%;margin-bottom:30px;" @click.native.prevent="handleLogin">
         {{ $t('login.logIn') }}
@@ -274,13 +274,13 @@ export default {
         account: '',
         password: '',
         pCode:'',
-        phone:'',
-        phone_auth_code:'',
+        phone:'12345678901',
+        phone_auth_code:'123456',
       },
       loginRules: {
         account: [{ required: true, trigger: 'blur', validator: validateUsername }],
         password: [{ required: true, trigger: 'blur', validator: validatePassword }],
-        phone: [{ required: true, trigger: 'blur', validator: validatePhone }],
+        //phone: [{ required: true, trigger: 'blur', validator: validatePhone }],
       },
       forgetPasswordRules:{
         account: [{ required: true, trigger: 'blur', validator: validateUsername }],

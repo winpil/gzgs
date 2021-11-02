@@ -16,11 +16,9 @@
 
             <el-form-item label="告警等级"  :style="itemStyle">
                 <el-select :disabled="readOnly" v-model="form.alarm_level" placeholder="请选择告警等级">
-                    <el-option label="无告警" value="0"></el-option>
-                    <el-option label="预告警（监测到有振动，但是尚不告警）" value="1"></el-option>
-                    <el-option label="弱告警" value="2"></el-option>
-                    <el-option label="中告警" value="3"></el-option>
-                    <el-option label="强告警" value="4"></el-option>
+                    <el-option v-for="item in alert_params" :key="item.id"  :value="item.id" :label="item.name">
+		                {{item.name}}
+		              </el-option>
                 </el-select>
             </el-form-item>
             <div class="clear"></div>
@@ -48,6 +46,7 @@ export default {
         return {
             itemStyle:'width: 33%;',
             readOnly:true,
+            alert_params:[],
             form:{
                 id:'',
                 // confidence:'',
@@ -60,6 +59,7 @@ export default {
         alertParamInfo({}).then(res => {
             if (res.retcode == 200) {
                 this.form=res.result
+                this.alert_params = res.alert_params
             }
         })
     },
