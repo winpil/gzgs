@@ -185,11 +185,10 @@
               </el-option>
             </el-select>
           </div> -->
-          <div class="abs f-width user_skills scrollbar" style="top: 5%;height: 100%;">
-            <el-scrollbar style="height:100%">
+          <div class="abs f-width user_skills" style="top: 5%;height: 100%;width: 100%;">
             <el-table
               :data="alarmPoints" @row-click="alarmClick"
-              style="width: 94%;height:84%">
+              style="width: 94%;height:84%" height="350">
               <el-table-column
                 prop="level"
                 align="center"
@@ -208,7 +207,6 @@
                 align="center">
               </el-table-column>
             </el-table>
-            </el-scrollbar>
           </div>
         </div>
         <Modal :show="showModal" :title="modalTitle" @hideModal="hideModal" @submit="submitModal">
@@ -242,15 +240,28 @@
       </div>
     </div>    
 
-    <el-dialog class="zdbxClass"  width="800px" :title="echartTitle" :close-on-click-modal="false" :visible.sync="chuliVisible">
+    <el-dialog class="zdbxClass" :title="echartTitle" :close-on-click-modal="false" :visible.sync="chuliVisible">
       <div :id="id" :class="className" :style="{height:height,width:width}" >
 
         </div>
     </el-dialog>
     <el-dialog class="zdbxClass"  width="800px" :title="echartTitle" :close-on-click-modal="false" :visible.sync="chuliVisible2">
-      <div id="alarmTrendView" :class="className" :style="{height:height,width:width}" >
+    	<el-date-picker style = "background:#fff;margin-left:70px;"
+    	    v-model="defaultTime"
+            value-format="yyyy-MM-dd HH:mm:ss"
+            type="datetimerange"
+            :picker-options="pickerOptions"
+            range-separator="至"
+            start-placeholder="开始日期"
+            end-placeholder="结束日期"
+            align="right">
+        </el-date-picker>
+         <el-button class="filter-item" style="margin-left:50px;" type="primary" icon="el-icon-search" @click="showAlarmTrend">
+          	查询
+        </el-button>
+      <div id="alarmTrendView" :class="className" :style="{height:'400px',width:'700px'}" >
 
-        </div>
+      </div>
     </el-dialog>
     <el-dialog class="chefangDialog"  width="600px" title="撤防" :close-on-click-modal="false" :visible.sync="chefangVisible">
       <el-form ref="chefangFunForm" :model="chefangFunForm"  >
@@ -302,7 +313,7 @@
             </el-table-column>
           </el-table>
         </div>
-        <div style="height:500px;width:1px;">&nbsp;</div>
+        <div style="height:400px;width:1px;">&nbsp;</div>
       <!-- <div slot="footer" class="dialog-footer">
         <el-button @click.native.prevent="zhiNengFenYeVisible=false" >关 闭</el-button>
       </div> -->
@@ -475,6 +486,7 @@ export default {
       zhiNengFenYeTableData:[],
       endPoints:[],
       echartTitle:"",
+      defaultTime:'',
       tableData: [{
             date: '2016-05-02',
             name: '王小虎',
@@ -1022,10 +1034,16 @@ export default {
       },
       showAlarmTrend(){
     	  this.echartTitle = '振动趋势'
-          this.chuliVisible2=true
-          alarmTrend({'alert_id':this.currentAlarm.id}).then(res => {
+    	  if(!this.chuliVisible2){
+    		  this.chuliVisible2=true
+    	  }
+          alarmTrend({'alert_id':this.currentAlarm.id,'start_time':this.defaultTime[0],'end_time':this.defaultTime[1]}).then(res => {
             if (res.retcode == 200) {
-              this.initAlarmTrendChart(res.x,res.y)
+              let _series = [];
+              res.y.forEach(it => {
+            	  _series.push({"data": it,"type": 'line',"color": '#f00'});
+              })
+              this.initAlarmTrendChart(res.x,_series)
             }
           })
         },
@@ -1047,24 +1065,24 @@ export default {
           ]
         })
       },
-      initAlarmTrendChart(xData,yData) {
+      initAlarmTrendChart(xData,_series) {
           this.chart = echarts.init(document.getElementById('alarmTrendView'))
           this.chart.setOption({
             xAxis: {
               name: '时间',
               type: 'category',
+              axisLabel: {  
+            	   interval:0,  
+            	   rotate:40,
+            	   fontSize:8
+            	},
               data: xData
             },
             yAxis: {
               name: '强度',
               type: 'value'
             },
-            series: [
-              {
-                data: yData,
-                type: 'line'
-              }
-            ]
+            series: _series
           })
         },
     // 获取地区数据
@@ -2066,7 +2084,17 @@ export default {
   /deep/ .el-input__inner:focus {
     border: 1px solid #0e7eb5 !important;
   }
+  
+  /deep/ .el-table__body-wrapper::-webkit-scrollbar {
+    width: 6px; 
+    height: 6px;
+  }
 
+  /deep/ .el-table__body-wrapper::-webkit-scrollbar-thumb {
+    background-color: #ddd;
+    border-radius: 3px;
+    background-color: #0f1730;
+  }
  .user_skills{
    margin: auto;
   }
@@ -2153,21 +2181,7 @@ export default {
 .switch-bg.on{
     width: 2.25rem;
 }
-/*滚动条样式*/
-.scrollbar {
-  white-space: nowrap;
-  el-scrollbar {
-    display: flex;
-    justify-content: space-around;
-    padding: 0 10px;
-  }
-  .el-scrollbar__wrap {
-    overflow: scroll;
-    width: 110%;
-    height: 100%;
-  }
 
-}
 .devicePoint{
 	display:inline-table;
 	border-radius:30px;
@@ -2196,7 +2210,6 @@ export default {
   font-size:8px;
   position: sticky;
 }
-
 </style>
 <style lang="scss" >
   .chefangInputClass>.el-input__inner {
