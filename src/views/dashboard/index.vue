@@ -1039,9 +1039,41 @@ export default {
     	  }
           alarmTrend({'alert_id':this.currentAlarm.id,'start_time':this.defaultTime[0],'end_time':this.defaultTime[1]}).then(res => {
             if (res.retcode == 200) {
+            	let flag = true;
               let _series = [];
               res.y.forEach(it => {
-            	  _series.push({"data": it,"type": 'line',"color": '#f00'});
+            	  _series.push({
+			            		  data: it,
+			            		  type: 'line',
+			            		  color: '#f00',
+			            		  itemStyle: {
+									normal: {
+										label: {
+										  formatter:function(data){
+											  let dateStr = [];
+										    if(flag){
+										    	flag = !flag;
+										    	it.forEach((_it,i) => {
+										    		if(_it != null && _it != ""){
+										    			dateStr.push(res.x[i]);
+										    		}
+										    	})
+										    	if(dateStr.length == 2){
+										    		let date1 = new Date(dateStr[0]);
+										    		let date2 = new Date(dateStr[1]);
+										    		return "         " + (date2.getTime()-date1.getTime())/1000 + "s";
+										    	}else{
+										    		return "";
+										    	}
+										    }else{
+										    	flag = !flag;
+										    	return "";
+										    }
+										  },
+											show: true
+										}
+									}
+								}});
               })
               this.initAlarmTrendChart(res.x,_series)
             }
