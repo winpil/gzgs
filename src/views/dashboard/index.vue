@@ -1475,15 +1475,13 @@ export default {
       })
     },
     gettTime() {
-      // let time = new Date()
-      // let timestr = time.toLocaleString()
-      // this.time = timestr
-      getTimeInfo({}).then(res => {
+      this.time = new Date().toLocaleString()
+      /* getTimeInfo({}).then(res => {
         // debugger
         if (res.retcode == 200) {
           this.time = res.result
         }
-      })
+      }) */
     },
 
     handleShowDecInfo(id) {

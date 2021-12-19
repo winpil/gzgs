@@ -46,7 +46,7 @@
           </span>
         </el-form-item>
       </el-tooltip>
-      <el-form-item prop="pcode">
+      <!-- <el-form-item prop="pcode">
         <span class="svg-container">
           <svg-icon icon-class="international" />
         </span>
@@ -61,8 +61,8 @@
           autocomplete="on"
         />
         <v-sidentify @click.native="resetImg" :identifyCode="identifyCode"></v-sidentify>
-        <!-- <img :src="imgUrl" @click="resetImg" class="vertify_img" /> -->
-      </el-form-item>
+        <img :src="imgUrl" @click="resetImg" class="vertify_img" />
+      </el-form-item> -->
       <!-- <el-form-item prop="phone">
         <span class="svg-container">
           <svg-icon icon-class="example" />
@@ -423,7 +423,7 @@ export default {
             this.$refs.phone.focus();
             return;
           }else{
-            if(checkForm=='loginForm' && that.identifyCode!=that.loginForm.pcode){
+            /* if(checkForm=='loginForm' && that.identifyCode!=that.loginForm.pcode){
               this.$message({
                 message: '请输入正确的图片验证码',
                 type: 'warning'
@@ -433,6 +433,7 @@ export default {
             }
             let data={purpose:(checkForm=='loginForm'?1:3),phone:that[checkForm].phone};
             this.tackBtn(data);   //验证码倒数60秒
+        	   */
           }
         })        
     },
