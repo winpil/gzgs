@@ -577,9 +577,10 @@ export default {
       this.getRealTableData()
      }
     }, 1000*60)
+    this.getDeviceInfo();
     setInterval(() => {
       this.getDeviceInfo()//获取设备状态
-    }, 1000)
+    }, 1000 * 60 * 10)
     //设备故障时十分钟提醒一次
     /* setInterval(() => {
       if(this.isDeviceError){
