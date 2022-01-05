@@ -891,16 +891,11 @@ export default {
    	       	  this.center.lng = res.result[0].longitude;
               this.center.lat = res.result[0].latitude;
               this.deviceList = [];
+              
    	      	  res.result.forEach(it => {
    	      		this.deviceList.push({"device_code":it.device_code,"device_name":it.device_name})
    	          })
    	          this.getChannelList();
-   	      	  let startPoint = {};
- 			  startPoint.lng = this.center.lng
-	          startPoint.lat = this.center.lat
-	          startPoint.type = "start"
-	          startPoint.icon = this.selfImgBaseUrl+"RELhIs.png"
-	          this.startPoints.push(startPoint);
    	        }
    	      })
       },
@@ -911,6 +906,14 @@ export default {
    	  console.log(params);
   	  deviceInfo(params).then(res => {
  		  if (res.retcode === 200 && res.result && res.result.length > 0) {
+ 			 this.center.lng = res.result[0].longitude
+ 			 this.center.lat = res.result[0].latitude
+ 			let startPoint = {};
+			  startPoint.lng = this.center.lng
+	          startPoint.lat = this.center.lat
+	          startPoint.type = "start"
+	          startPoint.icon = this.selfImgBaseUrl+"RELhIs.png"
+	          this.startPoints.push(startPoint);
  			  this.channelList = [];
  			 this.channel_code = res.result[0].channels[0].channel_code
  			 this.channel_name = res.result[0].channels[0].channel_name
@@ -1548,6 +1551,7 @@ export default {
         console.log(val);
         this.device_code = val;
         this.getChannelList();
+        this.startPoints = [];
         let startPoint = {};
 		startPoint.lng = this.center.lng
         startPoint.lat = this.center.lat
