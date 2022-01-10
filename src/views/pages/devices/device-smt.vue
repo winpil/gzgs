@@ -334,7 +334,7 @@ export default {
         if (res.retcode === 200) {
           this.list = res.result
           if (this.list && this.list.length > 0) {
-            this.total = this.list.length
+            this.total = res.total
           }
         }
         // Just to simulate the time of the request
@@ -350,7 +350,7 @@ export default {
         if (res.retcode == 200) {
           this.areaList = res.result
           if (this.list && this.list.length > 0) {
-            this.total = this.list.length
+            this.total = res.total
           }
         }
       })
@@ -362,7 +362,7 @@ export default {
         if (res.retcode == 200) {
           this.lineList = res.result
           if (this.list && this.list.length > 0) {
-            this.total = this.list.length
+            this.total = res.total
           }
         }
       })
@@ -374,7 +374,7 @@ export default {
         if (res.retcode == 200) {
           this.gtList = res.result
           if (this.list && this.list.length > 0) {
-            this.total = this.list.length
+            this.total = res.total
           }
         }
       })
