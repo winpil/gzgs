@@ -1342,20 +1342,20 @@ export default {
                 //默认用黄色
                 alarmPoint.icon = this.selfImgBaseUrl+"RFTd3Q.png";
               // }
-              if(it.alarm_level == "强告警"){
+              if(it.alarm_level_code == 2){
             	  if(it.defense_status=='0'){
             		  alarmPoint.icon = this.selfImgBaseUrl+"cf1.png"
             	  }else{
             		  alarmPoint.icon = this.selfImgBaseUrl+"RFTa9g.png"
             	  }
                 
-              }else if(it.alarm_level == "中告警"){
+              }else if(it.alarm_level_code == 1){
             	  if(it.defense_status=='0'){
             		  alarmPoint.icon = this.selfImgBaseUrl+"cf2.png"
             	  }else{
                 	alarmPoint.icon = this.selfImgBaseUrl+"RFTwcj.png"
             	  }
-              }else if(it.alarm_level == "弱告警"){
+              }else if(it.alarm_level_code == 0){
             	  if(it.defense_status=='0'){
             		  alarmPoint.icon = this.selfImgBaseUrl+"cf3.png"
             	  }else{
